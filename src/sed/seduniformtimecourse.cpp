@@ -34,9 +34,9 @@ Strings SedUniformTimeCourse::Impl::validationErrors(const SedModelPtr &pModel) 
 {
     // Make sure that our times are finite and such that initialTime <= outputStartTime < outputEndTime, and that our
     // number of steps is strictly positive.
-    // Note: we are validated both when instantiating a document (see SedSimulation::Impl::isValid()) and when running
-    //       an instance task (see SedInstanceTask::Impl::run()) since our times and number of steps may have been
-    //       changed in between.
+    // Note: we are validated both when instantiating a document (see SedSimulation::Impl::isValid()) and when
+    //       preparing an instance task to be run (see SedInstanceTask::Impl::prepareRun()) since our times and number
+    //       of steps may have been changed in between.
 
     const auto &modelId = pModel->id();
     Strings res;

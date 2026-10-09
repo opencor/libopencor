@@ -452,6 +452,69 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
+  test('Stop run before output start time', async () => {
+    // Note: our output start time is such that it would take our simulation a very long time to reach it, so we are
+    //       guaranteed to stop our run before it gets reached.
+
+    const OUTPUT_START_TIME = 1.0e9;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const instance = document.instantiate();
+
+    // Run our instance so that we have some results.
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+    const voi = instanceTask.voi;
+
+    assert.strictEqual(Number.isNaN(voi[0]), false);
+
+    // Start our run and stop it before it reaches the output start time, which means that we have no results to
+    // report. Our results should therefore not have been reallocated (since their size has not changed), but they
+    // should all be NaN values.
+
+    simulation.outputStartTime = OUTPUT_START_TIME;
+    simulation.outputEndTime = OUTPUT_START_TIME + simulation.numberOfSteps;
+
+    assert.strictEqual(instance.startRun(), true);
+
+    instance.stopRun();
+    instance.waitForRun();
+
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
+    assert.strictEqual(instance.progress, 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+    assert.strictEqual(instanceTask.voi.byteOffset, voi.byteOffset);
+
+    const allNaN = (values) => values.length > 0 && values.every((value) => Number.isNaN(value));
+
+    assert.strictEqual(allNaN(instanceTask.voi), true);
+
+    for (let i = 0; i < instanceTask.stateCount; ++i) {
+      assert.strictEqual(allNaN(instanceTask.state(i)), true);
+      assert.strictEqual(allNaN(instanceTask.rate(i)), true);
+    }
+
+    for (let i = 0; i < instanceTask.constantCount; ++i) {
+      assert.strictEqual(allNaN(instanceTask.constant(i)), true);
+    }
+
+    for (let i = 0; i < instanceTask.computedConstantCount; ++i) {
+      assert.strictEqual(allNaN(instanceTask.computedConstant(i)), true);
+    }
+
+    for (let i = 0; i < instanceTask.algebraicVariableCount; ++i) {
+      assert.strictEqual(allNaN(instanceTask.algebraicVariable(i)), true);
+    }
+  });
+
   test('Pause run and resume run', async () => {
     const SIMULATION_PROPERTY = 1000000;
     const WAIT_ITERATIONS = 60000;
@@ -684,6 +747,41 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
+  test('Start run right after status is idle', async () => {
+    // Note: a run is flagged as not running anymore just before it completes, so make sure that a new run can be
+    //       started as soon as our instance is reported as idle.
+
+    const NUMBER_OF_STEPS = 10;
+    const NUMBER_OF_RUNS = 1000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = NUMBER_OF_STEPS;
+    simulation.outputEndTime = NUMBER_OF_STEPS;
+
+    const instance = document.instantiate();
+
+    for (let i = 0; i < NUMBER_OF_RUNS; ++i) {
+      assert.strictEqual(instance.startRun(), true);
+
+      // Note: the threads of our previous runs can only be cleaned up when we return to the event loop, so we must do
+      //       so or we would eventually run out of memory. We do it here rather than once our run has completed so
+      //       that a new run is still started as soon as our instance is reported as idle.
+
+      await sleep(0);
+
+      while (instance.status !== loc.SedInstance.Status.IDLE) {}
+    }
+
+    assert.ok(instance.waitForRun() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
   test('Start run after previous run completed', async () => {
     const WAIT_ITERATIONS = 60000;
 
@@ -719,6 +817,135 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
     assert.ok(instance.waitForRun() > 0.0);
     assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Results allocated when starting run', () => {
+    // Note: the results of a task must be (re)allocated before startRun() returns, so that they can be safely
+    //       retrieved while the task is being run (e.g., to plot them progressively).
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const instance = document.instantiate();
+
+    // Run our instance so that our results get allocated.
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+    const numberOfSteps = simulation.numberOfSteps;
+
+    assert.strictEqual(instanceTask.voi.length, numberOfSteps + 1);
+
+    // Change the size of our results and start running our instance, which means that our results must have been
+    // reallocated by the time startRun() returns and that they must remain valid for the whole run.
+
+    simulation.numberOfSteps = 2 * numberOfSteps;
+
+    assert.strictEqual(instance.startRun(), true);
+
+    const voi = instanceTask.voi;
+    const state = instanceTask.state(0);
+
+    assert.strictEqual(voi.length, 2 * numberOfSteps + 1);
+    assert.strictEqual(state.length, 2 * numberOfSteps + 1);
+
+    // Retrieve our results while our instance is running. They should always be the same arrays and they should never
+    // contain any NaN values (our results are either not yet computed, i.e. zeros, or computed).
+
+    while (instance.status !== loc.SedInstance.Status.IDLE) {
+      assert.strictEqual(instanceTask.voi.byteOffset, voi.byteOffset);
+      assert.strictEqual(instanceTask.state(0).byteOffset, state.byteOffset);
+      assert.strictEqual(
+        voi.some((value) => Number.isNaN(value)),
+        false
+      );
+      assert.strictEqual(
+        state.some((value) => Number.isNaN(value)),
+        false
+      );
+    }
+
+    assert.ok(instance.waitForRun() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+    assert.strictEqual(instance.progress, 1.0);
+    assert.strictEqual(instanceTask.voi.byteOffset, voi.byteOffset);
+    assert.strictEqual(instanceTask.state(0).byteOffset, state.byteOffset);
+    assert.strictEqual(voi[voi.length - 1], simulation.outputEndTime);
+    assert.strictEqual(Number.isNaN(state[state.length - 1]), false);
+  });
+
+  test('Simulation settings used when starting run', () => {
+    // Note: the simulation settings used by a run are those in effect when the run is started, even if they get
+    //       changed while the run is in progress.
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const instance = document.instantiate();
+    const outputEndTime = simulation.outputEndTime;
+    const numberOfSteps = simulation.numberOfSteps;
+
+    assert.strictEqual(instance.startRun(), true);
+
+    simulation.outputEndTime = 2.0 * outputEndTime;
+    simulation.numberOfSteps = 2 * numberOfSteps;
+
+    assert.ok(instance.waitForRun() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+    const voi = instanceTask.voi;
+
+    assert.strictEqual(voi.length, numberOfSteps + 1);
+    assert.strictEqual(voi[voi.length - 1], outputEndTime);
+
+    // Running our instance again should use our new simulation settings.
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    assert.strictEqual(instanceTask.voi.length, 2 * numberOfSteps + 1);
+    assert.strictEqual(instanceTask.voi[instanceTask.voi.length - 1], 2.0 * outputEndTime);
+  });
+
+  test('Run while asynchronous run in progress', () => {
+    // Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to
+    //       complete before running the instance again.
+
+    const MODERATE_STEP_COUNT = 10000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = MODERATE_STEP_COUNT;
+    simulation.outputEndTime = MODERATE_STEP_COUNT;
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
+    assert.strictEqual(instance.progress, 1.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+    const voi = instanceTask.voi;
+
+    assert.strictEqual(voi.length, MODERATE_STEP_COUNT + 1);
+    assert.strictEqual(voi[voi.length - 1], MODERATE_STEP_COUNT);
+    assert.strictEqual(Number.isNaN(instanceTask.state(0)[voi.length - 1]), false);
   });
 
   test('ODE model', () => {
@@ -1424,10 +1651,25 @@ test.describe('Sed instance tests', () => {
     const instance = new loc.SedDocument(file).instantiate();
 
     assert.strictEqual(instance.hasIssues, false);
-
-    instance.run();
-
+    assert.strictEqual(instance.run(), 0.0);
     assert.strictEqual(instance.hasIssues, true);
+
+    // Our simulation failed before reaching its output start time, so we have no results to report, i.e. our results
+    // should all be NaN values.
+
+    const instanceTask = instance.tasks[0];
+    const voi = instanceTask.voi;
+    const state = instanceTask.state(0);
+
+    assert.ok(voi.length > 0);
+    assert.strictEqual(
+      voi.every((value) => Number.isNaN(value)),
+      true
+    );
+    assert.strictEqual(
+      state.every((value) => Number.isNaN(value)),
+      true
+    );
   });
 
   test('Changes to variables used to initialise other variables', () => {

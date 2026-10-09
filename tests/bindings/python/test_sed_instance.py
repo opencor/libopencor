@@ -401,6 +401,66 @@ def test_pause_run_right_after_start_run():
     assert not instance.has_issues
 
 
+def test_stop_run_before_output_start_time():
+    # Note: our output start time is such that it would take our simulation a very long time to reach it, so we are
+    #       guaranteed to stop our run before it gets reached.
+
+    OUTPUT_START_TIME = 1.0e9
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    instance = document.instantiate()
+
+    # Run our instance so that we have some results.
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+
+    assert not math.isnan(voi[0])
+
+    # Start our run and stop it before it reaches the output start time, which means that we have no results to
+    # report. Our results should therefore not have been reallocated (since their size has not changed), but they
+    # should all be NaN values.
+
+    simulation.output_start_time = OUTPUT_START_TIME
+    simulation.output_end_time = OUTPUT_START_TIME + float(simulation.number_of_steps)
+
+    assert instance.start_run() is True
+
+    instance.stop_run()
+    instance.wait_for_run()
+
+    assert instance.status == loc.SedInstance.Status.Idle
+    assert instance.progress == 0.0
+    assert not instance.has_issues
+    assert (
+        voi.__array_interface__["data"][0]
+        == instance_task.voi.__array_interface__["data"][0]
+    )
+
+    def all_nan(values):
+        return len(values) > 0 and all(math.isnan(value) for value in values)
+
+    assert all_nan(instance_task.voi)
+
+    for i in range(instance_task.state_count):
+        assert all_nan(instance_task.state(i))
+        assert all_nan(instance_task.rate(i))
+
+    for i in range(instance_task.constant_count):
+        assert all_nan(instance_task.constant(i))
+
+    for i in range(instance_task.computed_constant_count):
+        assert all_nan(instance_task.computed_constant(i))
+
+    for i in range(instance_task.algebraic_variable_count):
+        assert all_nan(instance_task.algebraic_variable(i))
+
+
 def test_pause_run_and_resume_run():
     SIMULATION_PROPERTY = 1000000
     WAIT_ITERATIONS = 60000
@@ -596,6 +656,32 @@ def test_start_run_while_already_running():
     assert not instance.has_issues
 
 
+def test_start_run_right_after_status_is_idle():
+    # Note: a run is flagged as not running anymore just before it completes, so make sure that a new run can be
+    #       started as soon as our instance is reported as idle.
+
+    NUMBER_OF_STEPS = 10
+    NUMBER_OF_RUNS = 1000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.number_of_steps = NUMBER_OF_STEPS
+    simulation.output_end_time = float(NUMBER_OF_STEPS)
+
+    instance = document.instantiate()
+
+    for _ in range(NUMBER_OF_RUNS):
+        assert instance.start_run() is True
+
+        while instance.status != loc.SedInstance.Status.Idle:
+            pass
+
+    assert instance.wait_for_run() > 0.0
+    assert not instance.has_issues
+
+
 def test_start_run_after_previous_run_completed():
     WAIT_ITERATIONS = 60000
 
@@ -656,6 +742,131 @@ def run_ode_model():
     instance.run()
 
     assert not instance.has_issues
+
+
+def test_results_allocated_when_starting_run():
+    # Note: the results of a task must be (re)allocated before start_run() returns, so that they can be safely retrieved
+    #       while the task is being run (e.g., to plot them progressively).
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    instance = document.instantiate()
+
+    # Run our instance so that our results get allocated.
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    number_of_steps = simulation.number_of_steps
+
+    assert len(instance_task.voi) == number_of_steps + 1
+
+    # Change the size of our results and start running our instance, which means that our results must have been
+    # reallocated by the time start_run() returns and that they must remain valid for the whole run.
+
+    simulation.number_of_steps = 2 * number_of_steps
+
+    assert instance.start_run() is True
+
+    voi = instance_task.voi
+    state = instance_task.state(0)
+
+    assert len(voi) == 2 * number_of_steps + 1
+    assert len(state) == 2 * number_of_steps + 1
+
+    # Retrieve our results while our instance is running. They should always be the same arrays and they should never
+    # contain any NaN values (our results are either not yet computed, i.e. zeros, or computed).
+
+    while instance.status != loc.SedInstance.Status.Idle:
+        assert (
+            instance_task.voi.__array_interface__["data"][0]
+            == voi.__array_interface__["data"][0]
+        )
+        assert (
+            instance_task.state(0).__array_interface__["data"][0]
+            == state.__array_interface__["data"][0]
+        )
+        assert not any(math.isnan(value) for value in voi)
+        assert not any(math.isnan(value) for value in state)
+
+    assert instance.wait_for_run() > 0.0
+    assert not instance.has_issues
+    assert instance.progress == 1.0
+    assert (
+        voi.__array_interface__["data"][0]
+        == instance_task.voi.__array_interface__["data"][0]
+    )
+    assert (
+        state.__array_interface__["data"][0]
+        == instance_task.state(0).__array_interface__["data"][0]
+    )
+    assert voi[-1] == simulation.output_end_time
+    assert not math.isnan(state[-1])
+
+
+def test_simulation_settings_used_when_starting_run():
+    # Note: the simulation settings used by a run are those in effect when the run is started, even if they get changed
+    #       while the run is in progress.
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    instance = document.instantiate()
+    output_end_time = simulation.output_end_time
+    number_of_steps = simulation.number_of_steps
+
+    assert instance.start_run() is True
+
+    simulation.output_end_time = 2.0 * output_end_time
+    simulation.number_of_steps = 2 * number_of_steps
+
+    assert instance.wait_for_run() > 0.0
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+
+    assert len(voi) == number_of_steps + 1
+    assert voi[-1] == output_end_time
+
+    # Running our instance again should use our new simulation settings.
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    assert len(instance_task.voi) == 2 * number_of_steps + 1
+    assert instance_task.voi[-1] == 2.0 * output_end_time
+
+
+def test_run_while_asynchronous_run_in_progress():
+    # Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to
+    #       complete before running the instance again.
+
+    MODERATE_STEP_COUNT = 10000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.number_of_steps = MODERATE_STEP_COUNT
+    simulation.output_end_time = float(MODERATE_STEP_COUNT)
+
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+    assert instance.run() > 0.0
+    assert instance.status == loc.SedInstance.Status.Idle
+    assert instance.progress == 1.0
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+
+    assert len(voi) == MODERATE_STEP_COUNT + 1
+    assert voi[-1] == float(MODERATE_STEP_COUNT)
+    assert not math.isnan(instance_task.state(0)[-1])
 
 
 def test_ode_model():
@@ -1299,10 +1510,19 @@ def test_simulation_with_initial_time_failing():
     instance = document.instantiate()
 
     assert not instance.has_issues
-
-    instance.run()
-
+    assert instance.run() == 0.0
     assert instance.has_issues
+
+    # Our simulation failed before reaching its output start time, so we have no results to report, i.e. our results
+    # should all be NaN values.
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+    state = instance_task.state(0)
+
+    assert len(voi) > 0
+    assert all(math.isnan(value) for value in voi)
+    assert all(math.isnan(value) for value in state)
 
 
 def test_changes_to_variables_used_to_initialise_other_variables():

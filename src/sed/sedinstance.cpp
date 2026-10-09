@@ -21,17 +21,10 @@ limitations under the License.
 #include "libopencor/seddocument.h"
 
 #include <atomic>
-#include <chrono>
 #include <exception>
 #include <memory>
 
 namespace libOpenCOR {
-
-namespace {
-
-constexpr auto ZERO_WAIT {std::chrono::milliseconds {0}};
-
-} // namespace
 
 SedInstancePtr SedInstance::Impl::create(const SedDocumentPtr &pDocument)
 {
@@ -105,8 +98,12 @@ SedInstance::Status SedInstance::Impl::status() const
     return Status::RUNNING;
 }
 
-double SedInstance::Impl::run()
+void SedInstance::Impl::prepareRun()
 {
+    // Note: we are called from the thread that runs us or that starts running us (see run() and startRun()), i.e.
+    //       before our tasks actually get run. This means that our issues are reset and the results of our tasks
+    //       (re)allocated before our tasks get run, so that they can be safely retrieved while our tasks are being run.
+
     // Reset ourselves by restoring the issues of all the tasks.
     // Note: the clearing of mIssues, mErrors, and mWarnings could be done using removeAllIssues(), but this would
     //       result in transiently-empty issues, which could be seen by a reader. So, instead, we just clear and restore
@@ -131,10 +128,9 @@ double SedInstance::Impl::run()
     }
 
     // Make sure that our control flags are passed to each task so that they can be used by them.
-    // Note: our control flags are reset by our callers (see SedInstance::run() and startRun()) rather than here.
-    //       Indeed, when called from startRun(), we are run on a separate thread, i.e. some time after startRun() has
-    //       returned. So, if we were to reset our control flags here, a stop or pause requested in between would be
-    //       lost.
+    // Note: our control flags are reset by our callers (see run() and startRun()) rather than here. Indeed, they are
+    //       reset before a run is started and they must not be reset afterwards, or a stop or pause requested in
+    //       between would be lost.
 
     for (const auto &task : mTasks) {
         task->pimpl()->mRunControl = &mRunControl;
@@ -143,23 +139,23 @@ double SedInstance::Impl::run()
         task->pimpl()->mPauseConditionVariable = &mPauseConditionVariable;
     }
 
-    // Run all the tasks associated with this instance unless they have some issues.
+    // Prepare all the tasks associated with this instance to be run unless they have some issues.
     // Note: a task may throw an exception (e.g., std::bad_alloc if its results cannot be allocated), in which case we
-    //       report it as an error rather than let it escape. Indeed, run() may be called from startRun(), i.e. on a
-    //       separate thread, and an escaping exception would leave us in a state from which we cannot recover. Also,
-    //       we have no way to trigger such an exception in our tests, hence we ignore our try...catch statement during
-    //       code coverage.
+    //       report it as an error rather than let it escape and we don't run any of our tasks. We have no way to
+    //       trigger such an exception in our tests, hence we ignore our try...catch statement during code coverage.
 
-    auto res {0.0};
+    mTasksToRun.clear();
 
 #ifndef CODE_COVERAGE_ENABLED
     try {
 #endif
+        mTasksToRun.reserve(mTasks.size());
+
         for (const auto &task : mTasks) {
             if (!task->hasIssues()) {
-                res += task->pimpl()->run();
-
-                if (task->hasIssues()) {
+                if (task->pimpl()->prepareRun()) {
+                    mTasksToRun.push_back(task);
+                } else {
                     addIssues(task, "Task");
 
                     // Reset the issues of the task so that they are not reported again should the instance be run
@@ -167,6 +163,43 @@ double SedInstance::Impl::run()
 
                     task->pimpl()->removeAllIssues();
                 }
+            }
+        }
+#ifndef CODE_COVERAGE_ENABLED
+    } catch (const std::exception &exception) {
+        mTasksToRun.clear();
+
+        addError(std::string("The simulation failed: ") + exception.what() + ".");
+    } catch (...) {
+        mTasksToRun.clear();
+
+        addError("The simulation failed.");
+    }
+#endif
+}
+
+double SedInstance::Impl::executeRun()
+{
+    // Run all the tasks that were prepared to be run (see prepareRun()).
+    // Note: a task may throw an exception, in which case we report it as an error rather than let it escape. Indeed, we
+    //       may be called from startRun(), i.e. on a separate thread, and an escaping exception would leave us in a
+    //       state from which we cannot recover. Also, we have no way to trigger such an exception in our tests, hence
+    //       we ignore our try...catch statement during code coverage.
+
+    auto res {0.0};
+
+#ifndef CODE_COVERAGE_ENABLED
+    try {
+#endif
+        for (const auto &task : mTasksToRun) {
+            res += task->pimpl()->run();
+
+            if (task->hasIssues()) {
+                addIssues(task, "Task");
+
+                // Reset the issues of the task so that they are not reported again should the instance be run again.
+
+                task->pimpl()->removeAllIssues();
             }
         }
 #ifndef CODE_COVERAGE_ENABLED
@@ -179,6 +212,8 @@ double SedInstance::Impl::run()
 
     // Reset and make sure that our control flags are no longer passed to each task.
 
+    mTasksToRun.clear();
+
     for (const auto &task : mTasks) {
         task->pimpl()->mRunControl = nullptr;
 
@@ -189,28 +224,70 @@ double SedInstance::Impl::run()
     return res;
 }
 
+double SedInstance::Impl::run()
+{
+    const std::scoped_lock<std::mutex> runLock(mRunMutex);
+
+    // Wait for any asynchronous run to complete since our tasks cannot be run while they are already being run.
+
+    if (mRunFuture.valid()) {
+        mLastRunElapsedTime.store(mRunFuture.get(), std::memory_order_relaxed);
+    }
+
+    // Reset our control flags (see the note in prepareRun()).
+
+    mRunControl.store(INSTANCE_RUN_CONTROL_NONE, std::memory_order_relaxed);
+
+    // Prepare and execute our run, making sure that we are flagged as running while doing so, and as not running
+    // anymore once done, even if an exception is thrown.
+
+    prepareRun();
+
+    mRunning.store(true, std::memory_order_release);
+
+    auto resetRunning = [](std::atomic<bool> *pRunning) {
+        pRunning->store(false, std::memory_order_release);
+    };
+    const std::unique_ptr<std::atomic<bool>, decltype(resetRunning)> runningGuard {&mRunning, resetRunning};
+
+    return executeRun();
+}
+
 bool SedInstance::Impl::startRun()
 {
     const std::scoped_lock<std::mutex> runLock(mRunMutex);
 
+    // Make sure that no run is in progress and, if a previous run is done, retrieve its elapsed time.
+    // Note: our previous run is flagged as not running anymore just before its future becomes ready (see below), so we
+    //       check whether we are running rather than whether our future is ready. Otherwise, a caller that waited for
+    //       status() to be IDLE before calling us might be told that a run is still in progress. This means that
+    //       retrieving the elapsed time of our previous run may require waiting for its future to become ready, but
+    //       only for the very short time that it takes for our previous run to complete.
+
     if (mRunFuture.valid()) {
-        if (mRunFuture.wait_for(ZERO_WAIT) != std::future_status::ready) {
+        if (mRunning.load(std::memory_order_acquire)) {
             return false;
         }
 
         mLastRunElapsedTime.store(mRunFuture.get(), std::memory_order_relaxed);
     }
 
-    // Reset our control flags (see the note in run()).
+    // Reset our control flags (see the note in prepareRun()).
 
     mRunControl.store(INSTANCE_RUN_CONTROL_NONE, std::memory_order_relaxed);
 
+    // Prepare our run.
+    // Note: this must be done here rather than on the separate thread below so that the results of our tasks are
+    //       (re)allocated before we return, i.e. so that they can be safely retrieved as soon as we return.
+
+    prepareRun();
+
     mRunning.store(true, std::memory_order_release);
 
-    // Start our run in a separate thread.
-    // Note #1: we must be flagged as not running anymore once our run is done, even if run() throws an exception (it
-    //          reports a failure as an issue, but it might still throw, e.g., std::bad_alloc when restoring our
-    //          issues), hence we use a guard to do so. Otherwise, we would be stuck in RUNNING.
+    // Execute our run in a separate thread.
+    // Note #1: we must be flagged as not running anymore once our run is done, even if executeRun() throws an exception
+    //          (it reports a failure as an issue, but it might still throw, e.g., std::bad_alloc when adding an issue),
+    //          hence we use a guard to do so. Otherwise, we would be stuck in RUNNING.
     // Note #2: std::async() may throw an exception (e.g., std::system_error if no thread could be created), in which
     //          case we must also be flagged as not running anymore. We have no way to trigger such an exception in our
     //          tests, hence we ignore our try...catch statement during code coverage.
@@ -224,7 +301,7 @@ bool SedInstance::Impl::startRun()
             };
             const std::unique_ptr<std::atomic<bool>, decltype(resetRunning)> runningGuard {&mRunning, resetRunning};
 
-            return run();
+            return executeRun();
         });
 #ifndef CODE_COVERAGE_ENABLED
     } catch (...) {
@@ -368,10 +445,6 @@ SedInstance::Status SedInstance::status() const noexcept
 
 double SedInstance::run()
 {
-    // Reset our control flags (see the note in SedInstance::Impl::run()).
-
-    pimpl()->mRunControl.store(INSTANCE_RUN_CONTROL_NONE, std::memory_order_relaxed);
-
     return pimpl()->run();
 }
 

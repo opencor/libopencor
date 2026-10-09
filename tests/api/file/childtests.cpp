@@ -89,8 +89,8 @@ TEST(ChildFileTest, remoteVirtualCombineArchives)
     auto simulationFile135 {file135->childFile("simulation.json")};
     auto simulationFile157 {file157->childFile("simulation.json")};
 
-    ASSERT_NE(simulationFile135, nullptr);
-    ASSERT_NE(simulationFile157, nullptr);
+    GTEST_ASSERT_NE(simulationFile135, nullptr);
+    GTEST_ASSERT_NE(simulationFile157, nullptr);
     EXPECT_NE(simulationFile135, simulationFile157);
     EXPECT_EQ(libOpenCOR::toString(simulationFile135->contents()), libOpenCOR::textFileContents(libOpenCOR::resourcePath("api/file/dataset_135.json")));
     EXPECT_EQ(libOpenCOR::toString(simulationFile157->contents()), libOpenCOR::textFileContents(libOpenCOR::resourcePath("api/file/dataset_157.json")));
@@ -106,7 +106,7 @@ TEST(ChildFileTest, remoteCombineArchive)
     auto simulationFile {file->childFile("simulation.json")};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
-    ASSERT_NE(simulationFile, nullptr);
+    GTEST_ASSERT_NE(simulationFile, nullptr);
     EXPECT_EQ(libOpenCOR::toString(simulationFile->contents()), libOpenCOR::textFileContents(libOpenCOR::resourcePath("api/file/dataset_135.json")));
 }
 

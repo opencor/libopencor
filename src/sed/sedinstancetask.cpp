@@ -98,6 +98,13 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
     ASSERT_EQ(mDifferentialModel, (mSedUniformTimeCourse != nullptr));
 
+    // Keep track of our initial time since it is needed to initialise ourselves (see initialise()).
+    // Note: our other times and our number of steps are only needed when running ourselves (see prepareRun()).
+
+    if (mDifferentialModel) {
+        mInitialTime = mSedUniformTimeCourse->pimpl()->mInitialTime;
+    }
+
     const auto &odeSolver {mSimulation->odeSolver()};
     const auto &nlaSolver {mSimulation->nlaSolver()};
 
@@ -261,6 +268,54 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     }
 }
 
+void SedInstanceTask::Impl::allocateResults(size_t pResultsSize)
+{
+    // Allocate our results, but only if their size has changed.
+    // Note #1: we only (re)allocate our results if their size has changed. This avoids needless allocations, but it
+    //          also means that our results remain where they are in memory, which matters since our Python bindings
+    //          return zero-copy NumPy arrays.
+    // Note #2: when (re)allocating our results, we release our previous results first (to limit our peak memory usage)
+    //          and only then allocate our new results, which we do into a local structure that we move into ours once
+    //          all of its arrays have been allocated. This means that should an allocation fail (e.g., std::bad_alloc),
+    //          our results structure would be left empty rather than with an inconsistent results size and arrays of
+    //          mismatched sizes (which would result in out-of-bounds accesses when retrieving our results).
+    // Note #3: on a 32-bit platform (e.g., WebAssembly), the size of an array may overflow (e.g., with many constants
+    //          and a large number of steps), in which case we would allocate an array that is too small for our
+    //          results, hence we check for it. We cannot trigger such an overflow on a 64-bit platform, so we ignore
+    //          our check during code coverage.
+
+    if (mResults.resultsSize == pResultsSize) {
+        return;
+    }
+
+    mResults = {};
+
+    auto arraySize = [pResultsSize](size_t pCount) {
+#ifndef CODE_COVERAGE_ENABLED
+        if ((pCount != 0) && (pResultsSize > (std::numeric_limits<size_t>::max() / pCount))) {
+            throw std::length_error("the results are too large to be allocated");
+        }
+#endif
+
+        return pCount * pResultsSize;
+    };
+    SedInstanceTaskResults results;
+
+    results.resultsSize = pResultsSize;
+
+    if (mDifferentialModel) {
+        results.voi.resize(pResultsSize);
+    }
+
+    results.states.resize(arraySize(mStateCount));
+    results.rates.resize(arraySize(mStateCount));
+    results.constants.resize(arraySize(mConstantCount));
+    results.computedConstants.resize(arraySize(mComputedConstantCount));
+    results.algebraicVariables.resize(arraySize(mAlgebraicVariableCount));
+
+    mResults = std::move(results);
+}
+
 void SedInstanceTask::Impl::trackResults(size_t pIndex)
 {
     mResults.voi[pIndex] = mVoi;
@@ -281,6 +336,31 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
     for (size_t i {0}; i < mAlgebraicVariableCount; ++i) {
         mResults.algebraicVariables[i * mResults.resultsSize + pIndex] = mAlgebraicVariables[i]; // NOLINT
     }
+}
+
+void SedInstanceTask::Impl::nanFillResults(size_t pFromIndex)
+{
+    // Fill our results with NaN values from the given index onwards.
+
+    auto nanFillRowTails = [pFromIndex, this](Doubles &pResults, size_t pCount) {
+        for (size_t i {0}; i < pCount; ++i) {
+            const auto rowStart {i * mResults.resultsSize};
+
+            std::fill(pResults.begin() + static_cast<std::ptrdiff_t>(rowStart + pFromIndex),
+                      pResults.begin() + static_cast<std::ptrdiff_t>(rowStart + mResults.resultsSize),
+                      NAN);
+        }
+    };
+
+    std::fill(mResults.voi.begin() + static_cast<std::ptrdiff_t>(pFromIndex),
+              mResults.voi.end(),
+              NAN);
+
+    nanFillRowTails(mResults.states, mStateCount);
+    nanFillRowTails(mResults.rates, mStateCount);
+    nanFillRowTails(mResults.constants, mConstantCount);
+    nanFillRowTails(mResults.computedConstants, mComputedConstantCount);
+    nanFillRowTails(mResults.algebraicVariables, mAlgebraicVariableCount);
 }
 
 void SedInstanceTask::Impl::applyChanges()
@@ -358,7 +438,7 @@ void SedInstanceTask::Impl::initialise()
     // initialise our variables and compute computed constants and variables.
 
     if (mSedUniformTimeCourse != nullptr) {
-        mVoi = mSedUniformTimeCourse->pimpl()->mInitialTime;
+        mVoi = mInitialTime;
 
         mRuntime->initialiseArraysForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
     } else {
@@ -410,29 +490,9 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
     // reaching the end of our simulation.
 
     auto guard = [this, &index, pTrackResults]() {
-        if (!pTrackResults) {
-            return;
+        if (pTrackResults) {
+            nanFillResults(index + 1);
         }
-
-        auto nanFillRowTails = [index, this](Doubles &pResults, size_t pCount) {
-            for (size_t i {0}; i < pCount; ++i) {
-                const auto rowStart {i * mResults.resultsSize};
-
-                std::fill(pResults.begin() + static_cast<std::ptrdiff_t>(rowStart + index + 1),
-                          pResults.begin() + static_cast<std::ptrdiff_t>(std::min(rowStart + mResults.resultsSize, pResults.size())),
-                          NAN);
-            }
-        };
-
-        std::fill(mResults.voi.begin() + static_cast<std::ptrdiff_t>(index + 1),
-                  mResults.voi.end(),
-                  NAN);
-
-        nanFillRowTails(mResults.states, mStateCount);
-        nanFillRowTails(mResults.rates, mStateCount);
-        nanFillRowTails(mResults.constants, mConstantCount);
-        nanFillRowTails(mResults.computedConstants, mComputedConstantCount);
-        nanFillRowTails(mResults.algebraicVariables, mAlgebraicVariableCount);
     };
 
     // Compute the differential model.
@@ -534,24 +594,26 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
     }
 }
 
-double SedInstanceTask::Impl::run()
+bool SedInstanceTask::Impl::prepareRun()
 {
-    // Start our timer.
-
-    auto startTime {std::chrono::high_resolution_clock::now()};
+    // Prepare ourselves to be run.
+    // Note: we are called from the thread that runs us or that starts running us (see SedInstance::Impl::prepareRun()),
+    //       i.e. before we actually get run. This means that our results are (re)allocated before we get run, so that
+    //       they can be safely retrieved while we are being run (e.g., to plot them progressively). This also means
+    //       that our simulation settings are those that were in effect when we were asked to be run, even if they get
+    //       changed while we are being run.
 
     // Reset our progress counters.
 
     mCompletedSteps.store(0, std::memory_order_relaxed);
     mTotalSteps.store(0, std::memory_order_relaxed);
 
-    // Make sure that our simulation is valid.
+    // Make sure that our simulation is valid, if needed, and keep track of its settings.
     // Note: our simulation was validated when we were instantiated (see SedSimulation::Impl::isValid()), but its times
     //       and/or number of steps may have been changed since then.
 
-    const auto *sedUniformTimeCoursePimpl {mDifferentialModel ? mSedUniformTimeCourse->pimpl() : nullptr};
-
     if (mDifferentialModel) {
+        const auto *sedUniformTimeCoursePimpl {mSedUniformTimeCourse->pimpl()};
         const auto errors {sedUniformTimeCoursePimpl->validationErrors(mModel)};
 
         if (!errors.empty()) {
@@ -559,97 +621,88 @@ double SedInstanceTask::Impl::run()
                 addIssue(Issue::Type::ERROR, error, "Simulation");
             }
 
-            return 0.0;
+            return false;
         }
+
+        mInitialTime = sedUniformTimeCoursePimpl->mInitialTime;
+        mOutputStartTime = sedUniformTimeCoursePimpl->mOutputStartTime;
+        mOutputEndTime = sedUniformTimeCoursePimpl->mOutputEndTime;
+        mNumberOfSteps = static_cast<size_t>(sedUniformTimeCoursePimpl->mNumberOfSteps);
+    } else {
+        mNumberOfSteps = 1;
     }
 
+    // (Re)allocate our results, if needed.
+    // Note: our results include our initial point, hence a differential model has one more result than its number of
+    //       steps.
+
+    allocateResults(mDifferentialModel ? mNumberOfSteps + 1 : 1);
+
     // Set our total number of steps.
-    // Note: we retrieve our number of steps only once since it is used in several places below.
 
-    const auto numberOfSteps {mDifferentialModel ? sedUniformTimeCoursePimpl->mNumberOfSteps : 1};
-    const auto totalSteps {static_cast<size_t>(numberOfSteps)};
+    mTotalSteps.store(mNumberOfSteps, std::memory_order_relaxed);
 
-    mTotalSteps.store(totalSteps, std::memory_order_relaxed);
+    return true;
+}
+
+double SedInstanceTask::Impl::run()
+{
+    // Note: we must have been prepared to be run (see prepareRun()).
+
+    // Start our timer.
+
+    auto startTime {std::chrono::high_resolution_clock::now()};
 
     // (Re)initialise our model.
     // Note: reinitialise our model because we initialised it when we created the instance task.
 
     initialise();
 
+    // Make sure that our model could be (re)initialised. It may not be possible, e.g., if an NLA system cannot be
+    // solved at our initial time (which may have been changed since we were created), in which case we have no results
+    // to report. Also, we must not go any further since our ODE solver, if any, may not have been (re)initialised.
+
+    if (hasIssues()) {
+        nanFillResults(0);
+
+        return 0.0;
+    }
+
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
     if (mDifferentialModel) {
         // Run our simulation from the initial time to the output start time, without tracking our results, but only if
         // the output start time is after the initial time.
+        // Note: should our simulation fail or be stopped before reaching the output start time, we have no results to
+        //       report, hence we fill all of them with NaN values (rather than leave our previous results, if any, or
+        //       our newly allocated ones, which are all zeros).
 
-        const auto voiInterval {(sedUniformTimeCoursePimpl->mOutputEndTime - sedUniformTimeCoursePimpl->mOutputStartTime) / numberOfSteps};
+        const auto voiInterval {(mOutputEndTime - mOutputStartTime) / static_cast<double>(mNumberOfSteps)};
 
-        if (!fuzzyCompare(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime)) {
-            run(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime, voiInterval, false);
+        if (!fuzzyCompare(mInitialTime, mOutputStartTime)) {
+            run(mInitialTime, mOutputStartTime, voiInterval, false);
+
+            if (hasIssues()) {
+                nanFillResults(0);
+
+                return 0.0;
+            }
+        }
+
+        // Run our simulation from the output start time to the output end time, tracking our results, unless we have
+        // already been asked to stop.
+
+        if ((mRunControl->load(std::memory_order_relaxed) & INSTANCE_RUN_CONTROL_STOP) != 0) {
+            nanFillResults(0);
+        } else {
+            run(mOutputStartTime, mOutputEndTime, voiInterval, true);
 
             if (hasIssues()) {
                 return 0.0;
             }
         }
-
-        // Initialise our results structure, if needed.
-        // Note #1: we only (re)allocate our results if their size has changed. This avoids needless allocations, but
-        //          it also means that our results remain where they are in memory, which matters since our Python
-        //          bindings return zero-copy NumPy arrays.
-        // Note #2: when (re)allocating our results, we release our previous results first (to limit our peak memory
-        //          usage) and only then allocate our new results, which we do into a local structure that we move into
-        //          ours once all of its arrays have been allocated. This means that should an allocation fail (e.g.,
-        //          std::bad_alloc), our results structure would be left empty rather than with an inconsistent results
-        //          size and arrays of mismatched sizes (which would result in out-of-bounds accesses when retrieving
-        //          our results).
-        // Note #3: on a 32-bit platform (e.g., WebAssembly), the size of an array may overflow (e.g., with many
-        //          constants and a large number of steps), in which case we would allocate an array that is too small
-        //          for our results, hence we check for it. We cannot trigger such an overflow on a 64-bit platform, so
-        //          we ignore our check during code coverage.
-
-        const auto resultsSize {totalSteps + 1};
-
-        if (mResults.resultsSize != resultsSize) {
-            mResults = {};
-
-            auto arraySize = [resultsSize](size_t pCount) {
-#ifndef CODE_COVERAGE_ENABLED
-                if ((pCount != 0) && (resultsSize > (std::numeric_limits<size_t>::max() / pCount))) {
-                    throw std::length_error("the results are too large to be allocated");
-                }
-#endif
-
-                return pCount * resultsSize;
-            };
-            SedInstanceTaskResults results;
-
-            results.resultsSize = resultsSize;
-
-            results.voi.resize(resultsSize);
-            results.states.resize(arraySize(mStateCount));
-            results.rates.resize(arraySize(mStateCount));
-            results.constants.resize(arraySize(mConstantCount));
-            results.computedConstants.resize(arraySize(mComputedConstantCount));
-            results.algebraicVariables.resize(arraySize(mAlgebraicVariableCount));
-
-            mResults = std::move(results);
-        }
-
-        // Run our simulation from the output start time to the output end time, tracking our results.
-
-        run(sedUniformTimeCoursePimpl->mOutputStartTime, sedUniformTimeCoursePimpl->mOutputEndTime, voiInterval, true);
-
-        if (hasIssues()) {
-            return 0.0;
-        }
     } else {
         // Track our results.
-
-        mResults.resultsSize = 1;
-
-        mResults.constants.resize(mConstantCount);
-        mResults.computedConstants.resize(mComputedConstantCount);
-        mResults.algebraicVariables.resize(mAlgebraicVariableCount);
 
         for (size_t i {0}; i < mConstantCount; ++i) {
             mResults.constants[i] = mConstants[i]; // NOLINT

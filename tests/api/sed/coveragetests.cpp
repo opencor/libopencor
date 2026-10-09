@@ -20,6 +20,7 @@ limitations under the License.
 
 #include <libopencor>
 
+#include <algorithm>
 #include <cmath>
 
 TEST(CoverageSedTest, initialise)
@@ -732,11 +733,60 @@ TEST(CoverageSedTest, KinsolWithNoSolutionOverTime)
 
     instance->run();
 
-    ASSERT_EQ(instance->issueCount(), 2U);
+    GTEST_ASSERT_EQ(instance->issueCount(), 2U);
     EXPECT_EQ(instance->issue(0)->description(), CVODE_KINSOL_ERROR);
     EXPECT_EQ(instance->issue(1)->description().substr(0, CVODE_ERROR_START.size()), CVODE_ERROR_START);
     EXPECT_FALSE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX]));
     EXPECT_TRUE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX + 1]));
+}
+
+TEST(CoverageSedTest, KinsolWithNoSolutionWhenInitialising)
+{
+    // The first NLA system of our model (a^2+x = 1) has no solution for x > 1, so if the initial value of x gets set to
+    // 2 after our instance has been created, then our model cannot be (re)initialised when running our instance,
+    // whether we use a fixed-step ODE solver or CVODE. Our simulation should therefore stop there and we should have no
+    // results to report.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::ERROR, "Task | KINSOL: the linear solver's setup function failed in an unrecoverable manner."},
+    };
+    static constexpr auto OUTPUT_END_TIME {2.0};
+    static constexpr auto NUMBER_OF_STEPS {20};
+    static constexpr auto STEP {0.01};
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/kinsol_with_no_solution_over_time.cellml"));
+    auto forwardEuler {libOpenCOR::SolverForwardEuler::create()};
+
+    forwardEuler->setStep(STEP);
+
+    auto isNan = [](double pValue) {
+        return std::isnan(pValue);
+    };
+
+    for (const libOpenCOR::SolverOdePtr &odeSolver : {libOpenCOR::SolverOdePtr {forwardEuler}, libOpenCOR::SolverOdePtr {libOpenCOR::SolverCvode::create()}}) {
+        auto document = libOpenCOR::SedDocument::create(file);
+        const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+        simulation->setOutputEndTime(OUTPUT_END_TIME);
+        simulation->setNumberOfSteps(NUMBER_OF_STEPS);
+        simulation->setOdeSolver(odeSolver);
+
+        auto instance {document->instantiate()};
+
+        EXPECT_FALSE(instance->hasIssues());
+
+        document->models()[0]->addChange(libOpenCOR::SedChangeAttribute::create("my_component", "x", "2.0"));
+
+        EXPECT_EQ(instance->run(), 0.0);
+        EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+        EXPECT_EQ(instance->progress(), 0.0);
+
+        const auto &instanceTask {instance->tasks()[0]};
+
+        EXPECT_EQ(instanceTask->voi().size(), NUMBER_OF_STEPS + 1);
+        EXPECT_TRUE(std::ranges::all_of(instanceTask->voi(), isNan));
+        EXPECT_TRUE(std::ranges::all_of(instanceTask->state(0), isNan));
+    }
 }
 
 TEST(CoverageSedTest, sedmlFileNlaAlgorithmAndNlaAlgorithm)
