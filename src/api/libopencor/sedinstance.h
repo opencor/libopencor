@@ -72,7 +72,8 @@ public:
     /**
      * @brief Run all the tasks associated with this instance.
      *
-     * Run all the tasks associated with this instance.
+     * Run all the tasks associated with this instance. If a run is already in progress (see @ref startRun), then wait
+     * for it to complete before running all the tasks associated with this instance.
      *
      * @return The elapsed time in milliseconds.
      */
@@ -82,7 +83,9 @@ public:
     /**
      * @brief Start running, in a background thread, all the tasks associated with this instance.
      *
-     * Start running, in a background thread, all the tasks associated with this instance.
+     * Start running, in a background thread, all the tasks associated with this instance. The results of the tasks
+     * are (re)allocated before this method returns, so they can be retrieved while the tasks are being run (e.g., to
+     * plot them progressively). The simulation settings used are those in effect when this method is called.
      *
      * @return @c true if a new run was started, @c false if a run is already in progress.
      */

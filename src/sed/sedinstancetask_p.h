@@ -100,6 +100,11 @@ public:
     SedInstanceTaskInitialisations mInitialisations;
     SedInstanceTaskChanges mChanges;
 
+    double mInitialTime {0.0};
+    double mOutputStartTime {0.0};
+    double mOutputEndTime {0.0};
+    size_t mNumberOfSteps {0};
+
     SedInstanceTaskResults mResults;
 
     std::atomic<size_t> mCompletedSteps {0};
@@ -127,10 +132,13 @@ public:
 
     explicit Impl(const SedAbstractTaskPtr &pTask);
 
+    void allocateResults(size_t pResultsSize);
     void trackResults(size_t pIndex);
+    void nanFillResults(size_t pFromIndex);
 
     void applyChanges();
     void initialise();
+    bool prepareRun();
     void run(double pVoiStart, double pVoiEnd, double pVoiInterval, bool pTrackResults);
     double run();
 

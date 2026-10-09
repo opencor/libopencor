@@ -18,9 +18,11 @@ limitations under the License.
 
 #include <libopencor>
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <limits>
+#include <span>
 #include <thread>
 
 TEST(InstanceSedTest, noFile)
@@ -399,6 +401,71 @@ TEST(InstanceSedTest, stopRunResultsHaveNans)
     EXPECT_LT(nanIndex, voi.size() - 1);
 }
 
+TEST(InstanceSedTest, stopRunBeforeOutputStartTime)
+{
+    // Note: our output start time is such that it would take our simulation a very long time to reach it, so we are
+    //       guaranteed to stop our run before it gets reached.
+
+    static const auto OUTPUT_START_TIME {1.0e9};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    auto instance {document->instantiate()};
+
+    // Run our instance so that we have some results.
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto voi {instanceTask->voi()};
+
+    EXPECT_FALSE(std::isnan(voi[0]));
+
+    // Start our run and stop it before it reaches the output start time, which means that we have no results to
+    // report. Our results should therefore not have been reallocated (since their size has not changed), but they
+    // should all be NaN values.
+
+    simulation->setOutputStartTime(OUTPUT_START_TIME);
+    simulation->setOutputEndTime(OUTPUT_START_TIME + static_cast<double>(simulation->numberOfSteps()));
+
+    EXPECT_TRUE(instance->startRun());
+
+    instance->stopRun();
+    instance->waitForRun();
+
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
+    EXPECT_EQ(instance->progress(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+    EXPECT_EQ(instanceTask->voi().data(), voi.data());
+
+    auto allNan = [](std::span<const double> pValues) {
+        return !pValues.empty() && std::ranges::all_of(pValues, [](double pValue) {
+            return std::isnan(pValue);
+        });
+    };
+
+    EXPECT_TRUE(allNan(instanceTask->voi()));
+
+    for (size_t i {0}; i < instanceTask->stateCount(); ++i) {
+        EXPECT_TRUE(allNan(instanceTask->state(i)));
+        EXPECT_TRUE(allNan(instanceTask->rate(i)));
+    }
+
+    for (size_t i {0}; i < instanceTask->constantCount(); ++i) {
+        EXPECT_TRUE(allNan(instanceTask->constant(i)));
+    }
+
+    for (size_t i {0}; i < instanceTask->computedConstantCount(); ++i) {
+        EXPECT_TRUE(allNan(instanceTask->computedConstant(i)));
+    }
+
+    for (size_t i {0}; i < instanceTask->algebraicVariableCount(); ++i) {
+        EXPECT_TRUE(allNan(instanceTask->algebraicVariable(i)));
+    }
+}
+
 TEST(InstanceSedTest, pauseRunAndResumeRun)
 {
     static const auto SIMULATION_PROPERTY {1000000};
@@ -655,6 +722,129 @@ TEST(InstanceSedTest, startRunAfterPreviousRunCompleted)
     EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
     EXPECT_GT(instance->waitForRun(), 0.0);
     EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, resultsAllocatedWhenStartingRun)
+{
+    // Note: the results of a task must be (re)allocated before startRun() returns, so that they can be safely retrieved
+    //       while the task is being run (e.g., to plot them progressively).
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    auto instance {document->instantiate()};
+
+    // Run our instance so that our results get allocated.
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto numberOfSteps {static_cast<size_t>(simulation->numberOfSteps())};
+
+    EXPECT_EQ(instanceTask->voi().size(), numberOfSteps + 1);
+
+    // Change the size of our results and start running our instance, which means that our results must have been
+    // reallocated by the time startRun() returns and that they must remain valid for the whole run.
+
+    simulation->setNumberOfSteps(static_cast<int>(2 * numberOfSteps));
+
+    EXPECT_TRUE(instance->startRun());
+
+    const auto voi {instanceTask->voi()};
+    const auto state {instanceTask->state(0)};
+
+    EXPECT_EQ(voi.size(), (2 * numberOfSteps) + 1);
+    EXPECT_EQ(state.size(), (2 * numberOfSteps) + 1);
+
+    // Retrieve our results while our instance is running. They should always be the same arrays and they should never
+    // contain any NaN values (our results are either not yet computed, i.e. zeros, or computed).
+
+    auto isNan = [](double pValue) {
+        return std::isnan(pValue);
+    };
+
+    while (instance->status() != libOpenCOR::SedInstance::Status::IDLE) {
+        EXPECT_EQ(instanceTask->voi().data(), voi.data());
+        EXPECT_EQ(instanceTask->state(0).data(), state.data());
+        EXPECT_FALSE(std::ranges::any_of(voi, isNan));
+        EXPECT_FALSE(std::ranges::any_of(state, isNan));
+    }
+
+    EXPECT_GT(instance->waitForRun(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
+    EXPECT_EQ(instanceTask->voi().data(), voi.data());
+    EXPECT_EQ(instanceTask->state(0).data(), state.data());
+    EXPECT_EQ(voi[voi.size() - 1], simulation->outputEndTime());
+    EXPECT_FALSE(std::isnan(state[state.size() - 1]));
+}
+
+TEST(InstanceSedTest, simulationSettingsUsedWhenStartingRun)
+{
+    // Note: the simulation settings used by a run are those in effect when the run is started, even if they get changed
+    //       while the run is in progress.
+
+    static const auto FACTOR {2};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    auto instance {document->instantiate()};
+    const auto outputEndTime {simulation->outputEndTime()};
+    const auto numberOfSteps {simulation->numberOfSteps()};
+
+    EXPECT_TRUE(instance->startRun());
+
+    simulation->setOutputEndTime(FACTOR * outputEndTime);
+    simulation->setNumberOfSteps(FACTOR * numberOfSteps);
+
+    EXPECT_GT(instance->waitForRun(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto voi {instanceTask->voi()};
+
+    EXPECT_EQ(voi.size(), static_cast<size_t>(numberOfSteps) + 1);
+    EXPECT_EQ(voi[voi.size() - 1], outputEndTime);
+
+    // Running our instance again should use our new simulation settings.
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    EXPECT_EQ(instanceTask->voi().size(), static_cast<size_t>(FACTOR * numberOfSteps) + 1);
+    EXPECT_EQ(instanceTask->voi()[instanceTask->voi().size() - 1], FACTOR * outputEndTime);
+}
+
+TEST(InstanceSedTest, runWhileAsynchronousRunInProgress)
+{
+    // Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to
+    //       complete before running the instance again.
+
+    static const auto MODERATE_STEP_COUNT {10000};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(MODERATE_STEP_COUNT);
+    simulation->setOutputEndTime(static_cast<double>(MODERATE_STEP_COUNT));
+
+    auto instance {document->instantiate()};
+
+    EXPECT_TRUE(instance->startRun());
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto voi {instanceTask->voi()};
+
+    EXPECT_EQ(voi.size(), MODERATE_STEP_COUNT + 1);
+    EXPECT_EQ(voi[voi.size() - 1], static_cast<double>(MODERATE_STEP_COUNT));
+    EXPECT_FALSE(std::isnan(instanceTask->state(0)[voi.size() - 1]));
 }
 
 TEST(InstanceSedTest, odeModel)
@@ -1296,10 +1486,23 @@ TEST(InstanceSedTest, simulationWithInitialTimeFailing)
     auto instance {document->instantiate()};
 
     EXPECT_FALSE(instance->hasIssues());
-
-    instance->run();
-
+    EXPECT_EQ(instance->run(), 0.0);
     EXPECT_TRUE(instance->hasIssues());
+
+    // Our simulation failed before reaching its output start time, so we have no results to report, i.e. our results
+    // should all be NaN values.
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto voi {instanceTask->voi()};
+    const auto state {instanceTask->state(0)};
+
+    EXPECT_FALSE(voi.empty());
+    EXPECT_TRUE(std::ranges::all_of(voi, [](double pValue) {
+        return std::isnan(pValue);
+    }));
+    EXPECT_TRUE(std::ranges::all_of(state, [](double pValue) {
+        return std::isnan(pValue);
+    }));
 }
 
 TEST(InstanceSedTest, changesToVariablesUsedToInitialiseOtherVariables)

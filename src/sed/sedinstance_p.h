@@ -31,6 +31,7 @@ class SedInstance::Impl: public Logger::Impl
 {
 public:
     SedInstanceTaskPtrs mTasks;
+    SedInstanceTaskPtrs mTasksToRun;
 
     IssuePtrs mTasksIssues;
     IssuePtrs mTasksErrors;
@@ -51,6 +52,9 @@ public:
     explicit Impl(const SedDocumentPtr &pDocument);
 
     Status status() const;
+
+    void prepareRun();
+    double executeRun();
 
     double run();
     bool startRun();
