@@ -29,6 +29,7 @@ limitations under the License.
 #    include <unistd.h>
 #endif
 
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <format>
@@ -36,6 +37,7 @@ limitations under the License.
 #include <iostream>
 #include <regex>
 #include <sstream>
+#include <vector>
 
 #ifdef BUILDING_USING_MSVC
 #    include <codecvt>
@@ -47,6 +49,10 @@ limitations under the License.
 
 #ifdef NAN
 #    undef NAN
+#endif
+
+#ifdef min
+#    undef min
 #endif
 
 namespace libOpenCOR {
@@ -230,74 +236,140 @@ std::string pathToString(const std::filesystem::path &pPath)
 #endif
 }
 
-#ifdef BUILDING_USING_MSVC
-std::string canonicalFileName(const std::string &pFileName, bool pIsRemoteFile)
-#else
 std::string canonicalFileName(const std::string &pFileName)
-#endif
 {
     // Determine the canonical version of the file name.
-    // Note #1: if the file exists then we want to use std::filesystem::canonical() since this will resolve any symbolic
-    //          links, etc. However, if the file doesn't exist then we want to use std::filesystem::weakly_canonical()
-    //          since this will return a file name that is as close to the canonical version as possible without
-    //          actually checking whether the file exists.
-    // Note #2: when building using Emscripten, std::filesystem::weakly_canonical() doesn't work as expected. For
-    //          instance, if pFileName is equal to "/some/path/../.." then it will generate an exception rather than
-    //          return "/". So, we prepend a dummy folder to pFileName and then remove it from the result of
-    //          std::filesystem::weakly_canonical().
+    // Note #1: we must never change the current working directory here since it is shared by all the threads of the
+    //          process.
+    // Note #2: we use the std::error_code versions of the std::filesystem functions so that nothing gets thrown (e.g.,
+    //          if the file name is too long or if the file gets deleted while we are dealing with it).
+    // Note #3: when building using Emscripten, the file system is virtual and std::filesystem::weakly_canonical()
+    //          doesn't work as expected (e.g., it throws an exception rather than return "/" for "/some/path/../.."),
+    //          so we only ever normalise the file name lexically.
 
-    static constexpr auto FORWARD_SLASH {"/"};
+    // An empty file name stays empty (std::filesystem::canonical() would otherwise return the current working
+    // directory).
 
-    auto fileExists {std::filesystem::exists(pFileName)};
-    auto currentPath {std::filesystem::current_path()};
-
-    if (!fileExists) {
-        std::filesystem::current_path(FORWARD_SLASH);
+    if (pFileName.empty()) {
+        return {};
     }
 
-#ifdef __EMSCRIPTEN__
-    static constexpr auto DUMMY_FOLDER {"/dummy"};
-
-    auto res {pFileName};
-
-    res = DUMMY_FOLDER + std::string(res.starts_with(FORWARD_SLASH) ? "" : FORWARD_SLASH) + res;
-    res = pathToString(std::filesystem::weakly_canonical(stringToPath(res)));
-
-    res.erase(0, strlen(DUMMY_FOLDER));
-#else
     auto filePath {stringToPath(pFileName)};
-    auto res {pathToString(fileExists ?
-                               std::filesystem::canonical(filePath) :
-                               std::filesystem::weakly_canonical(filePath))};
+
+#ifndef __EMSCRIPTEN__
+    std::error_code errorCode;
+
+    // If the file exists then use std::filesystem::canonical() since it resolves symbolic links, etc.
+    // Note: this fails if the file doesn't exist.
+
+    auto res {std::filesystem::canonical(filePath, errorCode)};
+
+    if (!errorCode) {
+        return pathToString(res);
+    }
+
+    // The file doesn't exist, so if its file name has a root directory (i.e., it is an absolute file name or, on
+    // Windows, a file name relative to the root of the current drive) then use std::filesystem::weakly_canonical()
+    // since it returns a file name that is as close to the canonical version as possible.
+
+    if (filePath.has_root_directory()) {
+        res = std::filesystem::weakly_canonical(filePath, errorCode);
+
+        if (!errorCode) {
+            return pathToString(res);
+        }
+    }
 #endif
 
-#if defined(BUILDING_USING_MSVC)
-    // Replace "\"s with "/"s, if needed.
+    // The file name is relative (or something went wrong), so normalise it lexically. Unlike
+    // std::filesystem::weakly_canonical(), this doesn't depend on the current working directory, and it keeps leading
+    // ".." components (e.g., "a/../../b" becomes "../b").
 
-    if (pIsRemoteFile) {
-        res = forwardSlashPath(pFileName);
-    }
-#elif defined(BUILDING_USING_CLANG) || defined(__EMSCRIPTEN__)
-    // The file name may be relative rather than absolute, in which case we need to remove the forward slash that got
-    // added (at the beginning of the file name) by std::filesystem::weakly_canonical().
+    return pathToString(filePath.lexically_normal());
+}
 
-    if (!fileExists && !pFileName.starts_with(FORWARD_SLASH)) {
-        static const auto FORWARD_SLASH_LENGTH {strlen(FORWARD_SLASH)};
+std::string canonicalUrl(const std::string &pUrl)
+{
+    // Determine the canonical version of the URL, i.e. remove the "." and ".." segments from its path, as described in
+    // RFC 3986 (https://www.rfc-editor.org/rfc/rfc3986#section-5.2.4), as well as its empty segments (e.g., "/a//b"
+    // becomes "/a/b").
+    // Note: a URL is never a local file name, so we must not access the file system (a local file that happens to have
+    //       the same name as the host and path of the URL would otherwise be used) or use std::filesystem::path (its
+    //       separators are platform specific).
 
-        res.erase(0, FORWARD_SLASH_LENGTH);
-    }
+    static constexpr auto FORWARD_SLASH {'/'};
+    static constexpr auto DOT {"."};
+    static constexpr auto DOT_DOT {".."};
+
+#ifdef BUILDING_USING_MSVC
+    auto url {forwardSlashPath(pUrl)};
+#else
+    const auto &url {pUrl};
 #endif
 
-    if (!fileExists) {
-        std::filesystem::current_path(currentPath);
+    // Retrieve the scheme and authority (e.g., "https://example.com"), the path (e.g., "/some/path/file.txt"), and the
+    // query and/or fragment (e.g., "?a=b#c") of the URL.
+
+    static constexpr auto SCHEME_SEPARATOR {"://"};
+    static const auto SCHEME_SEPARATOR_LENGTH {strlen(SCHEME_SEPARATOR)};
+
+    auto schemeSeparatorPos {url.find(SCHEME_SEPARATOR)};
+    auto authorityPos {(schemeSeparatorPos == std::string::npos) ? 0 : schemeSeparatorPos + SCHEME_SEPARATOR_LENGTH};
+    auto queryOrFragmentPos {url.find_first_of("?#", authorityPos)};
+    auto pathPos {std::min(url.find(FORWARD_SLASH, authorityPos), queryOrFragmentPos)};
+
+    if ((pathPos == std::string::npos) || (url[pathPos] != FORWARD_SLASH)) {
+        return url;
     }
 
-    // Return the canonical version of the file name.
+    auto path {url.substr(pathPos, (queryOrFragmentPos == std::string::npos) ? std::string::npos : queryOrFragmentPos - pathPos)};
+
+    // Remove the ".", "..", and empty segments from the path, keeping a trailing forward slash if the last segment is a
+    // ".", "..", or empty segment (e.g., "/a/b/.." and "/a//" become "/a/").
+    // Note: path starts with a forward slash, so the first segment that we retrieve is always empty and we skip it.
+
+    std::vector<std::string> segments;
+    size_t segmentPos {1};
+
+    while (true) {
+        auto nextSegmentPos {path.find(FORWARD_SLASH, segmentPos)};
+        auto isLastSegment {nextSegmentPos == std::string::npos};
+        auto segment {path.substr(segmentPos, isLastSegment ? std::string::npos : nextSegmentPos - segmentPos)};
+
+        if (segment == DOT_DOT) {
+            if (!segments.empty()) {
+                segments.pop_back();
+            }
+        } else if ((segment != DOT) && !segment.empty()) {
+            segments.push_back(segment);
+        }
+
+        if (isLastSegment) {
+            if ((segment == DOT) || (segment == DOT_DOT) || segment.empty()) {
+                segments.emplace_back();
+            }
+
+            break;
+        }
+
+        segmentPos = nextSegmentPos + 1;
+    }
+
+    std::string res {url.substr(0, pathPos)};
+
+    for (const auto &segment : segments) {
+        res += FORWARD_SLASH;
+        res += segment;
+    }
+
+    if (queryOrFragmentPos != std::string::npos) {
+        res += url.substr(queryOrFragmentPos);
+    }
 
     return res;
 }
 
-std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl)
+std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl, bool pCanonicalise)
 {
     // Check whether the given file name or URL is a local file name or a URL.
     // Note: a URL represents a local file when used with the "file" scheme.
@@ -309,38 +381,19 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
 #endif
     static auto FILE_SCHEME_LENGTH {strlen(FILE_SCHEME)};
     static constexpr auto HTTP_SCHEME {"http://"};
-    static auto HTTP_SCHEME_LENGTH {strlen(HTTP_SCHEME)};
     static constexpr auto HTTPS_SCHEME {"https://"};
-    static auto HTTPS_SCHEME_LENGTH {strlen(HTTPS_SCHEME)};
 
-    auto res {pFileNameOrUrl};
-    size_t schemeLength {0};
-    auto requiresHttpScheme {false};
-    auto requiresHttpsScheme {false};
-
-    if (pFileNameOrUrl.starts_with(FILE_SCHEME)) {
-        schemeLength = FILE_SCHEME_LENGTH;
-    } else if (pFileNameOrUrl.starts_with(HTTP_SCHEME)) {
-        schemeLength = HTTP_SCHEME_LENGTH;
-        requiresHttpScheme = true;
-    } else if (pFileNameOrUrl.starts_with(HTTPS_SCHEME)) {
-        schemeLength = HTTPS_SCHEME_LENGTH;
-        requiresHttpsScheme = true;
+    if (pFileNameOrUrl.starts_with(HTTP_SCHEME) || pFileNameOrUrl.starts_with(HTTPS_SCHEME)) {
+        return {false, pCanonicalise ? canonicalUrl(pFileNameOrUrl) : pFileNameOrUrl};
     }
 
-    res.erase(0, schemeLength);
+    auto res {pFileNameOrUrl};
 
-    return {!requiresHttpScheme && !requiresHttpsScheme,
-            (requiresHttpScheme ?
-                 HTTP_SCHEME :
-             requiresHttpsScheme ?
-                 HTTPS_SCHEME :
-                 "")
-#ifdef BUILDING_USING_MSVC
-                + canonicalFileName(res, requiresHttpScheme || requiresHttpsScheme)};
-#else
-                + canonicalFileName(res)};
-#endif
+    if (res.starts_with(FILE_SCHEME)) {
+        res.erase(0, FILE_SCHEME_LENGTH);
+    }
+
+    return {true, pCanonicalise ? canonicalFileName(res) : res};
 }
 
 namespace {
@@ -546,7 +599,9 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
         return {true, filePath};
     }
 
-    std::filesystem::remove(filePath);
+    std::error_code errorCode;
+
+    std::filesystem::remove(filePath, errorCode);
 
     return NO_TUPLE;
 }
@@ -563,7 +618,16 @@ UnsignedChars fileContents(const std::filesystem::path &pFilePath)
         return NO_UNSIGNED_CHARS;
     }
 
-    const auto fileSize {std::filesystem::file_size(pFilePath)};
+    // Note: we use the std::error_code version of std::filesystem::file_size() so that nothing gets thrown (e.g., if
+    //       the file is actually a directory, which can be opened on some platforms).
+
+    std::error_code errorCode;
+    const auto fileSize {std::filesystem::file_size(pFilePath, errorCode)};
+
+    if (errorCode) {
+        return NO_UNSIGNED_CHARS;
+    }
+
     UnsignedChars contents;
 
     contents.resize(fileSize);

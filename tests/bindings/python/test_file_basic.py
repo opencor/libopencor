@@ -16,6 +16,8 @@
 import libopencor as loc
 import os
 import platform
+import tempfile
+import threading
 import utils
 from utils import assert_issues
 
@@ -80,6 +82,49 @@ def test_non_existing_relative_local_file():
     assert_issues(file, expected_non_existing_file_issues)
 
 
+def test_non_existing_relative_local_file_with_leading_parent_directories():
+    file = loc.File("../models/./lorenz.cellml")
+
+    assert file.type == loc.File.Type.IrretrievableFile
+
+    if platform.system() == "Windows":
+        assert file.file_name == "..\\models\\lorenz.cellml"
+    else:
+        assert file.file_name == "../models/lorenz.cellml"
+
+    assert file.url == ""
+
+    if platform.system() == "Windows":
+        assert file.path == "..\\models\\lorenz.cellml"
+    else:
+        assert file.path == "../models/lorenz.cellml"
+
+    assert file.contents == []
+    assert_issues(file, expected_non_existing_file_issues)
+
+
+def test_too_long_local_file_name():
+    # A file name that is too long for the file system must not result in an exception being thrown.
+
+    TOO_LONG_NAME_LENGTH = 5000
+
+    file = loc.File("/" + "a" * TOO_LONG_NAME_LENGTH)
+
+    assert file.type == loc.File.Type.IrretrievableFile
+    assert file.contents == []
+    assert_issues(file, expected_non_existing_file_issues)
+
+
+def test_local_directory():
+    # A directory is not a file, but it must not result in an exception being thrown.
+
+    file = loc.File(utils.resource_path("api"))
+
+    assert file.type == loc.File.Type.UnknownFile
+    assert file.contents == []
+    assert_issues(file, expected_no_issues)
+
+
 def test_url_based_local_file():
     file_path = utils.resource_path("file.txt")
 
@@ -122,6 +167,78 @@ def test_encoded_remote_file():
         == "https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml"
     )
     assert file.contents != []
+
+
+def test_remote_file_with_dot_segments():
+    file = loc.File("https://example.com/a/./b/../../c/model.cellml", False)
+
+    assert file.url == "https://example.com/c/model.cellml"
+    assert file.path == "https://example.com/c/model.cellml"
+
+
+def test_remote_file_matching_local_file():
+    orig_dir = os.getcwd()
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        os.makedirs(os.path.join(temp_dir, "example.com"))
+        open(os.path.join(temp_dir, "example.com", "model.cellml"), "w").close()
+
+        os.chdir(temp_dir)
+
+        url = loc.File("https://example.com/model.cellml", False).url
+
+        os.chdir(orig_dir)
+
+    assert url == "https://example.com/model.cellml"
+
+
+def test_concurrent_file_creations():
+    # Creating a file must never change the current working directory since it is shared by all the threads of the
+    # process. Also, the file manager must cope with files that get looked up while they are being destroyed by another
+    # thread.
+
+    FILE_CREATION_COUNT = 1000
+
+    orig_dir = os.getcwd()
+    done = threading.Event()
+    working_directory_changed = False
+
+    def check():
+        nonlocal working_directory_changed
+
+        file_manager = loc.FileManager.instance()
+
+        while not done.is_set():
+            if os.getcwd() != orig_dir:
+                working_directory_changed = True
+
+            file_manager.file("https://example.com/model.cellml")
+            file_manager.files
+
+    def create_files():
+        for _ in range(FILE_CREATION_COUNT):
+            loc.File("https://example.com/model.cellml", False)
+            loc.File("non_existing_dir/../non_existing_file.txt", False)
+
+    checker = threading.Thread(target=check)
+
+    checker.start()
+
+    thread1 = threading.Thread(target=create_files)
+    thread2 = threading.Thread(target=create_files)
+
+    thread1.start()
+    thread2.start()
+
+    thread1.join()
+    thread2.join()
+
+    done.set()
+
+    checker.join()
+
+    assert not working_directory_changed
+    assert os.getcwd() == orig_dir
 
 
 def test_local_virtual_file():

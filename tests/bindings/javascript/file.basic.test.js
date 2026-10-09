@@ -15,6 +15,9 @@ limitations under the License.
 */
 
 import assert from 'node:assert';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 
 import libOpenCOR from './libopencor.js';
@@ -49,6 +52,39 @@ test.describe('File basic tests', () => {
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assert.deepStrictEqual(file.contents(), utils.fileContents(file.path));
     assertIssues(loc, file, expectedUnknownFileIssues);
+  });
+
+  test('Non-existing relative local file with leading parent directories', () => {
+    const file = new loc.File('../models/./lorenz.cellml');
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.fileName, '../models/lorenz.cellml');
+    assert.strictEqual(file.url, '');
+    assert.strictEqual(file.path, '../models/lorenz.cellml');
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
+  });
+
+  test('Too long local file name', () => {
+    // A file name that is too long for the file system must not result in an exception being thrown.
+
+    const TOO_LONG_NAME_LENGTH = 5000;
+
+    const file = new loc.File(`/${'a'.repeat(TOO_LONG_NAME_LENGTH)}`);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
+  });
+
+  test('Local directory', () => {
+    // A directory is not a file, but it must not result in an exception being thrown.
+
+    const file = new loc.File(utils.resourcePath('api'));
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
   });
 
   test('Remote file', () => {
@@ -95,6 +131,73 @@ test.describe('File basic tests', () => {
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assert.deepStrictEqual(file.contents(), fileContents);
     assertIssues(loc, file, expectedUnknownFileIssues);
+  });
+
+  test('Remote file with dot segments', () => {
+    const file = new loc.File('https://example.com/a/./b/../../c/model.cellml');
+
+    assert.strictEqual(file.url, 'https://example.com/c/model.cellml');
+    assert.strictEqual(file.path, 'https://example.com/c/model.cellml');
+  });
+
+  test('Remote file matching local file', () => {
+    // The host and path of a URL must never be resolved as a local file, even if such a local file exists.
+
+    const origDir = process.cwd();
+    const tempDir = path.join(os.tmpdir(), 'libopencor_remote_file_matching_local_file');
+
+    fs.mkdirSync(path.join(tempDir, 'example.com'), { recursive: true });
+    fs.writeFileSync(path.join(tempDir, 'example.com', 'model.cellml'), '');
+
+    process.chdir(tempDir);
+
+    const url = new loc.File('https://example.com/model.cellml').url;
+
+    process.chdir(origDir);
+    fs.rmSync(tempDir, { recursive: true, force: true });
+
+    assert.strictEqual(url, 'https://example.com/model.cellml');
+  });
+
+  test('Concurrent file creations', () => {
+    // Creating a file must never change the current working directory since it is shared by all the threads of the
+    // process. Also, the file manager must cope with files that get looked up while they are being destroyed.
+    // Note: JavaScript code cannot call libOpenCOR from several threads at once, so we interleave what the two
+    //       file-creating threads and the checking thread do in the C++ version of this test. We also delete our
+    //       handles as soon as we are done with them so that, like in the C++ version of this test, files get destroyed
+    //       as soon as they are not needed anymore.
+
+    const FILE_CREATION_COUNT = 1000;
+
+    const origDir = process.cwd();
+    const fileManager = loc.FileManager.instance();
+    let workingDirectoryChanged = false;
+
+    const check = () => {
+      if (process.cwd() !== origDir) {
+        workingDirectoryChanged = true;
+      }
+
+      fileManager.fileFromFileNameOrUrl('https://example.com/model.cellml')?.delete();
+
+      for (const file of fileManager.files) {
+        file.delete();
+      }
+    };
+    const createFiles = () => {
+      new loc.File('https://example.com/model.cellml').delete();
+      check();
+      new loc.File('non_existing_dir/../non_existing_file.txt').delete();
+      check();
+    };
+
+    for (let i = 0; i < FILE_CREATION_COUNT; ++i) {
+      createFiles();
+      createFiles();
+    }
+
+    assert.strictEqual(workingDirectoryChanged, false);
+    assert.strictEqual(process.cwd(), origDir);
   });
 
   test('File manager', () => {

@@ -44,6 +44,7 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
 
             if (res) {
                 mFilePath = filePath;
+                mDownloaded = true;
             } else {
                 mType = Type::IRRETRIEVABLE_FILE;
 
@@ -52,10 +53,17 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
         } else {
             mFilePath = stringToPath("/some/path/file");
         }
-    } else if (!std::filesystem::exists(mFilePath) && pRetrieveContents) {
-        mType = Type::IRRETRIEVABLE_FILE;
+    } else if (pRetrieveContents) {
+        // Note: we use the std::error_code version of std::filesystem::exists() so that nothing gets thrown (e.g., if
+        //       the file name is too long), in which case we consider that the file doesn't exist.
 
-        addError("The file does not exist.");
+        std::error_code errorCode;
+
+        if (!std::filesystem::exists(mFilePath, errorCode)) {
+            mType = Type::IRRETRIEVABLE_FILE;
+
+            addError("The file does not exist.");
+        }
     }
 #else
     if (mFilePath.empty()) {
@@ -68,10 +76,15 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
 
 File::Impl::~Impl()
 {
-    // Delete the local file associated with a remote file.
+    // Delete the local copy of a remote file, if we downloaded it.
+    // Note #1: a remote file that we didn't download has a dummy file path, which must obviously not be deleted.
+    // Note #2: we use the std::error_code version of std::filesystem::remove() so that nothing gets thrown since we are
+    //          in a destructor.
 
-    if (!mUrl.empty() && !mFilePath.empty()) {
-        std::filesystem::remove(mFilePath);
+    if (mDownloaded) {
+        std::error_code errorCode;
+
+        std::filesystem::remove(mFilePath, errorCode);
     }
 }
 

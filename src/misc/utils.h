@@ -92,12 +92,9 @@ std::string LIBOPENCOR_UNIT_TESTING_EXPORT forwardSlashPath(const std::string &p
 std::filesystem::path stringToPath(const std::string &pString);
 std::string pathToString(const std::filesystem::path &pPath);
 
-#ifdef BUILDING_USING_MSVC
-std::string LIBOPENCOR_UNIT_TESTING_EXPORT canonicalFileName(const std::string &pFileName, bool pIsRemoteFile = false);
-#else
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT canonicalFileName(const std::string &pFileName);
-#endif
-std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl);
+std::string LIBOPENCOR_UNIT_TESTING_EXPORT canonicalUrl(const std::string &pUrl);
+std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl, bool pCanonicalise = true);
 std::string relativePath(const std::string &pPath, const std::string &pBasePath);
 std::string urlPath(const std::string &pPath);
 
