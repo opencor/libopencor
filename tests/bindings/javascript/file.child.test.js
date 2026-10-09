@@ -123,4 +123,40 @@ test.describe('File type tests', () => {
     assert.strictEqual(file.hasChildFiles, false);
     assert.strictEqual(fileManager.fileCount, 1);
   });
+
+  test('COMBINE archive with files outside of it', () => {
+    // A COMBINE archive may reference files that are located outside of it (e.g., "../sibling.cellml" or even the
+    // COMBINE archive itself), in which case they must be ignored rather than replace the contents of another managed
+    // file (or result in an infinite recursion).
+
+    const expectedIssues = [
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file '../sibling.cellml' is not located within the COMBINE archive. It has been ignored."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file '%2E%2E/encoded_sibling.cellml' is not located within the COMBINE archive. It has been ignored."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file '../entries_outside_of_archive.omex' is not located within the COMBINE archive. It has been ignored."
+      ]
+    ];
+    const sibling = new loc.File(utils.resourcePath('api/file/sibling.cellml'));
+    const someContents = Uint8Array.from([1, 2, 3]);
+
+    sibling.setContents(someContents);
+
+    const file = new loc.File(utils.resourcePath('api/file/entries_outside_of_archive.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.childFileCount, 1);
+    assert.notStrictEqual(file.childFileFromFileName('model.cellml'), null);
+    utils.assertIssues(loc, file, expectedIssues);
+    assert.deepStrictEqual(sibling.contents(), someContents);
+    assert.strictEqual(loc.FileManager.instance().fileCount, 3);
+  });
 });

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import File, FileManager
+from libopencor import File, FileManager, Issue
 import os
 import utils
 
@@ -131,3 +131,38 @@ def test_type_combine_archive_replaced_with_other_contents():
     assert file.type == File.Type.CellmlFile
     assert not file.has_child_files
     assert file_manager.file_count == 1
+
+
+def test_type_combine_archive_with_files_outside_of_it():
+    # A COMBINE archive may reference files that are located outside of it (e.g., "../sibling.cellml" or even the
+    # COMBINE archive itself), in which case they must be ignored rather than replace the contents of another managed
+    # file (or result in an infinite recursion).
+
+    expected_issues = [
+        [
+            Issue.Type.Warning,
+            "COMBINE archive: the file '../sibling.cellml' is not located within the COMBINE archive. It has been ignored.",
+        ],
+        [
+            Issue.Type.Warning,
+            "COMBINE archive: the file '%2E%2E/encoded_sibling.cellml' is not located within the COMBINE archive. It has been ignored.",
+        ],
+        [
+            Issue.Type.Warning,
+            "COMBINE archive: the file '../entries_outside_of_archive.omex' is not located within the COMBINE archive. It has been ignored.",
+        ],
+    ]
+
+    sibling = File(utils.resource_path("api/file/sibling.cellml"), False)
+    some_contents = utils.text_to_list("Some contents.")
+
+    sibling.contents = some_contents
+
+    file = File(utils.resource_path("api/file/entries_outside_of_archive.omex"))
+
+    assert file.type == File.Type.CombineArchive
+    assert file.child_file_count == 1
+    assert file.child_file("model.cellml") is not None
+    utils.assert_issues(file, expected_issues)
+    assert sibling.contents == some_contents
+    assert FileManager.instance().file_count == 3

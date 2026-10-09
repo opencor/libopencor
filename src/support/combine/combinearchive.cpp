@@ -92,7 +92,32 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
     for (int i {0}; i < mArchive->getNumEntries(); ++i) {
         const auto *entry {mArchive->getEntry(i)};
         auto location {entry->getLocation()};
-        auto file {File::create(mArchiveLocation + location)};
+
+        // Make sure that the file is located within the COMBINE archive.
+        // Note: a location may have some ".." segments (e.g., "../file.cellml"), possibly percent-encoded (e.g.,
+        //       "%2E%2E/file.cellml"), in which case the file would be located outside of the COMBINE archive. It
+        //       could then be confused with another managed file (which contents would get replaced) or even with the
+        //       COMBINE archive itself (resulting in an infinite recursion), so we ignore such a file. To determine
+        //       where the file is located, we use its file name as determined by File::create().
+
+        auto fileNameOrUrl {mArchiveLocation + location};
+        auto [isLocalFile, fileName] {retrieveFileInfo(decodeUrl(fileNameOrUrl))};
+
+        if (!fileName.starts_with(mArchiveLocation)) {
+            std::string warning;
+
+            warning.reserve(location.size() + 64); // NOLINT
+
+            warning += "The file '";
+            warning += location;
+            warning += "' is not located within the COMBINE archive. It has been ignored.";
+
+            addWarning(warning);
+
+            continue;
+        }
+
+        auto file {File::create(fileNameOrUrl)};
 
         file->setContents(mArchive->extractEntryToBuffer(location));
 
