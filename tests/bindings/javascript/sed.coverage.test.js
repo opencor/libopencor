@@ -739,6 +739,57 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(Number.isNaN(instance.tasks[0].voi[lastValidIndex + 1]), true);
   });
 
+  test('KINSOL with no solution when initialising', () => {
+    // The first NLA system of our model (a^2+x = 1) has no solution for x > 1, so if the initial value of x gets set to
+    // 2 after our instance has been created, then our model cannot be (re)initialised when running our instance,
+    // whether we use a fixed-step ODE solver or CVODE. Our simulation should therefore stop there and we should have
+    // no results to report.
+
+    const expectedIssues = [
+      [loc.Issue.Type.ERROR, "Task | KINSOL: the linear solver's setup function failed in an unrecoverable manner."]
+    ];
+    const numberOfSteps = 20;
+
+    const file = new loc.File(utils.resourcePath('api/sed/kinsol_with_no_solution_over_time.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const forwardEuler = new loc.SolverForwardEuler();
+
+    forwardEuler.step = 0.01;
+
+    for (const odeSolver of [forwardEuler, new loc.SolverCvode()]) {
+      const document = new loc.SedDocument(file);
+      const simulation = document.simulations[0];
+
+      simulation.outputEndTime = 2.0;
+      simulation.numberOfSteps = numberOfSteps;
+      simulation.odeSolver = odeSolver;
+
+      const instance = document.instantiate();
+
+      assert.strictEqual(instance.hasIssues, false);
+
+      document.model(0).addChange(new loc.SedChangeAttribute('my_component', 'x', '2.0'));
+
+      assert.strictEqual(instance.run(), 0.0);
+      assertIssues(loc, instance, expectedIssues);
+      assert.strictEqual(instance.progress, 0.0);
+
+      const instanceTask = instance.tasks[0];
+
+      assert.strictEqual(instanceTask.voi.length, numberOfSteps + 1);
+      assert.strictEqual(
+        instanceTask.voi.every((value) => Number.isNaN(value)),
+        true
+      );
+      assert.strictEqual(
+        instanceTask.state(0).every((value) => Number.isNaN(value)),
+        true
+      );
+    }
+  });
+
   test('SED-ML file with nlaAlgorithm and NLA algorithm', () => {
     const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 

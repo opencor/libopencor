@@ -747,6 +747,41 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
+  test('Start run right after status is idle', async () => {
+    // Note: a run is flagged as not running anymore just before it completes, so make sure that a new run can be
+    //       started as soon as our instance is reported as idle.
+
+    const NUMBER_OF_STEPS = 10;
+    const NUMBER_OF_RUNS = 1000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = NUMBER_OF_STEPS;
+    simulation.outputEndTime = NUMBER_OF_STEPS;
+
+    const instance = document.instantiate();
+
+    for (let i = 0; i < NUMBER_OF_RUNS; ++i) {
+      assert.strictEqual(instance.startRun(), true);
+
+      // Note: the threads of our previous runs can only be cleaned up when we return to the event loop, so we must do
+      //       so or we would eventually run out of memory. We do it here rather than once our run has completed so
+      //       that a new run is still started as soon as our instance is reported as idle.
+
+      await sleep(0);
+
+      while (instance.status !== loc.SedInstance.Status.IDLE) {}
+    }
+
+    assert.ok(instance.waitForRun() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
   test('Start run after previous run completed', async () => {
     const WAIT_ITERATIONS = 60000;
 

@@ -845,6 +845,52 @@ def test_kinsol_with_no_solution_over_time():
     assert math.isnan(instance.tasks[0].voi[last_valid_index + 1])
 
 
+def test_kinsol_with_no_solution_when_initialising():
+    # The first NLA system of our model (a^2+x = 1) has no solution for x > 1, so if the initial value of x gets set to
+    # 2 after our instance has been created, then our model cannot be (re)initialised when running our instance,
+    # whether we use a fixed-step ODE solver or CVODE. Our simulation should therefore stop there and we should have no
+    # results to report.
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | KINSOL: the linear solver's setup function failed in an unrecoverable manner.",
+        ],
+    ]
+    number_of_steps = 20
+
+    file = loc.File(
+        utils.resource_path("api/sed/kinsol_with_no_solution_over_time.cellml")
+    )
+    forward_euler = loc.SolverForwardEuler()
+
+    forward_euler.step = 0.01
+
+    for ode_solver in [forward_euler, loc.SolverCvode()]:
+        document = loc.SedDocument(file)
+        simulation = document.simulations[0]
+
+        simulation.output_end_time = 2.0
+        simulation.number_of_steps = number_of_steps
+        simulation.ode_solver = ode_solver
+
+        instance = document.instantiate()
+
+        assert not instance.has_issues
+
+        document.model(0).add_change(loc.SedChangeAttribute("my_component", "x", "2.0"))
+
+        assert instance.run() == 0.0
+        assert_issues(instance, expected_issues)
+        assert instance.progress == 0.0
+
+        instance_task = instance.tasks[0]
+
+        assert len(instance_task.voi) == number_of_steps + 1
+        assert all(math.isnan(value) for value in instance_task.voi)
+        assert all(math.isnan(value) for value in instance_task.state(0))
+
+
 def test_sedml_file_nla_algorithm_and_nla_algorithm():
     expected_issues = [
         [

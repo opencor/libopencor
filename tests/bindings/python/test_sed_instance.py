@@ -656,6 +656,32 @@ def test_start_run_while_already_running():
     assert not instance.has_issues
 
 
+def test_start_run_right_after_status_is_idle():
+    # Note: a run is flagged as not running anymore just before it completes, so make sure that a new run can be
+    #       started as soon as our instance is reported as idle.
+
+    NUMBER_OF_STEPS = 10
+    NUMBER_OF_RUNS = 1000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.number_of_steps = NUMBER_OF_STEPS
+    simulation.output_end_time = float(NUMBER_OF_STEPS)
+
+    instance = document.instantiate()
+
+    for _ in range(NUMBER_OF_RUNS):
+        assert instance.start_run() is True
+
+        while instance.status != loc.SedInstance.Status.Idle:
+            pass
+
+    assert instance.wait_for_run() > 0.0
+    assert not instance.has_issues
+
+
 def test_start_run_after_previous_run_completed():
     WAIT_ITERATIONS = 60000
 

@@ -21,17 +21,10 @@ limitations under the License.
 #include "libopencor/seddocument.h"
 
 #include <atomic>
-#include <chrono>
 #include <exception>
 #include <memory>
 
 namespace libOpenCOR {
-
-namespace {
-
-constexpr auto ZERO_WAIT {std::chrono::milliseconds {0}};
-
-} // namespace
 
 SedInstancePtr SedInstance::Impl::create(const SedDocumentPtr &pDocument)
 {
@@ -264,8 +257,15 @@ bool SedInstance::Impl::startRun()
 {
     const std::scoped_lock<std::mutex> runLock(mRunMutex);
 
+    // Make sure that no run is in progress and, if a previous run is done, retrieve its elapsed time.
+    // Note: our previous run is flagged as not running anymore just before its future becomes ready (see below), so we
+    //       check whether we are running rather than whether our future is ready. Otherwise, a caller that waited for
+    //       status() to be IDLE before calling us might be told that a run is still in progress. This means that
+    //       retrieving the elapsed time of our previous run may require waiting for its future to become ready, but
+    //       only for the very short time that it takes for our previous run to complete.
+
     if (mRunFuture.valid()) {
-        if (mRunFuture.wait_for(ZERO_WAIT) != std::future_status::ready) {
+        if (mRunning.load(std::memory_order_acquire)) {
             return false;
         }
 

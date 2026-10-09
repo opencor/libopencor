@@ -658,6 +658,16 @@ double SedInstanceTask::Impl::run()
 
     initialise();
 
+    // Make sure that our model could be (re)initialised. It may not be possible, e.g., if an NLA system cannot be
+    // solved at our initial time (which may have been changed since we were created), in which case we have no results
+    // to report. Also, we must not go any further since our ODE solver, if any, may not have been (re)initialised.
+
+    if (hasIssues()) {
+        nanFillResults(0);
+
+        return 0.0;
+    }
+
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
     if (mDifferentialModel) {

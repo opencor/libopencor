@@ -689,6 +689,34 @@ TEST(InstanceSedTest, startRunWhileAlreadyRunning)
     EXPECT_FALSE(instance->hasIssues());
 }
 
+TEST(InstanceSedTest, startRunRightAfterStatusIsIdle)
+{
+    // Note: a run is flagged as not running anymore just before it completes, so make sure that a new run can be
+    //       started as soon as our instance is reported as idle.
+
+    static const auto NUMBER_OF_STEPS {10};
+    static const auto NUMBER_OF_RUNS {1000};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(NUMBER_OF_STEPS);
+    simulation->setOutputEndTime(static_cast<double>(NUMBER_OF_STEPS));
+
+    auto instance {document->instantiate()};
+
+    for (auto i {0}; i < NUMBER_OF_RUNS; ++i) {
+        ASSERT_TRUE(instance->startRun());
+
+        while (instance->status() != libOpenCOR::SedInstance::Status::IDLE) {
+        }
+    }
+
+    EXPECT_GT(instance->waitForRun(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
 TEST(InstanceSedTest, startRunAfterPreviousRunCompleted)
 {
     static const auto WAIT_ITERATIONS = 60000;
