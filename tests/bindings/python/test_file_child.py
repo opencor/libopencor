@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import File
+from libopencor import File, FileManager
 import os
 import utils
 
@@ -70,3 +70,64 @@ def test_type_dataset_157():
             "fabbri_et_al_based_composite_SAN_model.sedml",
         ],
     )
+
+
+def test_type_remote_virtual_combine_archives():
+    # Two remote COMBINE archives that are not downloaded must not share their child files.
+
+    file_135 = File(utils.RemoteBasePath + "/api/file/dataset_135.omex", False)
+    file_157 = File(utils.RemoteBasePath + "/api/file/dataset_157.omex", False)
+
+    file_135.contents = utils.binary_to_list(
+        utils.binary_file_contents(utils.resource_path("api/file/dataset_135.omex"))
+    )
+    file_157.contents = utils.binary_to_list(
+        utils.binary_file_contents(utils.resource_path("api/file/dataset_157.omex"))
+    )
+
+    assert file_135.type == File.Type.CombineArchive
+    assert file_157.type == File.Type.CombineArchive
+
+    simulation_file_135 = file_135.child_file("simulation.json")
+    simulation_file_157 = file_157.child_file("simulation.json")
+
+    assert simulation_file_135 is not None
+    assert simulation_file_157 is not None
+    assert utils.to_string(simulation_file_135.contents) == utils.text_file_contents(
+        utils.resource_path("api/file/dataset_135.json")
+    )
+    assert utils.to_string(simulation_file_157.contents) == utils.text_file_contents(
+        utils.resource_path("api/file/dataset_157.json")
+    )
+
+
+def test_type_remote_combine_archive():
+    # The child files of a remote COMBINE archive must be retrievable using their file name, even if the local copy of
+    # the COMBINE archive is in a directory that is accessed through a symbolic link (e.g., on macOS, the temporary
+    # directory is "/var/...", which is a symbolic link to "/private/var/...").
+
+    file = File(utils.RemoteBasePath + "/api/file/dataset_135.omex")
+    simulation_file = file.child_file("simulation.json")
+
+    assert file.type == File.Type.CombineArchive
+    assert simulation_file is not None
+    assert utils.to_string(simulation_file.contents) == utils.text_file_contents(
+        utils.resource_path("api/file/dataset_135.json")
+    )
+
+
+def test_type_combine_archive_replaced_with_other_contents():
+    # Replacing the contents of a COMBINE archive with some other contents must release its child files.
+
+    file = File(utils.resource_path("cellml_2.omex"))
+    file_manager = FileManager.instance()
+
+    assert file_manager.file_count == 3
+
+    file.contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+
+    assert file.type == File.Type.CellmlFile
+    assert not file.has_child_files
+    assert file_manager.file_count == 1

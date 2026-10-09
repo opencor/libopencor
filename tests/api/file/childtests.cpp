@@ -72,3 +72,56 @@ TEST(ChildFileTest, dataset157)
 {
     doTestDataset("157", {"fabbri_et_al_based_composite_SAN_model.cellml", "fabbri_et_al_based_composite_SAN_model.sedml"});
 }
+
+TEST(ChildFileTest, remoteVirtualCombineArchives)
+{
+    // Two remote COMBINE archives that are not downloaded must not share their child files.
+
+    auto file135 {libOpenCOR::File::create(std::string(libOpenCOR::REMOTE_BASE_PATH) + "/api/file/dataset_135.omex", false)};
+    auto file157 {libOpenCOR::File::create(std::string(libOpenCOR::REMOTE_BASE_PATH) + "/api/file/dataset_157.omex", false)};
+
+    file135->setContents(libOpenCOR::fileContents(libOpenCOR::resourcePath("api/file/dataset_135.omex")));
+    file157->setContents(libOpenCOR::fileContents(libOpenCOR::resourcePath("api/file/dataset_157.omex")));
+
+    EXPECT_EQ(file135->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file157->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+
+    auto simulationFile135 {file135->childFile("simulation.json")};
+    auto simulationFile157 {file157->childFile("simulation.json")};
+
+    ASSERT_NE(simulationFile135, nullptr);
+    ASSERT_NE(simulationFile157, nullptr);
+    EXPECT_NE(simulationFile135, simulationFile157);
+    EXPECT_EQ(libOpenCOR::toString(simulationFile135->contents()), libOpenCOR::textFileContents(libOpenCOR::resourcePath("api/file/dataset_135.json")));
+    EXPECT_EQ(libOpenCOR::toString(simulationFile157->contents()), libOpenCOR::textFileContents(libOpenCOR::resourcePath("api/file/dataset_157.json")));
+}
+
+TEST(ChildFileTest, remoteCombineArchive)
+{
+    // The child files of a remote COMBINE archive must be retrievable using their file name, even if the local copy of
+    // the COMBINE archive is in a directory that is accessed through a symbolic link (e.g., on macOS, the temporary
+    // directory is "/var/...", which is a symbolic link to "/private/var/...").
+
+    auto file {libOpenCOR::File::create(std::string(libOpenCOR::REMOTE_BASE_PATH) + "/api/file/dataset_135.omex")};
+    auto simulationFile {file->childFile("simulation.json")};
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    ASSERT_NE(simulationFile, nullptr);
+    EXPECT_EQ(libOpenCOR::toString(simulationFile->contents()), libOpenCOR::textFileContents(libOpenCOR::resourcePath("api/file/dataset_135.json")));
+}
+
+TEST(ChildFileTest, combineArchiveReplacedWithOtherContents)
+{
+    // Replacing the contents of a COMBINE archive with some other contents must release its child files.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"))};
+    auto &fileManager {libOpenCOR::FileManager::instance()};
+
+    EXPECT_EQ(fileManager.fileCount(), 3U);
+
+    file->setContents(libOpenCOR::fileContents(libOpenCOR::resourcePath("cellml_2.cellml")));
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
+    EXPECT_FALSE(file->hasChildFiles());
+    EXPECT_EQ(fileManager.fileCount(), 1U);
+}

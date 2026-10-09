@@ -51,7 +51,10 @@ FilePtr FileManager::Impl::managedFile(bool pIsLocalFile, const std::string &pFi
     std::erase(pLockedFiles, nullptr);
 
     for (const auto &lockedFile : pLockedFiles) {
-        if (pIsLocalFile ? lockedFile->fileName() == pFileNameOrUrl : lockedFile->url() == pFileNameOrUrl) {
+        // Note: a local file must only ever match a local file, not the local copy of a remote file (or a remote file
+        //       that has no local copy, i.e. an empty file name).
+
+        if (pIsLocalFile ? lockedFile->url().empty() && (lockedFile->fileName() == pFileNameOrUrl) : lockedFile->url() == pFileNameOrUrl) {
             return lockedFile;
         }
     }

@@ -35,6 +35,7 @@ limitations under the License.
 #include <format>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include <regex>
 #include <sstream>
 #include <vector>
@@ -470,9 +471,12 @@ std::filesystem::path uniqueFilePath()
     static const std::string LETTERS {"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"};
     static const uint64_t LETTERS_SIZE {LETTERS.size()};
 
-    static auto testFile {pathToString(std::filesystem::temp_directory_path() / "libOpenCOR_XXXXXX.tmp")};
+    // Note: our caller must ensure that only one thread at a time calls us and creates the file (see downloadFile()),
+    //       so that two threads cannot end up with the same file path.
 
-    static const size_t XXXXXX_POS {testFile.size() - 6 - 4};
+    static const auto TEST_FILE {pathToString(std::filesystem::temp_directory_path() / "libOpenCOR_XXXXXX.tmp")};
+
+    static const size_t XXXXXX_POS {TEST_FILE.size() - 6 - 4};
     static constexpr uint64_t MICROSECONDS_SHIFT {16U};
     static constexpr uint64_t PID_SHIFT {32U};
 #    ifndef CODE_COVERAGE_ENABLED
@@ -480,6 +484,7 @@ std::filesystem::path uniqueFilePath()
 #    endif
     static constexpr uint64_t XXXXXX_POS_SHIFT {6U};
 
+    auto testFile {TEST_FILE};
     TimeVal timeVal;
 
     getTimeOfDay(timeVal);
@@ -555,8 +560,23 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 {
     static const std::tuple<bool, std::filesystem::path> NO_TUPLE {false, std::filesystem::path()};
 
-    auto filePath {uniqueFilePath()};
-    std::ofstream file(filePath, std::ios_base::binary);
+    // Create a file with a unique file path.
+    // Note: we must generate the file path and create the file in one go, so that another thread cannot generate the
+    //       same file path in between (in which case both threads would download to the same file and the local copy
+    //       of one remote file would get deleted with the other remote file).
+
+    static std::mutex uniqueFilePathMutex;
+
+    std::filesystem::path filePath;
+    std::ofstream file;
+
+    {
+        const std::scoped_lock<std::mutex> lock(uniqueFilePathMutex);
+
+        filePath = uniqueFilePath();
+
+        file.open(filePath, std::ios_base::binary);
+    }
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!file.is_open()) {

@@ -151,6 +151,39 @@ def test_remote_file():
     assert file.contents != []
 
 
+def test_remote_file_local_copy():
+    # The local copy of a remote file must exist for as long as the remote file exists, and be deleted with it.
+
+    file = loc.File(utils.RemoteFile)
+    file_name = file.file_name
+
+    assert os.path.exists(file_name)
+
+    del file
+
+    assert not os.path.exists(file_name)
+
+
+def test_local_file_matching_local_copy_of_remote_file():
+    # A local file must never be confused with the local copy of a remote file, and deleting it must not delete that
+    # local copy (since it is not a file that we downloaded).
+
+    file_manager = loc.FileManager.instance()
+    remote_file = loc.File(utils.RemoteFile)
+    file_name = remote_file.file_name
+    local_file = loc.File(file_name)
+
+    assert local_file != remote_file
+    assert local_file.url == ""
+    assert local_file.contents == remote_file.contents
+    assert file_manager.file_count == 2
+
+    del local_file
+
+    assert os.path.exists(file_name)
+    assert file_manager.file(file_name) is None
+
+
 def test_encoded_remote_file():
     file = loc.File(
         "https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO%20BG%20example%203.1.cellml"
@@ -241,6 +274,44 @@ def test_concurrent_file_creations():
     assert os.getcwd() == orig_dir
 
 
+def test_concurrent_file_downloads():
+    # Remote files that are downloaded at the same time must each have their own local copy, so that deleting the local
+    # copy of one of them doesn't delete the local copy of another one.
+
+    THREAD_COUNT = 8
+
+    files = [None] * THREAD_COUNT
+
+    def download_file(index):
+        files[index] = loc.File(utils.RemoteFile + "?thread=" + str(index))
+
+    threads = [
+        threading.Thread(target=download_file, args=(i,)) for i in range(THREAD_COUNT)
+    ]
+
+    for thread in threads:
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    file_names = set()
+
+    for file in files:
+        assert file.type == loc.File.Type.CellmlFile
+        assert file.contents == files[0].contents
+
+        file_names.add(file.file_name)
+
+    assert len(file_names) == THREAD_COUNT
+
+    del file
+    files.clear()
+
+    for file_name in file_names:
+        assert not os.path.exists(file_name)
+
+
 def test_local_virtual_file():
     file_path = utils.resource_path("unknown_file.txt")
     file = loc.File(file_path, False)
@@ -269,10 +340,7 @@ def test_remote_virtual_file():
 
     assert file.type == loc.File.Type.UnknownFile
 
-    if platform.system() == "Windows":
-        assert file.file_name == "\\some\\path\\file"
-    else:
-        assert file.file_name == "/some/path/file"
+    assert file.file_name == ""
 
     assert (
         file.url
@@ -294,6 +362,22 @@ def test_remote_virtual_file():
     assert file.type == loc.File.Type.UnknownFile
     assert file.contents == some_unknown_contents_list
     assert_issues(file, expected_unknown_file_issues)
+
+
+def test_remote_virtual_file_matching_local_file():
+    # A remote file that has no local copy has an empty file name, so it must never be confused with a local file that
+    # has an empty file name.
+
+    file_manager = loc.FileManager.instance()
+    remote_file = loc.File(utils.RemoteFile, False)
+    local_file = loc.File("", False)
+
+    assert local_file != remote_file
+    assert remote_file.file_name == ""
+    assert local_file.file_name == ""
+    assert local_file.url == ""
+    assert file_manager.file("") == local_file
+    assert file_manager.file(utils.RemoteFile) == remote_file
 
 
 def test_file_manager():

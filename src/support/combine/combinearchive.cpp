@@ -22,6 +22,8 @@ limitations under the License.
 #include "combine/combinearchive.h"
 #include "omex/CaContent.h"
 
+#include <atomic>
+#include <filesystem>
 #include <regex>
 
 namespace libOpenCOR {
@@ -44,12 +46,37 @@ bool isSedmlFormat(const std::string &pFormat)
     return pFormat == SEDML_FORMAT;
 }
 
+std::string archiveLocation(const FilePtr &pFile)
+{
+    // Determine the location of the COMBINE archive, i.e. the location where its files are "virtually" extracted (e.g.,
+    // "/some/path/archive.omex.contents/").
+    // Note #1: the files of a COMBINE archive are managed by the file manager using their file name, so each COMBINE
+    //          archive must have its own location. This means that a remote COMBINE archive that has no local copy
+    //          (i.e. it was not downloaded), and therefore no file name, must use a virtual file name that is unique to
+    //          it.
+    // Note #2: we canonicalise the location since the files of the COMBINE archive have a canonical file name (see
+    //          File::create()), which we need to be able to compare against (see CombineArchive::Impl::file()). For
+    //          instance, the temporary directory on macOS is a symbolic link (i.e. "/var/..." vs. "/private/var/...").
+
+    static std::atomic<uint64_t> virtualFileNameCounter {0};
+
+    auto fileName {pFile->fileName()};
+
+    if (fileName.empty()) {
+        std::error_code errorCode;
+
+        fileName = pathToString(std::filesystem::temp_directory_path(errorCode) / ("libOpenCOR_" + std::to_string(++virtualFileNameCounter) + ".virtual"));
+    }
+
+    return pathToString(stringToPath(canonicalFileName(fileName + ".contents") + "/"));
+}
+
 } // namespace
 
 CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents)
     : mArchiveContents(std::move(pArchiveContents))
     , mArchive(pArchive)
-    , mArchiveLocation(libOpenCOR::pathToString(libOpenCOR::stringToPath(pFile->fileName() + ".contents/")))
+    , mArchiveLocation(archiveLocation(pFile))
     , mArchiveLocationSize(mArchiveLocation.size())
 {
     // Extract all the files contained in the COMBINE archive.

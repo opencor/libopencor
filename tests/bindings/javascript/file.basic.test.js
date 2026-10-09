@@ -91,7 +91,7 @@ test.describe('File basic tests', () => {
     const file = new loc.File(utils.REMOTE_FILE);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-    assert.strictEqual(file.fileName, '/some/path/file');
+    assert.strictEqual(file.fileName, '');
     assert.strictEqual(file.url, utils.REMOTE_FILE);
     assert.strictEqual(file.path, utils.REMOTE_FILE);
     assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
@@ -112,7 +112,7 @@ test.describe('File basic tests', () => {
     );
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-    assert.strictEqual(file.fileName, '/some/path/file');
+    assert.strictEqual(file.fileName, '');
     assert.strictEqual(
       file.url,
       'https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml'
@@ -198,6 +198,22 @@ test.describe('File basic tests', () => {
 
     assert.strictEqual(workingDirectoryChanged, false);
     assert.strictEqual(process.cwd(), origDir);
+  });
+
+  test('Remote virtual file matching local file', () => {
+    // A remote file that has no local copy has an empty file name, so it must never be confused with a local file that
+    // has an empty file name.
+
+    const fileManager = loc.FileManager.instance();
+    const remoteFile = new loc.File(utils.REMOTE_FILE);
+    const localFile = new loc.File('');
+
+    assert.strictEqual(fileManager.fileCount, 2);
+    assert.strictEqual(remoteFile.fileName, '');
+    assert.strictEqual(localFile.fileName, '');
+    assert.strictEqual(localFile.url, '');
+    assert.strictEqual(fileManager.fileFromFileNameOrUrl('').url, '');
+    assert.strictEqual(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE).url, utils.REMOTE_FILE);
   });
 
   test('File manager', () => {

@@ -79,4 +79,48 @@ test.describe('File type tests', () => {
       'fabbri_et_al_based_composite_SAN_model.sedml'
     ]);
   });
+
+  test('Remote virtual COMBINE archives', () => {
+    // Two remote COMBINE archives that are not downloaded must not share their child files.
+
+    const file135 = new loc.File(`${utils.REMOTE_BASE_PATH}/api/file/dataset_135.omex`);
+    const file157 = new loc.File(`${utils.REMOTE_BASE_PATH}/api/file/dataset_157.omex`);
+
+    file135.setContents(utils.fileContents(utils.resourcePath('api/file/dataset_135.omex')));
+    file157.setContents(utils.fileContents(utils.resourcePath('api/file/dataset_157.omex')));
+
+    assert.strictEqual(file135.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file157.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+
+    const simulationFile135 = file135.childFileFromFileName('simulation.json');
+    const simulationFile157 = file157.childFileFromFileName('simulation.json');
+
+    assert.notStrictEqual(simulationFile135, null);
+    assert.notStrictEqual(simulationFile157, null);
+    assert.deepStrictEqual(
+      simulationFile135.contents(),
+      utils.fileContents(utils.resourcePath('api/file/dataset_135.json'))
+    );
+    assert.deepStrictEqual(
+      simulationFile157.contents(),
+      utils.fileContents(utils.resourcePath('api/file/dataset_157.json'))
+    );
+  });
+
+  test('COMBINE archive replaced with other contents', () => {
+    // Replacing the contents of a COMBINE archive with some other contents must release its child files.
+
+    const file = new loc.File(utils.resourcePath('cellml_2.omex'));
+    const fileManager = loc.FileManager.instance();
+
+    file.setContents(utils.fileContents(file.path));
+
+    assert.strictEqual(fileManager.fileCount, 3);
+
+    file.setContents(utils.fileContents(utils.resourcePath('cellml_2.cellml')));
+
+    assert.strictEqual(file.type.value, loc.File.Type.CELLML_FILE.value);
+    assert.strictEqual(file.hasChildFiles, false);
+    assert.strictEqual(fileManager.fileCount, 1);
+  });
 });
