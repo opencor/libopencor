@@ -36,9 +36,11 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
     }
 
 #ifndef __EMSCRIPTEN__
-    // Download a local copy of the remote file, if needed and requested.
+    // Download a local copy of the remote file, if requested.
+    // Note: a remote file that is not downloaded (or that cannot be downloaded) has no local copy and therefore no file
+    //       path.
 
-    if (mFilePath.empty()) {
+    if (!mUrl.empty()) {
         if (pRetrieveContents) {
             auto [res, filePath] {downloadFile(mUrl)};
 
@@ -50,8 +52,6 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
 
                 addError("The file could not be downloaded.");
             }
-        } else {
-            mFilePath = stringToPath("/some/path/file");
         }
     } else if (pRetrieveContents) {
         // Note: we use the std::error_code version of std::filesystem::exists() so that nothing gets thrown (e.g., if
@@ -65,10 +65,6 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
             addError("The file does not exist.");
         }
     }
-#else
-    if (mFilePath.empty()) {
-        mFilePath = stringToPath("/some/path/file");
-    }
 #endif
 
     mFileName = pathToString(mFilePath);
@@ -77,7 +73,8 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
 File::Impl::~Impl()
 {
     // Delete the local copy of a remote file, if we downloaded it.
-    // Note #1: a remote file that we didn't download has a dummy file path, which must obviously not be deleted.
+    // Note #1: we must only ever delete a file that we downloaded ourselves, never a file that just happens to have the
+    //          same file path.
     // Note #2: we use the std::error_code version of std::filesystem::remove() so that nothing gets thrown since we are
     //          in a destructor.
 
@@ -90,12 +87,19 @@ File::Impl::~Impl()
 
 void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
 {
-    // Reset he type of the file, if needed.
+    // Reset the type of the file, if needed.
+    // Note: we also release our previous CellML file, SED-ML file, or COMBINE archive, if any, so that we don't keep
+    //       using it (and, for a COMBINE archive, keep its child files managed) if our new contents are of a different
+    //       type or are not recognised.
 
     if (pResetType) {
         removeAllIssues();
 
         mType = Type::UNKNOWN_FILE;
+
+        mCellmlFile = nullptr;
+        mSedmlFile = nullptr;
+        mCombineArchive = nullptr;
 #ifndef __EMSCRIPTEN__
     } else if (mType == Type::IRRETRIEVABLE_FILE) {
         return;

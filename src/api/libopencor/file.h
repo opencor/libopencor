@@ -111,7 +111,8 @@ public:
     /**
      * @brief Return the file name.
      *
-     * Return the file name. If the file is remote then we return the file name of its local copy.
+     * Return the file name. If the file is remote then we return the file name of its local copy or an empty string if
+     * it has no local copy (i.e. its contents were not retrieved or could not be downloaded).
      *
      * @sa url()
      * @sa path()

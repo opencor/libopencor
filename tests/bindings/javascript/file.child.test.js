@@ -79,4 +79,84 @@ test.describe('File type tests', () => {
       'fabbri_et_al_based_composite_SAN_model.sedml'
     ]);
   });
+
+  test('Remote virtual COMBINE archives', () => {
+    // Two remote COMBINE archives that are not downloaded must not share their child files.
+
+    const file135 = new loc.File(`${utils.REMOTE_BASE_PATH}/api/file/dataset_135.omex`);
+    const file157 = new loc.File(`${utils.REMOTE_BASE_PATH}/api/file/dataset_157.omex`);
+
+    file135.setContents(utils.fileContents(utils.resourcePath('api/file/dataset_135.omex')));
+    file157.setContents(utils.fileContents(utils.resourcePath('api/file/dataset_157.omex')));
+
+    assert.strictEqual(file135.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file157.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+
+    const simulationFile135 = file135.childFileFromFileName('simulation.json');
+    const simulationFile157 = file157.childFileFromFileName('simulation.json');
+
+    assert.notStrictEqual(simulationFile135, null);
+    assert.notStrictEqual(simulationFile157, null);
+    assert.deepStrictEqual(
+      simulationFile135.contents(),
+      utils.fileContents(utils.resourcePath('api/file/dataset_135.json'))
+    );
+    assert.deepStrictEqual(
+      simulationFile157.contents(),
+      utils.fileContents(utils.resourcePath('api/file/dataset_157.json'))
+    );
+  });
+
+  test('COMBINE archive replaced with other contents', () => {
+    // Replacing the contents of a COMBINE archive with some other contents must release its child files.
+
+    const file = new loc.File(utils.resourcePath('cellml_2.omex'));
+    const fileManager = loc.FileManager.instance();
+
+    file.setContents(utils.fileContents(file.path));
+
+    assert.strictEqual(fileManager.fileCount, 3);
+
+    file.setContents(utils.fileContents(utils.resourcePath('cellml_2.cellml')));
+
+    assert.strictEqual(file.type.value, loc.File.Type.CELLML_FILE.value);
+    assert.strictEqual(file.hasChildFiles, false);
+    assert.strictEqual(fileManager.fileCount, 1);
+  });
+
+  test('COMBINE archive with files outside of it', () => {
+    // A COMBINE archive may reference files that are located outside of it (e.g., "../sibling.cellml" or even the
+    // COMBINE archive itself), in which case they must be ignored rather than replace the contents of another managed
+    // file (or result in an infinite recursion).
+
+    const expectedIssues = [
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file '../sibling.cellml' is not located within the COMBINE archive. It has been ignored."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file '%2E%2E/encoded_sibling.cellml' is not located within the COMBINE archive. It has been ignored."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file '../entries_outside_of_archive.omex' is not located within the COMBINE archive. It has been ignored."
+      ]
+    ];
+    const sibling = new loc.File(utils.resourcePath('api/file/sibling.cellml'));
+    const someContents = Uint8Array.from([1, 2, 3]);
+
+    sibling.setContents(someContents);
+
+    const file = new loc.File(utils.resourcePath('api/file/entries_outside_of_archive.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.childFileCount, 1);
+    assert.notStrictEqual(file.childFileFromFileName('model.cellml'), null);
+    utils.assertIssues(loc, file, expectedIssues);
+    assert.deepStrictEqual(sibling.contents(), someContents);
+    assert.strictEqual(loc.FileManager.instance().fileCount, 3);
+  });
 });

@@ -22,6 +22,7 @@ limitations under the License.
 #include <filesystem>
 #include <fstream>
 #include <libopencor>
+#include <set>
 #include <thread>
 
 namespace {
@@ -170,6 +171,45 @@ TEST(BasicFileTest, remoteFile)
     EXPECT_FALSE(file->contents().empty());
 }
 
+TEST(BasicFileTest, remoteFileLocalCopy)
+{
+    // The local copy of a remote file must exist for as long as the remote file exists, and be deleted with it.
+
+    std::string fileName;
+
+    {
+        auto file {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE)};
+
+        fileName = file->fileName();
+
+        EXPECT_TRUE(std::filesystem::exists(fileName));
+    }
+
+    EXPECT_FALSE(std::filesystem::exists(fileName));
+}
+
+TEST(BasicFileTest, localFileMatchingLocalCopyOfRemoteFile)
+{
+    // A local file must never be confused with the local copy of a remote file, and deleting it must not delete that
+    // local copy (since it is not a file that we downloaded).
+
+    auto remoteFile {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE)};
+    const auto &fileName {remoteFile->fileName()};
+
+    {
+        auto localFile {libOpenCOR::File::create(fileName)};
+
+        EXPECT_NE(localFile, remoteFile);
+        EXPECT_EQ(localFile->fileName(), libOpenCOR::canonicalFileName(fileName));
+        EXPECT_EQ(localFile->url(), "");
+        EXPECT_EQ(localFile->contents(), remoteFile->contents());
+        EXPECT_EQ(libOpenCOR::FileManager::instance().fileCount(), 2U);
+    }
+
+    EXPECT_TRUE(std::filesystem::exists(fileName));
+    EXPECT_EQ(libOpenCOR::FileManager::instance().file(fileName), nullptr);
+}
+
 TEST(BasicFileTest, encodedRemoteFile)
 {
     auto file {libOpenCOR::File::create("https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO%20BG%20example%203.1.cellml")};
@@ -252,6 +292,46 @@ TEST(BasicFileTest, concurrentFileCreations)
     EXPECT_EQ(std::filesystem::current_path(), origDir);
 }
 
+TEST(BasicFileTest, concurrentFileDownloads)
+{
+    // Remote files that are downloaded at the same time must each have their own local copy, so that deleting the local
+    // copy of one of them doesn't delete the local copy of another one.
+
+    static constexpr size_t THREAD_COUNT {8};
+
+    std::vector<libOpenCOR::FilePtr> files(THREAD_COUNT);
+    std::vector<std::thread> threads;
+
+    threads.reserve(THREAD_COUNT);
+
+    for (size_t i {0}; i < THREAD_COUNT; ++i) {
+        threads.emplace_back([&files, i] {
+            files[i] = libOpenCOR::File::create(std::string(libOpenCOR::REMOTE_FILE) + "?thread=" + std::to_string(i));
+        });
+    }
+
+    for (auto &thread : threads) {
+        thread.join();
+    }
+
+    std::set<std::string> fileNames;
+
+    for (const auto &file : files) {
+        EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
+        EXPECT_EQ(file->contents(), files[0]->contents());
+
+        fileNames.insert(file->fileName());
+    }
+
+    EXPECT_EQ(fileNames.size(), THREAD_COUNT);
+
+    files.clear();
+
+    for (const auto &fileName : fileNames) {
+        EXPECT_FALSE(std::filesystem::exists(fileName));
+    }
+}
+
 TEST(BasicFileTest, localVirtualFile)
 {
     auto filePath {libOpenCOR::resourcePath("unknown_file.txt")};
@@ -278,11 +358,7 @@ TEST(BasicFileTest, remoteVirtualFile)
     auto file {libOpenCOR::File::create("https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt", false)};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
-#ifdef BUILDING_USING_MSVC
-    EXPECT_EQ(file->fileName(), "\\some\\path\\file");
-#else
-    EXPECT_EQ(file->fileName(), "/some/path/file");
-#endif
+    EXPECT_EQ(file->fileName(), "");
     EXPECT_EQ(file->url(), "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt");
     EXPECT_EQ(file->path(), "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt");
     EXPECT_TRUE(file->contents().empty());
@@ -296,6 +372,22 @@ TEST(BasicFileTest, remoteVirtualFile)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->contents(), someUnknownContents);
     EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues());
+}
+
+TEST(BasicFileTest, remoteVirtualFileMatchingLocalFile)
+{
+    // A remote file that has no local copy has an empty file name, so it must never be confused with a local file that
+    // has an empty file name.
+
+    auto remoteFile {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE, false)};
+    auto localFile {libOpenCOR::File::create("", false)};
+
+    EXPECT_NE(localFile, remoteFile);
+    EXPECT_EQ(remoteFile->fileName(), "");
+    EXPECT_EQ(localFile->fileName(), "");
+    EXPECT_EQ(localFile->url(), "");
+    EXPECT_EQ(libOpenCOR::FileManager::instance().file(""), localFile);
+    EXPECT_EQ(libOpenCOR::FileManager::instance().file(libOpenCOR::REMOTE_FILE), remoteFile);
 }
 
 TEST(BasicFileTest, fileManager)
