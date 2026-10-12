@@ -152,3 +152,36 @@ TEST(ChildFileTest, combineArchiveWithFilesOutsideOfIt)
     EXPECT_EQ(sibling->contents(), someContents);
     EXPECT_EQ(libOpenCOR::FileManager::instance().fileCount(), 3U);
 }
+
+TEST(ChildFileTest, combineArchiveWithPercentEncodedLocations)
+{
+    // A location is a URI reference, so it may be percent-encoded (e.g., "./my%20file.txt"), in which case the name of
+    // its ZIP entry should be its decoded location (e.g., "my file.txt"), although some tools use the location itself
+    // (e.g., "other%20file.txt"). Either way, a child file must have the contents of its ZIP entry and be retrievable
+    // using either its location or its file name.
+    // Note: the ZIP entry for "./my%2520file.txt" is "my%20file.txt", so it must not be used for "./my%20file.txt".
+
+    static const std::vector<std::pair<std::string, std::string>> LOCATIONS_AND_FILE_NAMES {
+        {"./file.txt", "file.txt"},
+        {"./my%20file.txt", "my file.txt"},
+        {"./my%2520file.txt", "my%20file.txt"},
+        {"./other%20file.txt", "other file.txt"},
+    };
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/percent_encoded_locations.omex"))};
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_FALSE(file->hasIssues());
+    EXPECT_EQ(file->childFileCount(), LOCATIONS_AND_FILE_NAMES.size());
+
+    for (size_t i {0}; i < LOCATIONS_AND_FILE_NAMES.size(); ++i) {
+        const auto &[location, fileName] {LOCATIONS_AND_FILE_NAMES[i]};
+        auto childFile {file->childFile(location)};
+
+        GTEST_ASSERT_NE(childFile, nullptr);
+        EXPECT_EQ(file->childFileNames()[i], location);
+        EXPECT_EQ(file->childFile(i), childFile);
+        EXPECT_EQ(file->childFile(fileName), childFile);
+        EXPECT_EQ(libOpenCOR::toString(childFile->contents()), fileName);
+    }
+}

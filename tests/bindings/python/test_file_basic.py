@@ -16,6 +16,7 @@
 import libopencor as loc
 import os
 import platform
+import shutil
 import tempfile
 import threading
 import utils
@@ -139,6 +140,97 @@ def test_url_based_local_file():
     assert file.path == file_path
     assert file.contents == []
     assert_issues(file, expected_non_existing_file_issues)
+
+
+def test_local_files_with_percent_signs():
+    # A local file name is never decoded since a percent sign is a valid character in a file name.
+
+    dir_path = os.path.join(
+        tempfile.gettempdir(), "libopencor_local_files_with_percent_signs"
+    )
+
+    with open(utils.resource_path("cellml_2.cellml"), "rb") as f:
+        cellml_contents = f.read()
+
+    not_a_model = b"not a model"
+
+    os.makedirs(dir_path, exist_ok=True)
+
+    with open(os.path.join(dir_path, "a%20model.cellml"), "wb") as f:
+        f.write(cellml_contents)
+
+    with open(os.path.join(dir_path, "b%20c.cellml"), "wb") as f:
+        f.write(cellml_contents)
+
+    with open(os.path.join(dir_path, "b c.cellml"), "wb") as f:
+        f.write(not_a_model)
+
+    canonical_dir_path = os.path.realpath(dir_path)
+    a = loc.File(os.path.join(dir_path, "a%20model.cellml"))
+    b = loc.File(os.path.join(dir_path, "b%20c.cellml"))
+    bc = loc.File(os.path.join(dir_path, "b c.cellml"))
+
+    assert a.type == loc.File.Type.CellmlFile
+    assert a.file_name == os.path.join(canonical_dir_path, "a%20model.cellml")
+    assert_issues(a, expected_no_issues)
+    assert b.type == loc.File.Type.CellmlFile
+    assert b.file_name == os.path.join(canonical_dir_path, "b%20c.cellml")
+    assert b.contents == utils.binary_to_list(cellml_contents)
+    assert_issues(b, expected_no_issues)
+    assert bc != b
+    assert bc.file_name == os.path.join(canonical_dir_path, "b c.cellml")
+    assert bc.contents == utils.binary_to_list(not_a_model)
+
+    # The path of a "file" URL is, however, decoded.
+
+    if platform.system() == "Windows":
+        dir_url = "file:///" + utils.forward_slash_path(canonical_dir_path)
+    else:
+        dir_url = "file://" + canonical_dir_path
+
+    assert loc.File(dir_url + "/b%2520c.cellml") == b
+    assert loc.File(dir_url + "/b%20c.cellml") == bc
+    assert loc.FileManager.instance().file(dir_url + "/b%2520c.cellml") == b
+    assert loc.FileManager.instance().file(dir_url + "/b%20c.cellml") == bc
+
+    shutil.rmtree(dir_path)
+
+
+def test_remote_files_with_percent_encoded_characters():
+    # Percent-encoded characters are decoded, unless they have a meaning in a URL, in which case the URL would refer to
+    # a different file.
+
+    file = loc.File("https://example.com/my%20file.cellml", False)
+
+    assert file.url == "https://example.com/my file.cellml"
+    assert loc.File("https://example.com/my file.cellml", False) == file
+    assert (
+        loc.FileManager.instance().file("https://example.com/my%20file.cellml") == file
+    )
+    assert loc.FileManager.instance().file("https://example.com/my file.cellml") == file
+
+    for encoded_url, other_url in [
+        ("https://example.com/a%2Fb.cellml", "https://example.com/a/b.cellml"),
+        ("https://example.com/x/..%2Fy.cellml", "https://example.com/y.cellml"),
+        ("https://example.com/a%3Fb.cellml", "https://example.com/a?b.cellml"),
+        ("https://example.com/a%23b.cellml", "https://example.com/a#b.cellml"),
+        ("https://example.com/a%2520b.cellml", "https://example.com/a%20b.cellml"),
+        ("https://example.com/a%5Cb.cellml", "https://example.com/a/b.cellml"),
+    ]:
+        encoded_file = loc.File(encoded_url, False)
+        other_file = loc.File(other_url, False)
+
+        assert encoded_file != other_file
+        assert encoded_file.url == encoded_url
+        assert loc.File(encoded_file.url, False) == encoded_file
+
+    # A percent sign that doesn't start a percent-encoded character is percent-encoded.
+
+    percent_file = loc.File("https://example.com/100%.cellml", False)
+
+    assert percent_file.url == "https://example.com/100%25.cellml"
+    assert loc.File("https://example.com/100%25.cellml", False) == percent_file
+    assert loc.File(percent_file.url, False) == percent_file
 
 
 def test_remote_file():

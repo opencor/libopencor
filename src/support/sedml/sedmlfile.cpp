@@ -53,7 +53,8 @@ limitations under the License.
 namespace libOpenCOR {
 
 SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
-    : mDocument(pDocument)
+    : mIsLocalLocation(pFile->url().empty())
+    , mDocument(pDocument)
     , mContents(toString(pFile->contents()))
 {
     // Determine the location of the SED-ML file, i.e. what a relative model source is relative to.
@@ -63,7 +64,7 @@ SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
 
     const auto &url {pFile->url()};
 
-    if (url.empty()) {
+    if (mIsLocalLocation) {
         mLocation = pathToString(stringToPath(pFile->fileName()).parent_path());
 
         if (!mLocation.empty()) {
@@ -375,14 +376,26 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
     for (unsigned int i {0}; i < mDocument->getNumModels(); ++i) {
         auto source {mDocument->getModel(i)->getSource()};
 
-        // Note: a relative model source is relative to the SED-ML file, not to the current working directory, so we
-        //       must not canonicalise it before we know whether it is relative (a model source that exists relative to
-        //       the current working directory would otherwise become absolute).
+        // Note #1: a relative model source is relative to the SED-ML file, not to the current working directory, so
+        //          we must not canonicalise it before we know whether it is relative (a model source that exists
+        //          relative to the current working directory would otherwise become absolute).
+        // Note #2: a model source is a URI reference (see https://www.rfc-editor.org/rfc/rfc3986#section-4.1), so it
+        //          may be percent-encoded (e.g., "my%20model.cellml"). If the SED-ML file is a local file and the model
+        //          source is a file name (i.e. neither a URL nor a "file" URL, which path is decoded by
+        //          retrieveFileInfo()) then we must decode the model source to get the file name of the model. We must,
+        //          however, do this after having checked whether the model source is relative since a percent-encoded
+        //          forward slash (i.e. "%2F") must not make a relative model source absolute. If the SED-ML file is a
+        //          remote file then a relative model source is decoded as part of the URL of the model (see
+        //          retrieveFileInfo()).
 
         auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(source, false)};
-        auto modelSource {(isLocalFile && !stringToPath(fileNameOrUrl).has_root_directory()) ?
-                              mLocation + fileNameOrUrl :
-                              fileNameOrUrl};
+        auto isRelativeFileName {isLocalFile && !stringToPath(fileNameOrUrl).has_root_directory()};
+
+        if (mIsLocalLocation && isLocalFile && (fileNameOrUrl == source)) {
+            fileNameOrUrl = decodeUrl(fileNameOrUrl);
+        }
+
+        auto modelSource {isRelativeFileName ? mLocation + fileNameOrUrl : fileNameOrUrl};
 #ifdef __EMSCRIPTEN__
         const auto &file {fileManager.fileFromFileNameOrUrl(modelSource)};
 #else

@@ -160,6 +160,97 @@ TEST(BasicFileTest, urlBasedLocalFile)
     EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
 }
 
+TEST(BasicFileTest, localFilesWithPercentSigns)
+{
+    // A local file name is never decoded since a percent sign is a valid character in a file name.
+
+    auto dir {std::filesystem::temp_directory_path() / "libopencor_local_files_with_percent_signs"};
+    auto cellmlContents {libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    static const std::string NOT_A_MODEL {"not a model"};
+
+    std::filesystem::create_directories(dir);
+    std::ofstream(dir / "a%20model.cellml", std::ios::binary) << cellmlContents;
+    std::ofstream(dir / "b%20c.cellml", std::ios::binary) << cellmlContents;
+    std::ofstream(dir / "b c.cellml", std::ios::binary) << NOT_A_MODEL;
+
+    {
+        auto canonicalDir {std::filesystem::canonical(dir)};
+        auto dirPath {canonicalDir.string()};
+        auto a {libOpenCOR::File::create((dir / "a%20model.cellml").string())};
+        auto b {libOpenCOR::File::create((dir / "b%20c.cellml").string())};
+        auto bc {libOpenCOR::File::create((dir / "b c.cellml").string())};
+
+        EXPECT_EQ(a->type(), libOpenCOR::File::Type::CELLML_FILE);
+        EXPECT_EQ(a->fileName(), (canonicalDir / "a%20model.cellml").string());
+        EXPECT_EQ_ISSUES(a, expectedNoIssues());
+        EXPECT_EQ(b->type(), libOpenCOR::File::Type::CELLML_FILE);
+        EXPECT_EQ(b->fileName(), (canonicalDir / "b%20c.cellml").string());
+        EXPECT_EQ(b->contents(), libOpenCOR::charArrayToUnsignedChars(cellmlContents.c_str()));
+        EXPECT_EQ_ISSUES(b, expectedNoIssues());
+        EXPECT_NE(bc, b);
+        EXPECT_EQ(bc->fileName(), (canonicalDir / "b c.cellml").string());
+        EXPECT_EQ(bc->contents(), libOpenCOR::charArrayToUnsignedChars(NOT_A_MODEL.c_str()));
+
+        // The path of a "file" URL is, however, decoded.
+
+#ifdef BUILDING_ON_WINDOWS
+        static const std::string FILE_SCHEME {"file:///"};
+
+        auto dirUrl {FILE_SCHEME + libOpenCOR::forwardSlashPath(dirPath)};
+#else
+        static const std::string FILE_SCHEME {"file://"};
+
+        auto dirUrl {FILE_SCHEME + dirPath};
+#endif
+
+        EXPECT_EQ(libOpenCOR::File::create(dirUrl + "/b%2520c.cellml"), b);
+        EXPECT_EQ(libOpenCOR::File::create(dirUrl + "/b%20c.cellml"), bc);
+        EXPECT_EQ(libOpenCOR::FileManager::instance().file(dirUrl + "/b%2520c.cellml"), b);
+        EXPECT_EQ(libOpenCOR::FileManager::instance().file(dirUrl + "/b%20c.cellml"), bc);
+    }
+
+    std::filesystem::remove_all(dir);
+}
+
+TEST(BasicFileTest, remoteFilesWithPercentEncodedCharacters)
+{
+    // Percent-encoded characters are decoded, unless they have a meaning in a URL, in which case the URL would refer to
+    // a different file.
+
+    auto file {libOpenCOR::File::create("https://example.com/my%20file.cellml", false)};
+
+    EXPECT_EQ(file->url(), "https://example.com/my file.cellml");
+    EXPECT_EQ(libOpenCOR::File::create("https://example.com/my file.cellml", false), file);
+    EXPECT_EQ(libOpenCOR::FileManager::instance().file("https://example.com/my%20file.cellml"), file);
+    EXPECT_EQ(libOpenCOR::FileManager::instance().file("https://example.com/my file.cellml"), file);
+
+    static const std::vector<std::pair<std::string, std::string>> URLS {
+        {"https://example.com/a%2Fb.cellml", "https://example.com/a/b.cellml"},
+        {"https://example.com/x/..%2Fy.cellml", "https://example.com/y.cellml"},
+        {"https://example.com/a%3Fb.cellml", "https://example.com/a?b.cellml"},
+        {"https://example.com/a%23b.cellml", "https://example.com/a#b.cellml"},
+        {"https://example.com/a%2520b.cellml", "https://example.com/a%20b.cellml"},
+        {"https://example.com/a%5Cb.cellml", "https://example.com/a/b.cellml"},
+    };
+
+    for (const auto &[encodedUrl, otherUrl] : URLS) {
+        auto encodedFile {libOpenCOR::File::create(encodedUrl, false)};
+        auto otherFile {libOpenCOR::File::create(otherUrl, false)};
+
+        EXPECT_NE(encodedFile, otherFile);
+        EXPECT_EQ(encodedFile->url(), encodedUrl);
+        EXPECT_EQ(libOpenCOR::File::create(encodedFile->url(), false), encodedFile);
+    }
+
+    // A percent sign that doesn't start a percent-encoded character is percent-encoded.
+
+    auto percentFile {libOpenCOR::File::create("https://example.com/100%.cellml", false)};
+
+    EXPECT_EQ(percentFile->url(), "https://example.com/100%25.cellml");
+    EXPECT_EQ(libOpenCOR::File::create("https://example.com/100%25.cellml", false), percentFile);
+    EXPECT_EQ(libOpenCOR::File::create(percentFile->url(), false), percentFile);
+}
+
 TEST(BasicFileTest, remoteFile)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE)};

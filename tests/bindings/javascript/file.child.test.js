@@ -159,4 +159,36 @@ test.describe('File type tests', () => {
     assert.deepStrictEqual(sibling.contents(), someContents);
     assert.strictEqual(loc.FileManager.instance().fileCount, 3);
   });
+
+  test('COMBINE archive with percent-encoded locations', () => {
+    // A location is a URI reference, so it may be percent-encoded (e.g., "./my%20file.txt"), in which case the name of
+    // its ZIP entry should be its decoded location (e.g., "my file.txt"), although some tools use the location itself
+    // (e.g., "other%20file.txt"). Either way, a child file must have the contents of its ZIP entry and be retrievable
+    // using either its location or its file name.
+    // Note: the ZIP entry for "./my%2520file.txt" is "my%20file.txt", so it must not be used for "./my%20file.txt".
+
+    const locationsAndFileNames = [
+      ['./file.txt', 'file.txt'],
+      ['./my%20file.txt', 'my file.txt'],
+      ['./my%2520file.txt', 'my%20file.txt'],
+      ['./other%20file.txt', 'other file.txt']
+    ];
+    const file = new loc.File(utils.resourcePath('api/file/percent_encoded_locations.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.hasIssues, false);
+    assert.strictEqual(file.childFileCount, locationsAndFileNames.length);
+
+    for (const [i, [location, fileName]] of locationsAndFileNames.entries()) {
+      const childFile = file.childFileFromFileName(location);
+
+      assert.notStrictEqual(childFile, null);
+      assert.strictEqual(file.childFileNames.get(i), location);
+      assert.strictEqual(file.childFile(i).isAliasOf(childFile), true);
+      assert.strictEqual(file.childFileFromFileName(fileName).isAliasOf(childFile), true);
+      assert.deepStrictEqual(childFile.contents(), new TextEncoder().encode(fileName));
+    }
+  });
 });

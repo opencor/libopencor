@@ -154,6 +154,55 @@ def test_relative_local_cellml_file_without_base_path():
     assert document.serialise() == cvode_expected_serialisation("cellml_2.cellml")
 
 
+def test_local_cellml_file_with_percent_signs():
+    # A model source is a URI reference, so the percent signs in the file name of a local model must be percent-encoded
+    # for the model source to refer to that model when the SED-ML file is loaded back.
+
+    cellml_contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+    file = loc.File(utils.resource_path("my%20model.cellml"), False)
+
+    file.contents = cellml_contents
+
+    other_file = loc.File(utils.resource_path("my model.cellml"), False)
+
+    other_file.contents = cellml_contents
+
+    document = loc.SedDocument(file)
+
+    if platform.system() == "Windows":
+        encoded_file_url = "file:///" + utils.forward_slash_path(
+            utils.resource_path("my%2520model.cellml")
+        )
+    else:
+        encoded_file_url = "file://" + utils.resource_path("my%2520model.cellml")
+
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
+        "my%2520model.cellml"
+    )
+    assert document.serialise() == cvode_expected_serialisation(encoded_file_url)
+
+    # Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    # (which we never generate, but which a third-party tool might).
+
+    for source in [
+        "my%2520model.cellml",
+        encoded_file_url,
+        utils.resource_path("my%2520model.cellml"),
+    ]:
+        sedml_file = loc.File(utils.resource_path("my_model.sedml"), False)
+
+        sedml_file.contents = utils.text_to_list(cvode_expected_serialisation(source))
+
+        sedml_document = loc.SedDocument(sedml_file)
+
+        assert len(sedml_document.models) == 1
+        assert sedml_document.models[0].file == file
+
+        loc.FileManager.instance().unmanage(sedml_file)
+
+
 def test_remote_cellml_file_with_base_path():
     file = loc.File(utils.RemoteFile)
     document = loc.SedDocument(file)

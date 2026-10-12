@@ -37,6 +37,7 @@ class SedmlFile::Impl: public Logger::Impl
 {
 public:
     std::string mLocation;
+    bool mIsLocalLocation;
     libsedml::SedDocument *mDocument;
     std::string mContents;
 
