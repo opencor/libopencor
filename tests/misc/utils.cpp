@@ -80,10 +80,20 @@ TEST(UtilsTest, retrieveFileInfo)
     EXPECT_TRUE(isLocalFile);
     EXPECT_EQ(fileNameOrUrl, "some/path/my%20file%2Ftxt");
 
+    std::tie(isLocalFile, fileNameOrUrl) = libOpenCOR::retrieveFileInfo("a", false);
+
+    EXPECT_TRUE(isLocalFile);
+    EXPECT_EQ(fileNameOrUrl, "a");
+
     // The path of a "file" URL is fully decoded.
 
 #ifdef BUILDING_ON_WINDOWS
     std::tie(isLocalFile, fileNameOrUrl) = libOpenCOR::retrieveFileInfo("file:///C:/some/path/my%20file%25.txt", false);
+
+    EXPECT_TRUE(isLocalFile);
+    EXPECT_EQ(fileNameOrUrl, "C:/some/path/my file%.txt");
+
+    std::tie(isLocalFile, fileNameOrUrl) = libOpenCOR::retrieveFileInfo("FILE:///C:/some/path/my%20file%25.txt", false);
 
     EXPECT_TRUE(isLocalFile);
     EXPECT_EQ(fileNameOrUrl, "C:/some/path/my file%.txt");
@@ -92,9 +102,15 @@ TEST(UtilsTest, retrieveFileInfo)
 
     EXPECT_TRUE(isLocalFile);
     EXPECT_EQ(fileNameOrUrl, "/some/path/my file%.txt");
+
+    std::tie(isLocalFile, fileNameOrUrl) = libOpenCOR::retrieveFileInfo("FILE:///some/path/my%20file%25.txt", false);
+
+    EXPECT_TRUE(isLocalFile);
+    EXPECT_EQ(fileNameOrUrl, "/some/path/my file%.txt");
 #endif
 
-    // A remote URL is decoded, except for its reserved characters and percent signs, and then canonicalised.
+    // A remote URL is decoded, except for its reserved characters and percent signs, and then canonicalised. Its
+    // scheme is also normalised to lowercase.
 
     static const std::vector<std::pair<std::string, std::string>> URLS {
         {"https://example.com/my%20file.cellml", "https://example.com/my file.cellml"},
@@ -112,6 +128,8 @@ TEST(UtilsTest, retrieveFileInfo)
         {"https://example.com/100%.cellml", "https://example.com/100%25.cellml"},
         {"https://example.com/%%32%30.cellml", "https://example.com/%2520.cellml"},
         {"http://example.com/a/../my%20file.cellml?b=%2F%20c", "http://example.com/my file.cellml?b=%2F c"},
+        {"HTTPS://example.com/my%20file.cellml", "https://example.com/my file.cellml"},
+        {"Http://example.com/a/../my%20file.cellml", "http://example.com/my file.cellml"},
     };
 
     for (const auto &[url, expectedUrl] : URLS) {

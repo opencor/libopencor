@@ -141,6 +141,13 @@ def test_url_based_local_file():
     assert file.contents == []
     assert_issues(file, expected_non_existing_file_issues)
 
+    # A scheme is case-insensitive.
+
+    if platform.system() == "Windows":
+        assert loc.File("FILE:///" + utils.forward_slash_path(file_path)) == file
+    else:
+        assert loc.File("FILE://" + file_path) == file
+
 
 def test_local_files_with_percent_signs():
     # A local file name is never decoded since a percent sign is a valid character in a file name.
@@ -307,6 +314,18 @@ def test_remote_file_with_dot_segments():
 
     assert file.url == "https://example.com/c/model.cellml"
     assert file.path == "https://example.com/c/model.cellml"
+
+
+def test_remote_file_with_upper_case_scheme():
+    # A scheme is case-insensitive, so it gets normalised to lowercase.
+
+    file = loc.File("HTTPS://example.com/model.cellml", False)
+
+    assert file.url == "https://example.com/model.cellml"
+    assert file.path == "https://example.com/model.cellml"
+    assert loc.File("https://example.com/model.cellml", False) == file
+    assert loc.File("Https://example.com/model.cellml", False) == file
+    assert loc.FileManager.instance().file("HTTPS://example.com/model.cellml") == file
 
 
 def test_remote_file_matching_local_file():

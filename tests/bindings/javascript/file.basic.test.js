@@ -232,6 +232,21 @@ test.describe('File basic tests', () => {
     assert.strictEqual(file.path, 'https://example.com/c/model.cellml');
   });
 
+  test('Remote file with upper-case scheme', () => {
+    // A scheme is case-insensitive, so it gets normalised to lowercase.
+
+    const file = new loc.File('HTTPS://example.com/model.cellml');
+
+    assert.strictEqual(file.url, 'https://example.com/model.cellml');
+    assert.strictEqual(file.path, 'https://example.com/model.cellml');
+    assert.strictEqual(new loc.File('https://example.com/model.cellml').isAliasOf(file), true);
+    assert.strictEqual(new loc.File('Https://example.com/model.cellml').isAliasOf(file), true);
+    assert.strictEqual(
+      loc.FileManager.instance().fileFromFileNameOrUrl('HTTPS://example.com/model.cellml').isAliasOf(file),
+      true
+    );
+  });
+
   test('Remote file matching local file', () => {
     // The host and path of a URL must never be resolved as a local file, even if such a local file exists.
 

@@ -453,33 +453,52 @@ std::string canonicalUrl(const std::string &pUrl)
     return res;
 }
 
+namespace {
+
+bool startsWithScheme(const std::string &pFileNameOrUrl, std::string_view pScheme)
+{
+    // Check whether the given file name or URL starts with the given (lowercase) scheme, ignoring case since a scheme
+    // is case-insensitive (see https://www.rfc-editor.org/rfc/rfc3986#section-3.1).
+
+    return (pFileNameOrUrl.size() >= pScheme.size())
+           && std::equal(pScheme.begin(), pScheme.end(), pFileNameOrUrl.begin(), [](char pSchemeChar, char pChar) {
+                  return pSchemeChar == static_cast<char>(std::tolower(static_cast<unsigned char>(pChar)));
+              });
+}
+
+} // namespace
+
 std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl, bool pCanonicalise)
 {
     // Check whether the given file name or URL is a local file name or a URL.
     // Note #1: a URL represents a local file when used with the "file" scheme.
-    // Note #2: the percent-encoded characters of a URL are decoded (e.g., "https://example.com/my%20file.txt" and
+    // Note #2: a scheme is case-insensitive (e.g., "HTTPS://example.com/file.txt" and "https://example.com/file.txt"
+    //          are the same file), so we normalise it to lowercase (see
+    //          https://www.rfc-editor.org/rfc/rfc3986#section-6.2.2.1).
+    // Note #3: the percent-encoded characters of a URL are decoded (e.g., "https://example.com/my%20file.txt" and
     //          "https://example.com/my file.txt" are the same file), except for those that have a meaning in a URL (see
     //          decodeUrl()). The path of a "file" URL is, however, always fully decoded since it is a local file name.
     //          On the other hand, a local file name is never decoded since a percent sign is a valid character in a
     //          file name (e.g., "/some/path/my%20file.txt" and "/some/path/my file.txt" are two different files).
 
 #ifdef BUILDING_ON_WINDOWS
-    static constexpr auto FILE_SCHEME {"file:///"};
+    static constexpr std::string_view FILE_SCHEME {"file:///"};
 #else
-    static constexpr auto FILE_SCHEME {"file://"};
+    static constexpr std::string_view FILE_SCHEME {"file://"};
 #endif
-    static auto FILE_SCHEME_LENGTH {strlen(FILE_SCHEME)};
-    static constexpr auto HTTP_SCHEME {"http://"};
-    static constexpr auto HTTPS_SCHEME {"https://"};
+    static constexpr std::string_view HTTP_SCHEME {"http://"};
+    static constexpr std::string_view HTTPS_SCHEME {"https://"};
 
-    if (pFileNameOrUrl.starts_with(HTTP_SCHEME) || pFileNameOrUrl.starts_with(HTTPS_SCHEME)) {
-        auto res {decodeUrl(pFileNameOrUrl, false)};
+    for (const auto &scheme : {HTTP_SCHEME, HTTPS_SCHEME}) {
+        if (startsWithScheme(pFileNameOrUrl, scheme)) {
+            auto res {decodeUrl(std::string(scheme) + pFileNameOrUrl.substr(scheme.size()), false)};
 
-        return {false, pCanonicalise ? canonicalUrl(res) : res};
+            return {false, pCanonicalise ? canonicalUrl(res) : res};
+        }
     }
 
-    auto res {pFileNameOrUrl.starts_with(FILE_SCHEME) ?
-                  decodeUrl(pFileNameOrUrl.substr(FILE_SCHEME_LENGTH)) :
+    auto res {startsWithScheme(pFileNameOrUrl, FILE_SCHEME) ?
+                  decodeUrl(pFileNameOrUrl.substr(FILE_SCHEME.size())) :
                   pFileNameOrUrl};
 
     return {true, pCanonicalise ? canonicalFileName(res) : res};

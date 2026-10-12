@@ -158,6 +158,14 @@ TEST(BasicFileTest, urlBasedLocalFile)
     EXPECT_EQ(file->path(), filePath);
     EXPECT_TRUE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
+
+    // A scheme is case-insensitive.
+
+#ifdef BUILDING_ON_WINDOWS
+    EXPECT_EQ(libOpenCOR::File::create(std::string("FILE:///") + libOpenCOR::forwardSlashPath(filePath)), file);
+#else
+    EXPECT_EQ(libOpenCOR::File::create(std::string("FILE://") + filePath), file);
+#endif
 }
 
 TEST(BasicFileTest, localFilesWithPercentSigns)
@@ -325,6 +333,19 @@ TEST(BasicFileTest, remoteFileWithDotSegments)
 
     EXPECT_EQ(file->url(), "https://example.com/c/model.cellml");
     EXPECT_EQ(file->path(), "https://example.com/c/model.cellml");
+}
+
+TEST(BasicFileTest, remoteFileWithUpperCaseScheme)
+{
+    // A scheme is case-insensitive, so it gets normalised to lowercase.
+
+    auto file {libOpenCOR::File::create("HTTPS://example.com/model.cellml", false)};
+
+    EXPECT_EQ(file->url(), "https://example.com/model.cellml");
+    EXPECT_EQ(file->path(), "https://example.com/model.cellml");
+    EXPECT_EQ(libOpenCOR::File::create("https://example.com/model.cellml", false), file);
+    EXPECT_EQ(libOpenCOR::File::create("Https://example.com/model.cellml", false), file);
+    EXPECT_EQ(libOpenCOR::FileManager::instance().file("HTTPS://example.com/model.cellml"), file);
 }
 
 TEST(BasicFileTest, remoteFileMatchingLocalFile)
