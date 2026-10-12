@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <libopencor>
+#include "stringcaster.h"
 
-#include <nanobind/stl/string.h>
+#include <libopencor>
 
 namespace nb = nanobind;
 

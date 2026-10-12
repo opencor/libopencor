@@ -170,6 +170,13 @@ test.describe('File basic tests', () => {
     assert.strictEqual(percentFile.url, 'https://example.com/100%25.cellml');
     assert.strictEqual(new loc.File('https://example.com/100%25.cellml').isAliasOf(percentFile), true);
     assert.strictEqual(new loc.File(percentFile.url).isAliasOf(percentFile), true);
+
+    // A percent-encoded character that is not valid UTF-8 is also decoded.
+
+    const nonUtf8File = new loc.File('https://example.com/%FF.cellml');
+
+    assert.strictEqual(nonUtf8File.url, 'https://example.com/\udcff.cellml');
+    assert.strictEqual(new loc.File(nonUtf8File.url).isAliasOf(nonUtf8File), true);
   });
 
   test('Remote file', () => {

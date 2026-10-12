@@ -232,6 +232,14 @@ def test_remote_files_with_percent_encoded_characters():
     assert loc.File("https://example.com/100%25.cellml", False) == percent_file
     assert loc.File(percent_file.url, False) == percent_file
 
+    # A percent-encoded character that is not valid UTF-8 is also decoded.
+
+    non_utf8_file = loc.File("https://example.com/%FF.cellml", False)
+
+    assert non_utf8_file.url == "https://example.com/\udcff.cellml"
+    assert loc.File(non_utf8_file.url, False) == non_utf8_file
+    assert repr(non_utf8_file) == 'File("https://example.com/\\xff.cellml")'
+
 
 def test_remote_file():
     file = loc.File(utils.RemoteFile)

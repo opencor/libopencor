@@ -249,6 +249,13 @@ TEST(BasicFileTest, remoteFilesWithPercentEncodedCharacters)
     EXPECT_EQ(percentFile->url(), "https://example.com/100%25.cellml");
     EXPECT_EQ(libOpenCOR::File::create("https://example.com/100%25.cellml", false), percentFile);
     EXPECT_EQ(libOpenCOR::File::create(percentFile->url(), false), percentFile);
+
+    // A percent-encoded character that is not valid UTF-8 is also decoded.
+
+    auto nonUtf8File {libOpenCOR::File::create("https://example.com/%FF.cellml", false)};
+
+    EXPECT_EQ(nonUtf8File->url(), "https://example.com/\xFF.cellml");
+    EXPECT_EQ(libOpenCOR::File::create(nonUtf8File->url(), false), nonUtf8File);
 }
 
 TEST(BasicFileTest, remoteFile)

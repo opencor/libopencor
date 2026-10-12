@@ -14,11 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "stringcaster.h"
+
 #include <libopencor>
 
 #include <nanobind/ndarray.h>
 #include <nanobind/stl/shared_ptr.h>
-#include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
 namespace nb = nanobind;
