@@ -185,6 +185,19 @@ std::string encodeUrl(const std::string &pUrl)
     static constexpr unsigned int HEX_HIGH_NIBBLE_SHIFT {4U};
     static constexpr unsigned int HEX_LOW_NIBBLE_MASK {0x0FU};
 
+    static constexpr std::string_view SCHEME_SEPARATOR {"://"};
+    static constexpr std::string_view AUTHORITY_TERMINATORS {"/?#"};
+
+    // Determine where the authority of the URL is (e.g., "example.com:8080" in "https://example.com:8080/a/b"), if any.
+
+    auto authorityStart {pUrl.find(SCHEME_SEPARATOR)};
+    auto authorityEnd {std::string::npos};
+
+    if (authorityStart != std::string::npos) {
+        authorityStart += SCHEME_SEPARATOR.size();
+        authorityEnd = pUrl.find_first_of(AUTHORITY_TERMINATORS, authorityStart);
+    }
+
     std::string res;
 
     res.reserve(pUrl.size() * 3); // NOLINT
@@ -198,6 +211,17 @@ std::string encodeUrl(const std::string &pUrl)
         // encoded twice.
 
         if (isPercentEncodedCharacter(pUrl, i)) {
+            res += urlChar;
+
+            continue;
+        }
+
+        // Keep the square brackets of an IP literal as is (e.g., "[::1]" in "https://[::1]:8080/a/b"), since they are
+        // only allowed in the authority of a URL (see https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2) and
+        // encoding them would result in a host name that cannot be resolved.
+
+        if (((urlChar == '[') || (urlChar == ']')) && (authorityStart != std::string::npos) && (i >= authorityStart)
+            && (i < authorityEnd)) {
             res += urlChar;
 
             continue;

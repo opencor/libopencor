@@ -25,6 +25,16 @@ TEST(UtilsTest, encodeUrl)
     EXPECT_EQ(libOpenCOR::encodeUrl("https://example.com/a%2Fb%3fc d.cellml"), "https://example.com/a%2Fb%3fc%20d.cellml");
     EXPECT_EQ(libOpenCOR::encodeUrl("https://example.com/100%.cellml"), "https://example.com/100%25.cellml");
     EXPECT_EQ(libOpenCOR::encodeUrl("https://example.com/%X%2X%"), "https://example.com/%25X%252X%25");
+
+    // Keep the square brackets of an IP literal as is, but only in the authority of a URL.
+
+    EXPECT_EQ(libOpenCOR::encodeUrl("https://[::1]/a[b].cellml"), "https://[::1]/a%5Bb%5D.cellml");
+    EXPECT_EQ(libOpenCOR::encodeUrl("https://[::1]:8080/a[b].cellml"), "https://[::1]:8080/a%5Bb%5D.cellml");
+    EXPECT_EQ(libOpenCOR::encodeUrl("https://[::1]?a[b]"), "https://[::1]?a%5Bb%5D");
+    EXPECT_EQ(libOpenCOR::encodeUrl("https://[::1]#a[b]"), "https://[::1]#a%5Bb%5D");
+    EXPECT_EQ(libOpenCOR::encodeUrl("https://[::1]"), "https://[::1]");
+    EXPECT_EQ(libOpenCOR::encodeUrl("https://[fe80::1%en0]/a.cellml"), "https://[fe80::1%25en0]/a.cellml");
+    EXPECT_EQ(libOpenCOR::encodeUrl("a[b]://[::1]"), "a%5Bb%5D://[::1]");
 }
 
 TEST(UtilsTest, decodeUrl)
