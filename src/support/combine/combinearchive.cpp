@@ -89,7 +89,7 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
 
     FilePtr cellmlFile;
     FilePtr sedmlFile;
-    std::unordered_map<std::string, std::string> fileLocations;
+    std::unordered_map<std::string, size_t> fileIndexes;
 
     for (int i {0}; i < mArchive->getNumEntries(); ++i) {
         const auto *entry {mArchive->getEntry(i)};
@@ -127,25 +127,31 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
         // Note: different locations may refer to the same file (e.g., "./my%20file.cellml" and "./my file.cellml", or
         //       "./file.cellml" and "file.cellml"). This is an ambiguity in the COMBINE archive itself, so we keep the
         //       first file and ignore the other ones (File::create() would otherwise return the same file, which
-        //       contents would get replaced and which would be counted several times).
+        //       contents would get replaced and which would be counted several times). We do, however, honour the
+        //       master attribute of an ignored entry since it still refers to the file that we kept.
 
-        if (auto fileLocation {fileLocations.find(fileName)}; fileLocation != fileLocations.end()) {
+        if (auto fileIndex {fileIndexes.find(fileName)}; fileIndex != fileIndexes.end()) {
+            const auto &fileLocation {mFileNames[fileIndex->second]};
             std::string warning;
 
-            warning.reserve(location.size() + fileLocation->second.size() + 64); // NOLINT
+            warning.reserve(location.size() + fileLocation.size() + 64); // NOLINT
 
             warning += "The file '";
             warning += location;
             warning += "' is the same as the file '";
-            warning += fileLocation->second;
+            warning += fileLocation;
             warning += "'. It has been ignored.";
 
             addWarning(warning);
 
+            if (entry->getMaster()) {
+                mMasterFile = mFiles[fileIndex->second];
+            }
+
             continue;
         }
 
-        fileLocations.emplace(fileName, location);
+        fileIndexes.emplace(fileName, mFiles.size());
 
         // Retrieve the contents of the file.
         // Note #1: a location is a URI reference while the name of an entry in the ZIP file is a file name, so the

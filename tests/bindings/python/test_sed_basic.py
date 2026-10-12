@@ -190,6 +190,24 @@ def test_remote_sedml_file_with_network_path_cellml_file():
     assert document.models[0].file == needed_file
 
 
+def test_remote_sedml_file_with_remote_cellml_file():
+    # A model source that is a URL is used as is (its scheme being normalised), i.e. it is not relative to the remote
+    # SED-ML file.
+
+    file = loc.File("https://example.com/simulations/simulation.sedml", False)
+
+    file.contents = utils.text_to_list(
+        sedml_contents("HTTPS://example.org/models/model.cellml")
+    )
+
+    needed_file = loc.File("https://example.org/models/model.cellml", False)
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == needed_file
+
+
 def test_sedml_file_with_remote_cellml_file():
     file = loc.File(utils.resource_path("api/sed/remote_cellml_file.sedml"))
     document = loc.SedDocument(file)
@@ -270,6 +288,28 @@ def test_combine_archive_with_no_master_file_and_several_cellml_files():
     document = loc.SedDocument(file)
 
     assert_issues(document, expected_issues)
+
+
+def test_combine_archive_with_master_file_with_duplicate_location():
+    # The master attribute of an entry that is ignored because its location refers to the same file as another entry
+    # still applies to that file.
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "COMBINE archive: the file 'cellml_2_b.cellml' is the same as the file './cellml_2_b.cellml'. It has been ignored.",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path("api/sed/master_file_with_duplicate_location.omex")
+    )
+    document = loc.SedDocument(file)
+
+    assert_issues(file, expected_issues)
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == file.child_file("./cellml_2_b.cellml")
 
 
 def test_combine_archive_with_no_master_file_and_one_sedml_file():

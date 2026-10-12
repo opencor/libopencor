@@ -198,6 +198,22 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(document.models[0].file.isAliasOf(neededFile), true);
   });
 
+  test('Remote SED-ML file with remote CellML file', () => {
+    // A model source that is a URL is used as is (its scheme being normalised), i.e. it is not relative to the remote
+    // SED-ML file.
+
+    const file = new loc.File('https://example.com/simulations/simulation.sedml');
+
+    file.setContents(sedmlContents('HTTPS://example.org/models/model.cellml'));
+
+    const neededFile = new loc.File('https://example.org/models/model.cellml');
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.isAliasOf(neededFile), true);
+  });
+
   test('SED-ML file with remote CellML file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/remote_cellml_file.sedml'));
 
@@ -284,6 +300,27 @@ test.describe('Sed basic tests', () => {
         'A simulation experiment description cannot be created using a COMBINE archive with no master file, no SED-ML file, and several CellML files.'
       ]
     ]);
+  });
+
+  test('COMBINE archive with master file with duplicate location', () => {
+    // The master attribute of an entry that is ignored because its location refers to the same file as another entry
+    // still applies to that file.
+
+    const file = new loc.File(utils.resourcePath('api/sed/master_file_with_duplicate_location.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, file, [
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file 'cellml_2_b.cellml' is the same as the file './cellml_2_b.cellml'. It has been ignored."
+      ]
+    ]);
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.isAliasOf(file.childFileFromFileName('./cellml_2_b.cellml')), true);
   });
 
   test('COMBINE archive with no master file and one SED-ML file', () => {

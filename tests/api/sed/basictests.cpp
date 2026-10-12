@@ -198,6 +198,23 @@ TEST(BasicSedTest, remoteSedmlFileWithNetworkPathCellmlFile)
     EXPECT_EQ(document->models()[0]->file(), neededFile);
 }
 
+TEST(BasicSedTest, remoteSedmlFileWithRemoteCellmlFile)
+{
+    // A model source that is a URL is used as is (its scheme being normalised), i.e. it is not relative to the remote
+    // SED-ML file.
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("HTTPS://example.org/models/model.cellml").c_str()));
+
+    auto neededFile {libOpenCOR::File::create("https://example.org/models/model.cellml", false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
 TEST(BasicSedTest, sedmlFileWithRemoteCellmlFile)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/remote_cellml_file.sedml"))};
@@ -269,6 +286,24 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndSeveralCellmlFiles)
     auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
+TEST(BasicSedTest, combineArchiveWithMasterFileWithDuplicateLocation)
+{
+    // The master attribute of an entry that is ignored because its location refers to the same file as another entry
+    // still applies to that file.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file 'cellml_2_b.cellml' is the same as the file './cellml_2_b.cellml'. It has been ignored."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/master_file_with_duplicate_location.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(file, EXPECTED_ISSUES);
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), file->childFile("./cellml_2_b.cellml"));
 }
 
 TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneSedmlFile)
