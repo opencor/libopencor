@@ -83,7 +83,7 @@ void LIBOPENCOR_UNIT_TESTING_EXPORT printArray(const std::string &pName, const D
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT encodeUrl(const std::string &pUrl);
-std::string LIBOPENCOR_UNIT_TESTING_EXPORT decodeUrl(const std::string &pUrl);
+std::string LIBOPENCOR_UNIT_TESTING_EXPORT decodeUrl(const std::string &pUrl, bool pDecodeReservedCharacters = true);
 
 #ifdef BUILDING_USING_MSVC
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT forwardSlashPath(const std::string &pPath);
@@ -94,7 +94,7 @@ std::string pathToString(const std::filesystem::path &pPath);
 
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT canonicalFileName(const std::string &pFileName);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT canonicalUrl(const std::string &pUrl);
-std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl, bool pCanonicalise = true);
+std::tuple<bool, std::string> LIBOPENCOR_UNIT_TESTING_EXPORT retrieveFileInfo(const std::string &pFileNameOrUrl, bool pCanonicalise = true);
 std::string relativePath(const std::string &pPath, const std::string &pBasePath);
 std::string urlPath(const std::string &pPath);
 

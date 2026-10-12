@@ -139,6 +139,42 @@ test.describe('Sed serialise tests', () => {
     assert.strictEqual(document.serialise(), cvodeExpectedSerialisation('cellml_2.cellml'));
   });
 
+  test('Local CellML file with percent signs', () => {
+    // A model source is a URI reference, so the percent signs in the file name of a local model must be percent-encoded
+    // for the model source to refer to that model when the SED-ML file is loaded back.
+
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const file = new loc.File(utils.resourcePath('my%20model.cellml'));
+
+    file.setContents(cellmlContents);
+
+    const otherFile = new loc.File(utils.resourcePath('my model.cellml'));
+
+    otherFile.setContents(cellmlContents);
+
+    const document = new loc.SedDocument(file);
+    const encodedFileUrl = `file://${utils.resourcePath('my%2520model.cellml')}`;
+
+    assert.strictEqual(document.serialise(utils.resourcePath()), cvodeExpectedSerialisation('my%2520model.cellml'));
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation(encodedFileUrl));
+
+    // Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    // (which we never generate, but which a third-party tool might).
+
+    for (const source of ['my%2520model.cellml', encodedFileUrl, utils.resourcePath('my%2520model.cellml')]) {
+      const sedmlFile = new loc.File(utils.resourcePath('my_model.sedml'));
+
+      sedmlFile.setContents(new TextEncoder().encode(cvodeExpectedSerialisation(source)));
+
+      const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+      assert.strictEqual(sedmlDocument.models.length, 1);
+      assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+      loc.FileManager.instance().unmanage(sedmlFile);
+    }
+  });
+
   test('Remote CellML file with base path', () => {
     const file = new loc.File(utils.REMOTE_FILE);
 

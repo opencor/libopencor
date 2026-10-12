@@ -166,3 +166,32 @@ def test_type_combine_archive_with_files_outside_of_it():
     utils.assert_issues(file, expected_issues)
     assert sibling.contents == some_contents
     assert FileManager.instance().file_count == 3
+
+
+def test_type_combine_archive_with_percent_encoded_locations():
+    # A location is a URI reference, so it may be percent-encoded (e.g., "./my%20file.txt"), in which case the name of
+    # its ZIP entry should be its decoded location (e.g., "my file.txt"), although some tools use the location itself
+    # (e.g., "other%20file.txt"). Either way, a child file must have the contents of its ZIP entry and be retrievable
+    # using either its location or its file name.
+    # Note: the ZIP entry for "./my%2520file.txt" is "my%20file.txt", so it must not be used for "./my%20file.txt".
+
+    locations_and_file_names = [
+        ("./file.txt", "file.txt"),
+        ("./my%20file.txt", "my file.txt"),
+        ("./my%2520file.txt", "my%20file.txt"),
+        ("./other%20file.txt", "other file.txt"),
+    ]
+    file = File(utils.resource_path("api/file/percent_encoded_locations.omex"))
+
+    assert file.type == File.Type.CombineArchive
+    assert not file.has_issues
+    assert file.child_file_count == len(locations_and_file_names)
+
+    for i, (location, file_name) in enumerate(locations_and_file_names):
+        child_file = file.child_file(location)
+
+        assert child_file is not None
+        assert file.child_file_names[i] == location
+        assert file.child_file(i) == child_file
+        assert file.child_file(file_name) == child_file
+        assert child_file.contents == utils.text_to_list(file_name)

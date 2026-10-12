@@ -94,14 +94,18 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
         auto location {entry->getLocation()};
 
         // Make sure that the file is located within the COMBINE archive.
-        // Note: a location may have some ".." segments (e.g., "../file.cellml"), possibly percent-encoded (e.g.,
-        //       "%2E%2E/file.cellml"), in which case the file would be located outside of the COMBINE archive. It
-        //       could then be confused with another managed file (which contents would get replaced) or even with the
-        //       COMBINE archive itself (resulting in an infinite recursion), so we ignore such a file. To determine
-        //       where the file is located, we use its file name as determined by File::create().
+        // Note #1: a location is a URI reference (see https://www.rfc-editor.org/rfc/rfc3986#section-4.1), so it may be
+        //          percent-encoded (e.g., "my%20file.cellml"). Since mArchiveLocation is a local file name, we must
+        //          decode the location to get the file name of the file.
+        // Note #2: a location may have some ".." segments (e.g., "../file.cellml"), possibly percent-encoded (e.g.,
+        //          "%2E%2E/file.cellml"), in which case the file would be located outside of the COMBINE archive. It
+        //          could then be confused with another managed file (which contents would get replaced) or even with
+        //          the COMBINE archive itself (resulting in an infinite recursion), so we ignore such a file. To
+        //          determine where the file is located, we use its file name as determined by File::create().
 
-        auto fileNameOrUrl {mArchiveLocation + location};
-        auto [isLocalFile, fileName] {retrieveFileInfo(decodeUrl(fileNameOrUrl))};
+        auto decodedLocation {decodeUrl(location)};
+        auto fileNameOrUrl {mArchiveLocation + decodedLocation};
+        auto [isLocalFile, fileName] {retrieveFileInfo(fileNameOrUrl)};
 
         if (!fileName.starts_with(mArchiveLocation)) {
             std::string warning;
@@ -117,9 +121,27 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
             continue;
         }
 
+        // Retrieve the contents of the file.
+        // Note #1: a location is a URI reference while the name of an entry in the ZIP file is a file name, so the
+        //          entry for a percent-encoded location (e.g., "my%20file.cellml") should be named after its decoded
+        //          location (e.g., "my file.cellml"). However, libCOMBINE uses a location as is, so some tools name the
+        //          entry after the location itself. So, we first look for an entry named after the decoded location
+        //          and, if there is none, for an entry named after the location itself.
+        // Note #2: we must use libcombine::CombineArchive::extractEntryToBuffer() since it extracts an entry in memory
+        //          while libcombine::CombineArchive::extractEntryToStream() extracts it to a temporary file (which name
+        //          is generated in a non thread-safe way) and returns empty contents if that file cannot be created.
+        //          However, it returns empty contents for an entry that doesn't exist, so we cannot distinguish it from
+        //          an empty entry, in which case we also look for an entry named after the location itself.
+
+        auto contents {mArchive->extractEntryToBuffer(decodedLocation)};
+
+        if (contents.empty()) {
+            contents = mArchive->extractEntryToBuffer(location);
+        }
+
         auto file {File::create(fileNameOrUrl)};
 
-        file->setContents(mArchive->extractEntryToBuffer(location));
+        file->setContents(contents);
 
         mFiles.push_back(file);
         mFileNames.push_back(location);
@@ -229,8 +251,19 @@ const FilePtr &CombineArchive::Impl::file(const std::string &pFileName) const
 {
     static const FilePtr NO_FILE_PTR;
 
+    // Look for the file using its location, as returned by fileNames() (e.g., "./my%20file.cellml"), or its file name
+    // relative to the COMBINE archive (e.g., "my file.cellml").
+
+    for (size_t i {0}; i < mFileNames.size(); ++i) {
+        if (mFileNames[i] == pFileName) {
+            return mFiles[i];
+        }
+    }
+
+    auto [isLocalFile, fileName] {retrieveFileInfo(mArchiveLocation + pFileName)};
+
     for (const auto &file : mFiles) {
-        if (file->fileName() == mArchiveLocation + pFileName) {
+        if (file->fileName() == fileName) {
             return file;
         }
     }

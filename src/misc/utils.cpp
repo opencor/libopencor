@@ -164,6 +164,20 @@ bool fuzzyCompare(double pNb1, double pNb2)
     return std::fabs(pNb1 - pNb2) * ONE_TRILLION <= std::fmin(std::fabs(pNb1), std::fabs(pNb2));
 }
 
+namespace {
+
+bool isPercentEncodedCharacter(const std::string &pUrl, size_t pIndex)
+{
+    // Check whether there is a percent-encoded character (e.g., "%20") at the given index of the given URL.
+
+    return (pUrl[pIndex] == '%')
+           && (pIndex + 2 < pUrl.size())
+           && (std::isxdigit(static_cast<unsigned char>(pUrl[pIndex + 1])) != 0)
+           && (std::isxdigit(static_cast<unsigned char>(pUrl[pIndex + 2])) != 0);
+}
+
+} // namespace
+
 std::string encodeUrl(const std::string &pUrl)
 {
     static constexpr std::string_view URL_SAFE_CHARACTERS {"!#$&'()*+,-./:;=?@_~"};
@@ -175,9 +189,22 @@ std::string encodeUrl(const std::string &pUrl)
 
     res.reserve(pUrl.size() * 3); // NOLINT
 
-    for (const auto urlChar : pUrl) {
+    for (size_t i {0}; i < pUrl.size(); ++i) {
+        const auto urlChar {pUrl[i]};
         const auto unsignedChar {static_cast<unsigned char>(urlChar)};
         const auto encodedChar {static_cast<unsigned int>(unsignedChar)};
+
+        // Keep a percent-encoded character as is (e.g., "%2F" in "https://example.com/a%2Fb"), so that it doesn't get
+        // encoded twice.
+
+        if (isPercentEncodedCharacter(pUrl, i)) {
+            res += urlChar;
+
+            continue;
+        }
+
+        // Encode the character if it is not alphanumeric and not one of the URL safe characters (see
+        // https://www.rfc-editor.org/rfc/rfc3986#section-2.3).
 
         if ((isalnum(unsignedChar) != 0) || (URL_SAFE_CHARACTERS.find(urlChar) != std::string::npos)) {
             res += urlChar;
@@ -191,17 +218,49 @@ std::string encodeUrl(const std::string &pUrl)
     return res;
 }
 
-std::string decodeUrl(const std::string &pUrl)
+std::string decodeUrl(const std::string &pUrl, bool pDecodeReservedCharacters)
 {
+    // Decode the given URL.
+    // Note #1: if pDecodeReservedCharacters is false, we don't decode the characters that have a meaning in a URL, i.e.
+    //          the reserved characters (see https://www.rfc-editor.org/rfc/rfc3986#section-2.2) and the percent sign
+    //          (see https://www.rfc-editor.org/rfc/rfc3986#section-2.4). Indeed, decoding them would result in a
+    //          different URL (e.g., "https://example.com/a%2Fb" and "https://example.com/a/b" are two different URLs).
+    //          We do, however, uppercase their hexadecimal digits (see
+    //          https://www.rfc-editor.org/rfc/rfc3986#section-6.2.2.1), so that "https://example.com/a%2fb" and
+    //          "https://example.com/a%2Fb" are considered to be the same URL. We also don't decode the backslash since
+    //          canonicalUrl() considers it to be a forward slash on Windows (e.g., "https://example.com/a%5Cb" and
+    //          "https://example.com/a/b" would otherwise be the same URL on Windows, but not on other platforms).
+    // Note #2: if pDecodeReservedCharacters is false, we also percent-encode a percent sign that doesn't start a
+    //          percent-encoded character (e.g., "https://example.com/100%" becomes "https://example.com/100%25"), so
+    //          that decoding a decoded URL doesn't change it (e.g., "https://example.com/%%32%30" would otherwise
+    //          become "https://example.com/%20" and then "https://example.com/ ").
+    // Note #3: we never decode the null character since it cannot be part of a file name or URL, and since a file name
+    //          with an embedded null character would get truncated when used by the operating system (e.g.,
+    //          "file:///some/path/file.txt%00.cellml" would otherwise refer to "/some/path/file.txt").
+
     static constexpr auto BASE_16 {16};
+    static constexpr std::string_view UNDECODED_CHARACTERS {":/?#[]@!$&'()*+,;=%\\"};
 
     std::string res;
 
+    res.reserve(pUrl.size());
+
     for (size_t i {0}; i < pUrl.size(); ++i) {
-        if ((pUrl[i] == '%') && (i + 2 < pUrl.size()) && (std::isxdigit(pUrl[i + 1]) != 0) && (std::isxdigit(pUrl[i + 2]) != 0)) {
-            res += static_cast<char>(std::stoi(pUrl.substr(i + 1, 2), nullptr, BASE_16));
+        if (isPercentEncodedCharacter(pUrl, i)) {
+            const auto decodedChar {static_cast<char>(std::stoi(pUrl.substr(i + 1, 2), nullptr, BASE_16))};
+
+            if ((decodedChar != '\0')
+                && (pDecodeReservedCharacters || (UNDECODED_CHARACTERS.find(decodedChar) == std::string::npos))) {
+                res += decodedChar;
+            } else {
+                res += '%';
+                res += static_cast<char>(std::toupper(static_cast<unsigned char>(pUrl[i + 1])));
+                res += static_cast<char>(std::toupper(static_cast<unsigned char>(pUrl[i + 2])));
+            }
 
             i += 2;
+        } else if (!pDecodeReservedCharacters && (pUrl[i] == '%')) {
+            res += "%25";
         } else {
             res += pUrl[i];
         }
@@ -373,7 +432,12 @@ std::string canonicalUrl(const std::string &pUrl)
 std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl, bool pCanonicalise)
 {
     // Check whether the given file name or URL is a local file name or a URL.
-    // Note: a URL represents a local file when used with the "file" scheme.
+    // Note #1: a URL represents a local file when used with the "file" scheme.
+    // Note #2: the percent-encoded characters of a URL are decoded (e.g., "https://example.com/my%20file.txt" and
+    //          "https://example.com/my file.txt" are the same file), except for those that have a meaning in a URL (see
+    //          decodeUrl()). The path of a "file" URL is, however, always fully decoded since it is a local file name.
+    //          On the other hand, a local file name is never decoded since a percent sign is a valid character in a
+    //          file name (e.g., "/some/path/my%20file.txt" and "/some/path/my file.txt" are two different files).
 
 #ifdef BUILDING_ON_WINDOWS
     static constexpr auto FILE_SCHEME {"file:///"};
@@ -385,14 +449,14 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
     static constexpr auto HTTPS_SCHEME {"https://"};
 
     if (pFileNameOrUrl.starts_with(HTTP_SCHEME) || pFileNameOrUrl.starts_with(HTTPS_SCHEME)) {
-        return {false, pCanonicalise ? canonicalUrl(pFileNameOrUrl) : pFileNameOrUrl};
+        auto res {decodeUrl(pFileNameOrUrl, false)};
+
+        return {false, pCanonicalise ? canonicalUrl(res) : res};
     }
 
-    auto res {pFileNameOrUrl};
-
-    if (res.starts_with(FILE_SCHEME)) {
-        res.erase(0, FILE_SCHEME_LENGTH);
-    }
+    auto res {pFileNameOrUrl.starts_with(FILE_SCHEME) ?
+                  decodeUrl(pFileNameOrUrl.substr(FILE_SCHEME_LENGTH)) :
+                  pFileNameOrUrl};
 
     return {true, pCanonicalise ? canonicalFileName(res) : res};
 }

@@ -171,6 +171,20 @@ void SedModel::Impl::serialise(xmlNodePtr pNode) const
                      relativePath(mFile->path(), mBasePath)};
 #endif
 
+    // A model source is a URI reference, which gets decoded when it is for a local file (see retrieveFileInfo() and
+    // SedmlFile::Impl::populateDocument()). So, for a local file, we must percent-encode the percent signs in its file
+    // name (e.g., "my%20model.cellml" must become "my%2520model.cellml"), so that the model source can be decoded back
+    // to the file name of the model.
+
+    if (mFile->url().empty()) {
+        static constexpr auto PERCENT_SIGN {'%'};
+        static constexpr std::string_view PERCENT_ENCODED_PERCENT_SIGN {"%25"};
+
+        for (auto pos {source.find(PERCENT_SIGN)}; pos != std::string::npos; pos = source.find(PERCENT_SIGN, pos + PERCENT_ENCODED_PERCENT_SIGN.size())) {
+            source.replace(pos, 1, PERCENT_ENCODED_PERCENT_SIGN);
+        }
+    }
+
     xmlNewProp(node, toConstXmlCharPtr("source"), toConstXmlCharPtr(source));
 
     xmlAddChild(pNode, node);

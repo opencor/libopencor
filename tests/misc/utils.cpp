@@ -22,6 +22,9 @@ TEST(UtilsTest, encodeUrl)
 {
     EXPECT_EQ(libOpenCOR::encodeUrl(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"),
               "%20!%22#$%25&'()*+,-./0123456789:;%3C=%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~");
+    EXPECT_EQ(libOpenCOR::encodeUrl("https://example.com/a%2Fb%3fc d.cellml"), "https://example.com/a%2Fb%3fc%20d.cellml");
+    EXPECT_EQ(libOpenCOR::encodeUrl("https://example.com/100%.cellml"), "https://example.com/100%25.cellml");
+    EXPECT_EQ(libOpenCOR::encodeUrl("https://example.com/%X%2X%"), "https://example.com/%25X%252X%25");
 }
 
 TEST(UtilsTest, decodeUrl)
@@ -32,6 +35,88 @@ TEST(UtilsTest, decodeUrl)
     EXPECT_EQ(libOpenCOR::decodeUrl("%X"), "%X");
     EXPECT_EQ(libOpenCOR::decodeUrl("%XX"), "%XX");
     EXPECT_EQ(libOpenCOR::decodeUrl("%2X"), "%2X");
+
+    // Don't decode the reserved characters, the percent sign, and the backslash, but uppercase their hexadecimal digits.
+
+    EXPECT_EQ(libOpenCOR::decodeUrl("%20!%22#$%25&'()*+,-./0123456789:;%3C=%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~", false),
+              " !\"#$%25&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D^_`abcdefghijklmnopqrstuvwxyz{|}~");
+    EXPECT_EQ(libOpenCOR::decodeUrl("%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%25%5C", false),
+              "%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%25%5C");
+    EXPECT_EQ(libOpenCOR::decodeUrl("%3a%2f%3f%23%5b%5d%2a%2b%2c%3b%3d%5c", false), "%3A%2F%3F%23%5B%5D%2A%2B%2C%3B%3D%5C");
+    EXPECT_EQ(libOpenCOR::decodeUrl("%2541%2e%7e", false), "%2541.~");
+
+    // Percent-encode a percent sign that doesn't start a percent-encoded character, so that decoding a decoded URL
+    // doesn't change it.
+
+    EXPECT_EQ(libOpenCOR::decodeUrl("%", false), "%25");
+    EXPECT_EQ(libOpenCOR::decodeUrl("%2X", false), "%252X");
+    EXPECT_EQ(libOpenCOR::decodeUrl("%%32%30", false), "%2520");
+    EXPECT_EQ(libOpenCOR::decodeUrl(libOpenCOR::decodeUrl("%%32%30", false), false), "%2520");
+
+    // Never decode the null character.
+
+    EXPECT_EQ(libOpenCOR::decodeUrl("file.txt%00.cellml"), "file.txt%00.cellml");
+    EXPECT_EQ(libOpenCOR::decodeUrl("file.txt%00.cellml", false), "file.txt%00.cellml");
+    EXPECT_EQ(libOpenCOR::decodeUrl("%2500"), "%00");
+    EXPECT_EQ(libOpenCOR::decodeUrl("%2500", false), "%2500");
+}
+
+TEST(UtilsTest, retrieveFileInfo)
+{
+    // A local file name is never decoded.
+
+    auto [isLocalFile, fileNameOrUrl] {libOpenCOR::retrieveFileInfo("some/path/my%20file%2Ftxt", false)};
+
+    EXPECT_TRUE(isLocalFile);
+    EXPECT_EQ(fileNameOrUrl, "some/path/my%20file%2Ftxt");
+
+    // The path of a "file" URL is fully decoded.
+
+#ifdef BUILDING_ON_WINDOWS
+    std::tie(isLocalFile, fileNameOrUrl) = libOpenCOR::retrieveFileInfo("file:///C:/some/path/my%20file%25.txt", false);
+
+    EXPECT_TRUE(isLocalFile);
+    EXPECT_EQ(fileNameOrUrl, "C:/some/path/my file%.txt");
+#else
+    std::tie(isLocalFile, fileNameOrUrl) = libOpenCOR::retrieveFileInfo("file:///some/path/my%20file%25.txt", false);
+
+    EXPECT_TRUE(isLocalFile);
+    EXPECT_EQ(fileNameOrUrl, "/some/path/my file%.txt");
+#endif
+
+    // A remote URL is decoded, except for its reserved characters and percent signs, and then canonicalised.
+
+    static const std::vector<std::pair<std::string, std::string>> URLS {
+        {"https://example.com/my%20file.cellml", "https://example.com/my file.cellml"},
+        {"https://example.com/my file.cellml", "https://example.com/my file.cellml"},
+        {"https://example.com/a%2Fb.cellml", "https://example.com/a%2Fb.cellml"},
+        {"https://example.com/a%2fb.cellml", "https://example.com/a%2Fb.cellml"},
+        {"https://example.com/a/b.cellml", "https://example.com/a/b.cellml"},
+        {"https://example.com/x/..%2Fy.cellml", "https://example.com/x/..%2Fy.cellml"},
+        {"https://example.com/x/%2E%2E/y.cellml", "https://example.com/y.cellml"},
+        {"https://example.com/a%3Fb.cellml", "https://example.com/a%3Fb.cellml"},
+        {"https://example.com/a%23b.cellml", "https://example.com/a%23b.cellml"},
+        {"https://example.com/a%2541.cellml", "https://example.com/a%2541.cellml"},
+        {"https://example.com/a%5Cb.cellml", "https://example.com/a%5Cb.cellml"},
+        {"https://example.com/a%5cb.cellml", "https://example.com/a%5Cb.cellml"},
+        {"https://example.com/100%.cellml", "https://example.com/100%25.cellml"},
+        {"https://example.com/%%32%30.cellml", "https://example.com/%2520.cellml"},
+        {"http://example.com/a/../my%20file.cellml?b=%2F%20c", "http://example.com/my file.cellml?b=%2F c"},
+    };
+
+    for (const auto &[url, expectedUrl] : URLS) {
+        std::tie(isLocalFile, fileNameOrUrl) = libOpenCOR::retrieveFileInfo(url);
+
+        EXPECT_FALSE(isLocalFile);
+        EXPECT_EQ(fileNameOrUrl, expectedUrl);
+
+        // Retrieving the information of a URL that has already been retrieved must not change it.
+
+        std::tie(isLocalFile, fileNameOrUrl) = libOpenCOR::retrieveFileInfo(fileNameOrUrl);
+
+        EXPECT_FALSE(isLocalFile);
+        EXPECT_EQ(fileNameOrUrl, expectedUrl);
+    }
 }
 
 TEST(UtilsTest, isInfOrNan)

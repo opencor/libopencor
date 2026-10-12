@@ -83,8 +83,14 @@ public:
      * auto remoteFile {libOpenCOR::File::create("https://some.domain.com/file.txt")};
      * ```
      *
-     * Note: if there is already a @ref File object for the given file name or URL then we return it after having reset
-     *       its contents and type.
+     * Note #1: if there is already a @ref File object for the given file name or URL then we return it after having
+     *          reset its contents and type.
+     * Note #2: a file name is used as is (e.g., "/some/path/my%20file.txt" and "/some/path/my file.txt" are two
+     *          different files) while a URL is percent-decoded (e.g., "https://some.domain.com/my%20file.txt" and
+     *          "https://some.domain.com/my file.txt" are the same file), except for the characters that have a meaning
+     *          in a URL (e.g., "https://some.domain.com/a%2Fb.txt" and "https://some.domain.com/a/b.txt" are two
+     *          different files). The path of a "file" URL is fully percent-decoded (e.g.,
+     *          "file:///some/path/my%20file.txt" and "/some/path/my file.txt" are the same file).
      *
      * @param pFileNameOrUrl The @c std::string file name or URL.
      * @param pRetrieveContents Whether the contents of the file should be retrieved.

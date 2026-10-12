@@ -87,6 +87,91 @@ test.describe('File basic tests', () => {
     assertIssues(loc, file, expectedNoIssues);
   });
 
+  test('Local files with percent signs', () => {
+    // A local file name is never decoded since a percent sign is a valid character in a file name.
+
+    const dir = path.join(os.tmpdir(), 'libopencor_local_files_with_percent_signs');
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const notAModel = new TextEncoder().encode('not a model');
+
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'a%20model.cellml'), cellmlContents);
+    fs.writeFileSync(path.join(dir, 'b%20c.cellml'), cellmlContents);
+    fs.writeFileSync(path.join(dir, 'b c.cellml'), notAModel);
+
+    const a = new loc.File(path.join(dir, 'a%20model.cellml'));
+    const b = new loc.File(path.join(dir, 'b%20c.cellml'));
+    const bc = new loc.File(path.join(dir, 'b c.cellml'));
+
+    a.setContents(utils.fileContents(a.fileName));
+    b.setContents(utils.fileContents(b.fileName));
+    bc.setContents(utils.fileContents(bc.fileName));
+
+    assert.strictEqual(a.type.value, loc.File.Type.CELLML_FILE.value);
+    assert.strictEqual(a.fileName, path.join(dir, 'a%20model.cellml'));
+    assertIssues(loc, a, expectedNoIssues);
+    assert.strictEqual(b.type.value, loc.File.Type.CELLML_FILE.value);
+    assert.strictEqual(b.fileName, path.join(dir, 'b%20c.cellml'));
+    assert.deepStrictEqual(b.contents(), cellmlContents);
+    assertIssues(loc, b, expectedNoIssues);
+    assert.strictEqual(bc.isAliasOf(b), false);
+    assert.strictEqual(bc.fileName, path.join(dir, 'b c.cellml'));
+    assert.deepStrictEqual(bc.contents(), notAModel);
+
+    // The path of a "file" URL is, however, decoded.
+
+    const dirUrl = `file://${dir}`;
+
+    assert.strictEqual(new loc.File(`${dirUrl}/b%2520c.cellml`).isAliasOf(b), true);
+    assert.strictEqual(new loc.File(`${dirUrl}/b%20c.cellml`).isAliasOf(bc), true);
+    assert.strictEqual(loc.FileManager.instance().fileFromFileNameOrUrl(`${dirUrl}/b%2520c.cellml`).isAliasOf(b), true);
+    assert.strictEqual(loc.FileManager.instance().fileFromFileNameOrUrl(`${dirUrl}/b%20c.cellml`).isAliasOf(bc), true);
+
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  test('Remote files with percent-encoded characters', () => {
+    // Percent-encoded characters are decoded, unless they have a meaning in a URL, in which case the URL would refer to
+    // a different file.
+
+    const file = new loc.File('https://example.com/my%20file.cellml');
+
+    assert.strictEqual(file.url, 'https://example.com/my file.cellml');
+    assert.strictEqual(new loc.File('https://example.com/my file.cellml').isAliasOf(file), true);
+    assert.strictEqual(
+      loc.FileManager.instance().fileFromFileNameOrUrl('https://example.com/my%20file.cellml').isAliasOf(file),
+      true
+    );
+    assert.strictEqual(
+      loc.FileManager.instance().fileFromFileNameOrUrl('https://example.com/my file.cellml').isAliasOf(file),
+      true
+    );
+
+    for (const [encodedUrl, otherUrl] of [
+      ['https://example.com/a%2Fb.cellml', 'https://example.com/a/b.cellml'],
+      ['https://example.com/x/..%2Fy.cellml', 'https://example.com/y.cellml'],
+      ['https://example.com/a%3Fb.cellml', 'https://example.com/a?b.cellml'],
+      ['https://example.com/a%23b.cellml', 'https://example.com/a#b.cellml'],
+      ['https://example.com/a%2520b.cellml', 'https://example.com/a%20b.cellml'],
+      ['https://example.com/a%5Cb.cellml', 'https://example.com/a/b.cellml']
+    ]) {
+      const encodedFile = new loc.File(encodedUrl);
+      const otherFile = new loc.File(otherUrl);
+
+      assert.strictEqual(encodedFile.isAliasOf(otherFile), false);
+      assert.strictEqual(encodedFile.url, encodedUrl);
+      assert.strictEqual(new loc.File(encodedFile.url).isAliasOf(encodedFile), true);
+    }
+
+    // A percent sign that doesn't start a percent-encoded character is percent-encoded.
+
+    const percentFile = new loc.File('https://example.com/100%.cellml');
+
+    assert.strictEqual(percentFile.url, 'https://example.com/100%25.cellml');
+    assert.strictEqual(new loc.File('https://example.com/100%25.cellml').isAliasOf(percentFile), true);
+    assert.strictEqual(new loc.File(percentFile.url).isAliasOf(percentFile), true);
+  });
+
   test('Remote file', () => {
     const file = new loc.File(utils.REMOTE_FILE);
 
