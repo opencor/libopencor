@@ -195,10 +195,12 @@ TEST(ChildFileTest, combineArchiveWithDuplicateLocations)
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file 'file.txt' is the same as the file './file.txt'. It has been ignored."},
         {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file './other%20file.txt' is the same as the file './other file.txt'. It has been ignored."},
     }};
     static const std::vector<std::tuple<std::string, std::string, std::string>> LOCATIONS_FILE_NAMES_AND_DUPLICATE_LOCATIONS {
         {"./file.txt", "file.txt", "file.txt"},
         {"./my%20file.txt", "my file.txt", "./my file.txt"},
+        {"./other file.txt", "other file.txt", "./other%20file.txt"},
     };
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/duplicate_locations.omex"))};
@@ -219,5 +221,5 @@ TEST(ChildFileTest, combineArchiveWithDuplicateLocations)
         EXPECT_EQ(libOpenCOR::toString(childFile->contents()), fileName);
     }
 
-    EXPECT_EQ(libOpenCOR::FileManager::instance().fileCount(), 3U);
+    EXPECT_EQ(libOpenCOR::FileManager::instance().fileCount(), 4U);
 }

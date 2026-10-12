@@ -211,10 +211,15 @@ def test_type_combine_archive_with_duplicate_locations():
             Issue.Type.Warning,
             "COMBINE archive: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored.",
         ],
+        [
+            Issue.Type.Warning,
+            "COMBINE archive: the file './other%20file.txt' is the same as the file './other file.txt'. It has been ignored.",
+        ],
     ]
     locations_file_names_and_duplicate_locations = [
         ("./file.txt", "file.txt", "file.txt"),
         ("./my%20file.txt", "my file.txt", "./my file.txt"),
+        ("./other file.txt", "other file.txt", "./other%20file.txt"),
     ]
     file = File(utils.resource_path("api/file/duplicate_locations.omex"))
 
@@ -234,4 +239,4 @@ def test_type_combine_archive_with_duplicate_locations():
         assert file.child_file(duplicate_location) == child_file
         assert child_file.contents == utils.text_to_list(file_name)
 
-    assert FileManager.instance().file_count == 3
+    assert FileManager.instance().file_count == 4

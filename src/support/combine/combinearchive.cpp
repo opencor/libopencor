@@ -128,7 +128,8 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
         //       "./file.cellml" and "file.cellml"). This is an ambiguity in the COMBINE archive itself, so we keep the
         //       first file and ignore the other ones (File::create() would otherwise return the same file, which
         //       contents would get replaced and which would be counted several times). We do, however, honour the
-        //       master attribute of an ignored entry since it still refers to the file that we kept.
+        //       master attribute of an ignored entry since it still refers to the file that we kept, and we keep track
+        //       of its location so that it can still be used to retrieve that file (see file()).
 
         if (auto fileIndex {fileIndexes.find(fileName)}; fileIndex != fileIndexes.end()) {
             const auto &fileLocation {mFileNames[fileIndex->second]};
@@ -143,6 +144,8 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
             warning += "'. It has been ignored.";
 
             addWarning(warning);
+
+            mIgnoredFileNameIndexes.emplace(location, fileIndex->second);
 
             if (entry->getMaster()) {
                 mMasterFile = mFiles[fileIndex->second];
@@ -283,13 +286,22 @@ const FilePtr &CombineArchive::Impl::file(const std::string &pFileName) const
 {
     static const FilePtr NO_FILE_PTR;
 
-    // Look for the file using its location, as returned by fileNames() (e.g., "./my%20file.cellml"), or its file name
-    // relative to the COMBINE archive (e.g., "my file.cellml").
+    // Look for the file using its location, as returned by fileNames() (e.g., "./my%20file.cellml"), the location of an
+    // entry that was ignored because it refers to the same file (e.g., "my%20file.cellml"), or its file name relative
+    // to the COMBINE archive (e.g., "my file.cellml").
+    // Note: a file name is never decoded (see retrieveFileInfo()), so we must look for the location of an ignored entry
+    //       explicitly since it may be percent-encoded.
 
     for (size_t i {0}; i < mFileNames.size(); ++i) {
         if (mFileNames[i] == pFileName) {
             return mFiles[i];
         }
+    }
+
+    auto ignoredFileNameIndex {mIgnoredFileNameIndexes.find(pFileName)};
+
+    if (ignoredFileNameIndex != mIgnoredFileNameIndexes.end()) {
+        return mFiles[ignoredFileNameIndex->second];
     }
 
     auto [isLocalFile, fileName] {retrieveFileInfo(mArchiveLocation + pFileName)};

@@ -205,11 +205,16 @@ test.describe('File type tests', () => {
       [
         loc.Issue.Type.WARNING,
         "COMBINE archive: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file './other%20file.txt' is the same as the file './other file.txt'. It has been ignored."
       ]
     ];
     const locationsFileNamesAndDuplicateLocations = [
       ['./file.txt', 'file.txt', 'file.txt'],
-      ['./my%20file.txt', 'my file.txt', './my file.txt']
+      ['./my%20file.txt', 'my file.txt', './my file.txt'],
+      ['./other file.txt', 'other file.txt', './other%20file.txt']
     ];
     const file = new loc.File(utils.resourcePath('api/file/duplicate_locations.omex'));
 
@@ -230,6 +235,6 @@ test.describe('File type tests', () => {
       assert.deepStrictEqual(childFile.contents(), new TextEncoder().encode(fileName));
     }
 
-    assert.strictEqual(loc.FileManager.instance().fileCount, 3);
+    assert.strictEqual(loc.FileManager.instance().fileCount, 4);
   });
 });

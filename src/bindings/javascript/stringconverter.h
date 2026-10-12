@@ -29,6 +29,9 @@ limitations under the License.
 //          declarations.
 // Note #2: the code within the EM_ASM() blocks is such that it doesn't rely on top-level commas since those can get
 //          interpreted as macro argument separators by the C++ preprocessor (see main.cpp).
+// Note #3: we build our JavaScript bindings with shared memory support (see CMakeLists.txt), meaning that HEAPU8 is
+//          backed by a SharedArrayBuffer, which TextDecoder.decode() doesn't accept in a browser. So, we must copy the
+//          bytes of a std::string (using slice() rather than subarray()) before decoding them.
 
 EMSCRIPTEN_DECLARE_VAL_TYPE(JsString);
 
@@ -36,7 +39,7 @@ inline JsString toJsString(const std::string &pString)
 {
     // clang-format off
     return JsString(emscripten::val::take_ownership(static_cast<emscripten::EM_VAL>(EM_ASM_PTR({
-        let bytes = HEAPU8.subarray($0, $0 + $1);
+        let bytes = HEAPU8.slice($0, $0 + $1);
 
         try {
             return Emval.toHandle(new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes));
