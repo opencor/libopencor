@@ -196,7 +196,7 @@ size_t CombineArchive::Impl::sedmlFileCount() const
 
 bool CombineArchive::Impl::hasFiles() const
 {
-    return mFiles.empty();
+    return !mFiles.empty();
 }
 
 size_t CombineArchive::Impl::fileCount() const
@@ -319,7 +319,7 @@ size_t CombineArchive::sedmlFileCount() const
 
 bool CombineArchive::hasFiles() const
 {
-    return !pimpl()->hasFiles();
+    return pimpl()->hasFiles();
 }
 
 size_t CombineArchive::fileCount() const
