@@ -21,6 +21,10 @@ NAMESPACE_BEGIN(NB_NAMESPACE)
 /// DLPack API/ABI data structures are part of a separate namespace.
 NAMESPACE_BEGIN(dlpack)
 
+// The version of DLPack that is supported by libnanobind
+static constexpr uint32_t major_version = 1;
+static constexpr uint32_t minor_version = 1;
+
 enum class dtype_code : uint8_t {
     Int = 0, UInt = 1, Float = 2, Bfloat = 4, Complex = 5, Bool = 6,
     Float8_E3M4 = 7, Float8_E4M3 = 8, Float8_E4M3B11FNUZ = 9,
@@ -106,39 +110,34 @@ NAMESPACE_END(device)
 #undef NB_DEVICE
 #undef NB_ORDER
 
-template <typename T> struct ndarray_traits {
-    static constexpr bool is_complex = detail::is_complex_v<T>;
+NAMESPACE_BEGIN(detail)
+
+template <typename T, typename /* SFINAE */ = int> struct dtype_traits {
+    static constexpr bool is_complex = is_complex_v<T>;
     static constexpr bool is_float   = std::is_floating_point_v<T>;
     static constexpr bool is_bool    = std::is_same_v<std::remove_cv_t<T>, bool>;
     static constexpr bool is_int     = std::is_integral_v<T> && !is_bool;
     static constexpr bool is_signed  = std::is_signed_v<T>;
-};
 
-NAMESPACE_BEGIN(detail)
-
-template <typename T, typename /* SFINAE */ = int> struct dtype_traits {
-    using traits = ndarray_traits<T>;
-
-    static constexpr int matches = traits::is_bool + traits::is_complex +
-                                   traits::is_float + traits::is_int;
+    static constexpr int matches = is_bool + is_complex + is_float + is_int;
     static_assert(matches <= 1, "dtype matches multiple type categories!");
 
     static constexpr dlpack::dtype value{
-        (uint8_t) ((traits::is_bool ? (int) dlpack::dtype_code::Bool : 0) +
-                   (traits::is_complex ? (int) dlpack::dtype_code::Complex : 0) +
-                   (traits::is_float ? (int) dlpack::dtype_code::Float : 0) +
-                   (traits::is_int &&  traits::is_signed ? (int) dlpack::dtype_code::Int : 0) +
-                   (traits::is_int && !traits::is_signed ? (int) dlpack::dtype_code::UInt : 0)),
+        (uint8_t) ((is_bool ? (int) dlpack::dtype_code::Bool : 0) +
+                   (is_complex ? (int) dlpack::dtype_code::Complex : 0) +
+                   (is_float ? (int) dlpack::dtype_code::Float : 0) +
+                   (is_int &&  is_signed ? (int) dlpack::dtype_code::Int : 0) +
+                   (is_int && !is_signed ? (int) dlpack::dtype_code::UInt : 0)),
         (uint8_t) matches ? sizeof(T) * 8 : 0,
         matches ? 1 : 0
     };
 
     static constexpr auto name =
-        const_name<traits::is_complex>("complex", "") +
-        const_name<traits::is_int &&  traits::is_signed>("int", "") +
-        const_name<traits::is_int && !traits::is_signed>("uint", "") +
-        const_name<traits::is_float>("float", "") +
-        const_name<traits::is_bool>(const_name("bool"), const_name<sizeof(T) * 8>());
+        const_name<is_complex>("complex", "") +
+        const_name<is_int &&  is_signed>("int", "") +
+        const_name<is_int && !is_signed>("uint", "") +
+        const_name<is_float>("float", "") +
+        const_name<is_bool>(const_name("bool"), const_name<sizeof(T) * 8>());
 };
 
 template <> struct dtype_traits<void> {
@@ -168,7 +167,9 @@ template <ssize_t... Is> struct shape {
 
     static void put(size_t *out) {
         if constexpr (((Is == -1) || ...)) {
-            detail::fail("Negative ndarray sizes are not allowed here!");
+            fprintf(stderr, "Critical nanobind error: negative ndarray "
+                            "sizes are not allowed here!\n");
+            abort();
         } else {
             size_t ctr = 0;
             ((out[ctr++] = (size_t) Is), ...);
@@ -206,23 +207,88 @@ struct unused {
     static constexpr auto name = descr<0>();
 };
 
-/// ndarray_config describes a requested array configuration
+/**
+ * \brief ndarray_config describes a requested array configuration, which the
+ * backend reads through \ref ndarray_import().
+ *
+ * The layout of this data structure is part of the backend ABI contract.
+ */
 struct ndarray_config {
-    int device_type = 0;
-    char order = '\0';
-    bool ro = false;
-    dlpack::dtype dtype { };
-    int32_t ndim = -1;
-    int64_t *shape = nullptr;
+    /// Optional constraints (none yet) and the ABI tag in the top 8 bits
+    uint32_t flags;
 
-    ndarray_config() = default;
+    /// Requested DLPack device type (0: any)
+    int32_t device_type;
+
+    /// Requested dimension count (-1: any)
+    int32_t ndim;
+
+    /// Requested element type (a zero 'bits' field means any)
+    dlpack::dtype dtype;
+
+    /// Requested memory order ('C', 'F', 'A', or '\0' for any)
+    char order;
+
+    /// Does the binding access the array through a const pointer?
+    bool ro;
+
+    /// Unused, claimable by a later ABI minor
+    uint16_t unused_0;
+    uint32_t unused_1;
+
+    /// Requested extents ('ndim' entries, -1 marks a free dimension)
+    const int64_t *shape;
+
     template <typename T> ndarray_config(T)
-        : device_type(T::DeviceType::value),
-          order((char) T::Order::value),
-          ro(std::is_const_v<typename T::Scalar>),
+        : flags(NB_ABI_MINOR_TAG),
+          device_type(T::DeviceType::value), ndim(T::N),
           dtype(nanobind::dtype<typename T::Scalar>()),
-          ndim(T::N),
-          shape(nullptr) { }
+          order((char) T::Order::value),
+          ro(std::is_const_v<typename T::Scalar>), shape(nullptr) { }
+};
+
+/// ndarray_create_args describes an array that a binding hands to Python,
+/// which the backend reads through ndarray_create()
+struct ndarray_create_args {
+    /// Pointer to the array contents
+    void *data;
+
+    /// Extents of the array ('ndim' entries)
+    const size_t *shape;
+
+    /// Strides in units of elements ('ndim' entries). When null, they are
+    /// derived from 'shape' and 'order'.
+    const int64_t *strides;
+
+    /// Python object owning the data, if any
+    PyObject *owner;
+
+    /// Offset of the first element in bytes
+    uint64_t byte_offset;
+
+    /// Number of dimensions
+    uint32_t ndim;
+
+    /// Optional fields (none yet) and the ABI tag in the top 8 bits
+    uint32_t flags;
+
+    /// DLPack device type (0: the CPU device)
+    int32_t device_type;
+
+    /// Index of the device within its device type
+    int32_t device_id;
+
+    /// Element type
+    dlpack::dtype dtype;
+
+    /// Memory order used to derive missing strides ('C', 'F', 'A', or '\0')
+    char order;
+
+    /// Is the array read-only?
+    bool ro;
+
+    /// Unused, claimable by a later ABI minor
+    uint16_t unused;
 };
 
 /// ndarray_config_t collects nd-array template parameters in a structured way.
@@ -304,8 +370,8 @@ private:
                  std::index_sequence<I1...>, nanobind::shape<I2...>)
         : m_data(data) {
 
-        /* Initialize shape/strides with compile-time knowledge if
-           available (to permit vectorization, loop unrolling, etc.) */
+        // Initialize shape/strides with compile-time knowledge if
+        // available (to permit vectorization, loop unrolling, etc.)
         ((m_shape[I1] = (I2 == -1) ? shape[I1] : (int64_t) I2), ...);
         ((m_strides[I1] = strides[I1]), ...);
 
@@ -342,7 +408,7 @@ public:
 
     explicit ndarray(detail::ndarray_handle *handle) : m_handle(handle) {
         if (handle)
-            m_dltensor = *detail::ndarray_inc_ref(handle);
+            m_dltensor = *NB_CALL(ndarray_inc_ref)(handle);
     }
 
     template <typename... Args2>
@@ -359,11 +425,22 @@ public:
             char order = Order,
             uint64_t byte_offset = 0) {
 
-        m_handle = detail::ndarray_create(
-            (void *) data, ndim, shape, owner.ptr(), strides, dtype,
-            ReadOnly, device_type, device_id, order, byte_offset);
+        detail::ndarray_create_args args;
+        args.flags = NB_ABI_MINOR_TAG;
+        args.data = (void *) data;
+        args.shape = shape;
+        args.strides = strides;
+        args.owner = owner.ptr();
+        args.ndim = (uint32_t) ndim;
+        args.byte_offset = byte_offset;
+        args.device_type = device_type;
+        args.device_id = device_id;
+        args.dtype = dtype;
+        args.order = order;
+        args.ro = ReadOnly;
 
-        m_dltensor = *detail::ndarray_inc_ref(m_handle);
+        m_handle = NB_CALL(ndarray_create)(NB_CTX, &args);
+        m_dltensor = *NB_CALL(ndarray_inc_ref)(m_handle);
     }
 
     ndarray(VoidPtr data,
@@ -378,8 +455,11 @@ public:
 
         size_t shape_size = shape.size();
 
-        if (strides.size() != 0 && strides.size() != shape_size)
-            detail::fail("ndarray(): shape and strides have incompatible size!");
+        if (strides.size() != 0 && strides.size() != shape_size) {
+            fprintf(stderr, "Critical nanobind error: ndarray(): shape and "
+                            "strides have incompatible size!\n");
+            abort();
+        }
 
         size_t shape_buf[Config::N <= 0 ? 1 : Config::N];
         const size_t *shape_ptr = shape.begin();
@@ -394,20 +474,30 @@ public:
             (void) shape_buf;
         }
 
-        m_handle = detail::ndarray_create(
-            (void *) data, shape_size, shape_ptr, owner.ptr(),
-            (strides.size() == 0) ? nullptr : strides.begin(), dtype,
-            ReadOnly, device_type, device_id, order, byte_offset);
+        detail::ndarray_create_args args;
+        args.flags = NB_ABI_MINOR_TAG;
+        args.data = (void *) data;
+        args.shape = shape_ptr;
+        args.strides = (strides.size() == 0) ? nullptr : strides.begin();
+        args.owner = owner.ptr();
+        args.ndim = (uint32_t) shape_size;
+        args.byte_offset = byte_offset;
+        args.device_type = device_type;
+        args.device_id = device_id;
+        args.dtype = dtype;
+        args.order = order;
+        args.ro = ReadOnly;
 
-        m_dltensor = *detail::ndarray_inc_ref(m_handle);
+        m_handle = NB_CALL(ndarray_create)(NB_CTX, &args);
+        m_dltensor = *NB_CALL(ndarray_inc_ref)(m_handle);
     }
 
     ~ndarray() {
-        detail::ndarray_dec_ref(m_handle);
+        NB_CALL(ndarray_dec_ref)(m_handle);
     }
 
     ndarray(const ndarray &t) : m_handle(t.m_handle), m_dltensor(t.m_dltensor) {
-        detail::ndarray_inc_ref(m_handle);
+        NB_CALL(ndarray_inc_ref)(m_handle);
     }
 
     ndarray(ndarray &&t) noexcept : m_handle(t.m_handle), m_dltensor(t.m_dltensor) {
@@ -416,7 +506,7 @@ public:
     }
 
     ndarray &operator=(ndarray &&t) noexcept {
-        detail::ndarray_dec_ref(m_handle);
+        NB_CALL(ndarray_dec_ref)(m_handle);
         m_handle = t.m_handle;
         m_dltensor = t.m_dltensor;
         // Only reset t.m_handle, it's safe to leave t.m_dltensor as-is
@@ -425,8 +515,8 @@ public:
     }
 
     ndarray &operator=(const ndarray &t) {
-        detail::ndarray_inc_ref(t.m_handle);
-        detail::ndarray_dec_ref(m_handle);
+        NB_CALL(ndarray_inc_ref)(t.m_handle);
+        NB_CALL(ndarray_dec_ref)(m_handle);
         m_handle = t.m_handle;
         m_dltensor = t.m_dltensor;
         return *this;
@@ -529,7 +619,7 @@ private:
     dlpack::dltensor m_dltensor;
 };
 
-inline bool ndarray_check(handle h) { return detail::ndarray_check(h.ptr()); }
+inline bool ndarray_check(handle h) { return NB_CALL(ndarray_check)(NB_CTX, h.ptr()); }
 
 NAMESPACE_BEGIN(detail)
 
@@ -558,8 +648,8 @@ template <typename... Args> struct type_caster<ndarray<Args...>> {
                                     dtype_const_name<Scalar>::name) +
                    const_name("]"))
 
-    bool from_python(handle src, uint8_t flags, cleanup_list *cleanup) noexcept {
-        if (src.is_none() && flags & (uint8_t) cast_flags::accepts_none) {
+    bool from_python(handle src, uint32_t flags, cleanup_list *cleanup) noexcept {
+        if (src.is_none() && flags & cast_flags::accepts_none) {
             value = ndarray<Args...>();
             return true;
         }
@@ -574,20 +664,23 @@ template <typename... Args> struct type_caster<ndarray<Args...>> {
             (void) shape_buf;
         }
 
-        detail::ndarray_handle *h = ndarray_import(
-            src.ptr(), &config, flags & (uint8_t) cast_flags::convert, cleanup);
+        detail::ndarray_handle *h = NB_CALL(ndarray_import)(NB_CTX_C(cleanup),
+            src.ptr(), &config, flags & cast_flags::convert,
+            cleanup);
 
         if (NB_UNLIKELY(value.m_handle))
-            detail::ndarray_dec_ref(value.m_handle);
+            NB_CALL(ndarray_dec_ref)(value.m_handle);
         if (NB_LIKELY(h))
-            value.m_dltensor = *detail::ndarray_inc_ref(h);
+            value.m_dltensor = *NB_CALL(ndarray_inc_ref)(h);
         value.m_handle = h;
         return h != nullptr;
     }
 
     static handle from_cpp(const ndarray<Args...> &tensor, rv_policy policy,
                            cleanup_list *cleanup) noexcept {
-        return ndarray_export(tensor.handle(), Config::Framework::value, policy, cleanup);
+        return NB_CALL(ndarray_export)(NB_CTX_C(cleanup), tensor.handle(),
+                                       Config::Framework::value, policy,
+                                       cleanup);
     }
 };
 

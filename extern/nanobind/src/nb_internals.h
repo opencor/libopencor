@@ -22,10 +22,35 @@
 #include <cstring>
 #include <string_view>
 #include <functional>
+#include <vector>
 #include "hash.h"
+
+#if defined(_AIX) && defined(func_data)
+# undef func_data
+#endif
 
 #if TSL_RH_VERSION_MAJOR != 1 || TSL_RH_VERSION_MINOR < 3
 #  error nanobind depends on tsl::robin_map, in particular version >= 1.3.0, <2.0.0
+#endif
+
+#if defined(Py_LIMITED_API) && Py_LIMITED_API < 0x030C0000
+#  error "Compiling the nanobind backend under the limited API requires Python >= 3.12"
+#endif
+
+/* Can this build use the interpreter views and guards of PEP 788 to attach a
+   thread state without risking a hang at interpreter shutdown? They arrived in
+   Python 3.15, and only enter the limited API at that version. The backend
+   never targets a limited API newer than 3.12, so a linked-mode stable ABI
+   build has to fall back to PyGILState_Ensure(). */
+#if PY_VERSION_HEX >= 0x030F0000 && !defined(Py_LIMITED_API)
+#  define NB_HAVE_INTERP_VIEW 1
+#endif
+
+#if PY_VERSION_HEX < 0x030C0000
+#  include <structmember.h>
+#  define Py_T_PYSSIZET  T_PYSSIZET
+#  define Py_T_OBJECT_EX T_OBJECT_EX
+#  define Py_READONLY    READONLY
 #endif
 
 #if defined(_MSC_VER)
@@ -37,36 +62,294 @@
 // When forwarding vector calls between functions that are known to be implemented by
 // nanobind, it uses an extended ABI that may set one additional bit to communicate
 // that the implicit 'self' argument is trusted and does not need to be type-checked.
-#define NB_VECTORCALL_TRUSTED_SELF (PY_VECTORCALL_ARGUMENTS_OFFSET >> 1)
+#define NB_VECTORCALL_TRUSTED_SELF (NB_VECTORCALL_ARGUMENTS_OFFSET >> 1)
 
-// Decodes the call argument count to avoid all use of ``PyVectorcall_NARGS()``
-// in nanobind. The an official function requires a (costly) indirect PLT call
-// in the stable ABI, which is unnecessary as its behavior is fully frozen by
-// the stable ABI contract.
-#define NB_VECTORCALL_NARGS(n)                                                  \
-    ((Py_ssize_t) ((n) & ~(PY_VECTORCALL_ARGUMENTS_OFFSET |                     \
-                           NB_VECTORCALL_TRUSTED_SELF)))
+// Decodes the call argument count of this extended ABI. The public
+// ``NB_VECTORCALL_NARGS()`` macro leaves the extra bit in place.
+#define NB_VECTORCALL_NARGS_EXT(n)                                              \
+    (NB_VECTORCALL_NARGS(n) & ~(Py_ssize_t) NB_VECTORCALL_TRUSTED_SELF)
 
-#if PY_VERSION_HEX >= 0x030A0000
-#  define NB_TPFLAGS_IMMUTABLETYPE Py_TPFLAGS_IMMUTABLETYPE
-#else
-#  define NB_TPFLAGS_IMMUTABLETYPE 0
+/// Strip the ABI tag (see NB_ABI_MINOR_TAG) from a flags word
+#define NB_ABI_FLAGS(flags) ((uint32_t) (flags) & 0xFFFFFF)
+
+/// Version of nanobind's internal data structures. A mismatch isolates
+/// backends from each other instead of breaking them: their type universes
+/// simply become disjoint.
+#ifndef NB_INTERNALS_VERSION
+#  define NB_INTERNALS_VERSION 22
 #endif
+
+/// Backends compiled under the limited API cache type slots and lay out
+/// their internals differently, so they must not share state with others
+#if defined(Py_LIMITED_API)
+#  define NB_STABLE_ABI "_stable"
+#else
+#  define NB_STABLE_ABI ""
+#endif
+
+/// Prefix of the dictionary key under which a backend stores the
+/// ``nb_internals`` record of a domain (see nb_module_init). Backend binaries
+/// in one process share the state of a domain exactly when their keys match.
+#define NB_INTERNALS_KEY                                                       \
+    NB_PLATFORM_ABI_TAG "_a" NB_TOSTRING(NB_BACKEND_ABI_MAJOR)                 \
+                        "_v" NB_TOSTRING(NB_INTERNALS_VERSION) NB_STABLE_ABI
 
 NAMESPACE_BEGIN(NB_NAMESPACE)
 NAMESPACE_BEGIN(detail)
 
+/// Abort the process with a fatal error
+#if defined(__GNUC__)
+    __attribute__((noreturn, __format__(__printf__, 1, 2)))
+#else
+    [[noreturn]]
+#endif
+extern void fail(const char *fmt, ...) noexcept;
+
+/// Abort the process, describing the exception that is currently handled
+[[noreturn]] extern void fail_exception(const char *context,
+                                        const char *name) noexcept;
+
+/* Assertion checks. Each check() expands to a branch that the compiler is
+   told to expect to succeed, and the message is only assembled once the
+   failure is certain. Release builds compile the messages out entirely
+   (NB_COMPACT_ASSERTIONS), except in backend modules, whose users have no way
+   to rebuild them with a different set of flags. */
 #if defined(NB_COMPACT_ASSERTIONS)
 [[noreturn]] extern void fail_unspecified() noexcept;
-#  define check(cond, ...) if (NB_UNLIKELY(!(cond))) nanobind::detail::fail_unspecified()
+#  define check(cond, ...)                                                     \
+      do {                                                                     \
+          if (NB_UNLIKELY(!(cond)))                                            \
+              nanobind::detail::fail_unspecified();                            \
+      } while (0)
 #else
-#  define check(cond, ...) if (NB_UNLIKELY(!(cond))) nanobind::detail::fail(__VA_ARGS__)
+/* Out-of-line stub that carries the arguments of a failing check() over to
+   fail(). Calling the variadic fail() from the check site would reserve
+   outgoing-argument stack space in the frame of every enclosing function,
+   which some ABIs charge for on the fast path (Apple arm64 passes variadic
+   arguments on the stack). This stub receives them in registers, which leaves
+   the enclosing frame identical to a build without messages. */
+#  if defined(__GNUC__)
+#    pragma GCC diagnostic push
+     // 'fmt' arrives as a parameter here; the check() macro below verifies it
+#    pragma GCC diagnostic ignored "-Wformat-security"
+#    pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#  endif
+template <typename... Ts>
+[[noreturn]] NB_NOINLINE void fail_cold(const char *fmt, Ts... args) noexcept {
+    fail(fmt, args...);
+}
+#  if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#  endif
+
+/* A dead direct call to fail() keeps the format attribute checking the format
+   string against its arguments, which the stub above cannot do. Both GCC and
+   Clang fold it away and generate identical code with and without it. MSVC
+   has no such check to begin with. */
+#  if defined(__GNUC__)
+#    define NB_CHECK_FMT(...) if (false) nanobind::detail::fail(__VA_ARGS__)
+#  else
+#    define NB_CHECK_FMT(...) ((void) 0)
+#  endif
+
+#  define check(cond, ...)                                                     \
+      do {                                                                     \
+          if (NB_UNLIKELY(!(cond))) {                                          \
+              NB_CHECK_FMT(__VA_ARGS__);                                       \
+              nanobind::detail::fail_cold(__VA_ARGS__);                        \
+          }                                                                    \
+      } while (0)
 #endif
 
-/// Nanobind function metadata (overloads, etc.)
-struct func_data : func_data_prelim_base {
+/// Internal version of a function argument record (see arg_data_init in
+/// nb_backend.h)
+struct arg_data {
+    /// Argument name (nullptr if unnamed)
+    const char *name;
+
+    /// Overrides the argument type in docstrings and stubs (or nullptr)
+    const char *signature;
+
+    /// Interned Python version of 'name'
+    PyObject *name_py;
+
+    /// Default argument value (or nullptr)
+    PyObject *value;
+
+    /// Argument-specific cast flags (see the 'cast_flags' enumeration)
+    uint32_t flag;
+};
+
+/// Internal version of a function binding record (see func_data_init_base in
+/// nb_backend.h)
+struct func_data {
+    /// Space to capture data used by the function/closure
+    void *capture[3];
+
+    /// Callback to clean up the 'capture' field
+    void (*free_capture)(void *);
+
+    /// Type-erased trampoline implementing the function call
+    PyObject *(*impl)(void *, PyObject **, uint32_t, cleanup_list *);
+
+    /// Function signature description
+    const char *descr;
+
+    /// C++ types referenced by 'descr'
+    const std::type_info **descr_types;
+
+    /// Supplementary flags
+    uint32_t flags;
+
+    /// Total number of parameters accepted by the C++ function
+    uint16_t nargs;
+
+    /// Number of parameters that can be filled from positional arguments
+    uint16_t nargs_pos;
+
+    /// Function name
+    const char *name;
+
+    /// Docstring
+    const char *doc;
+
+    /// Argument records (nargs entries when func_flags::has_args is set)
     arg_data *args;
+
+    /// Custom signature override (nb::sig), or nullptr
     char *signature;
+};
+
+/// Runtime-only type flags maintained by the backend. They occupy bits 24+
+/// of type_data::flags, above the public type_flags (bits 0..13) and
+/// type_init_flags (bits 19..23, stripped during translation).
+enum class type_flags_internal : uint32_t {
+    /// Cached copy of Py_TPFLAGS_HAVE_GC
+    has_gc                   = (1 << 24),
+
+    /// Does the type maintain a list of implicit conversions?
+    has_implicit_conversions = (1 << 25),
+
+    /// Is this a python type that extends a bound C++ type?
+    is_python_type           = (1 << 26),
+
+    /// Does the type implement a custom __new__ operator?
+    has_new                  = (1 << 27),
+
+    /// Does the type implement a custom __new__ operator that can take no
+    /// args (except the type object)?
+    has_nullary_new          = (1 << 28)
+};
+
+struct nb_alias_chain;
+struct nb_inst;
+
+/// LIFO Instance pool
+struct nb_inst_pool {
+    nb_inst **slots;
+    uint32_t count;
+    uint32_t capacity;
+};
+
+// Implicit conversions for C++ type bindings, used in type_data below
+struct implicit_t {
+    const std::type_info **cpp;
+    bool (**py)(PyTypeObject *, PyObject *, cleanup_list *) noexcept;
+};
+
+// Forward and reverse mappings for enumerations, used in type_data below
+struct enum_tbl_t {
+    void *fwd;
+    void *rev;
+};
+
+/// Internal version of a type binding record (see type_data_init in
+/// nb_backend.h)
+struct type_data {
+    /// Size of a C++ instance in bytes
+    uint32_t size;
+
+    /// Full 32-bit flags word: public type_flags in the low bits (init-only
+    /// flags stripped during translation) plus type_flags_internal (24+)
+    uint32_t flags;
+
+    /// Alignment of a C++ instance in bytes
+    uint32_t align;
+
+    /// Instance pool capacity
+    uint32_t pool_capacity;
+
+    /// Backend state of the domain that owns this type. A null pointer
+    /// identifies the record of a Python subclass that is not yet initialized.
+    nb_internals *internals;
+
+    /// Type name
+    const char *name;
+
+    /// C++ RTTI record of the bound type
+    const std::type_info *type;
+
+    /// Associated Python type object
+    PyTypeObject *type_py;
+
+    /// Alternative C++ RTTI records that also map to this type
+    nb_alias_chain *alias_chain;
+#if defined(Py_LIMITED_API)
+    /// Cached tp_vectorcall_offset target; the limited API provides no way
+    /// to read it from PyTypeObject
+    PyObject* (*vectorcall)(PyObject *, PyObject * const*, size_t, PyObject *);
+#endif
+
+    /// Constructor nb_func object
+    void *init;
+
+    /// Destruct an instance
+    void (*destruct)(void *);
+
+    /// Copy-construct an instance from another one
+    void (*copy)(void *, const void *);
+
+    /// Move-construct an instance from another one
+    void (*move)(void *, void *) noexcept;
+
+    union {
+        implicit_t implicit;  // for C++ type bindings
+        enum_tbl_t enum_tbl;  // for enumerations
+    };
+
+    /// Inform an intrusively reference-counted instance about its Python side
+    void (*set_self_py)(void *, PyObject *) noexcept;
+
+    /// Keep-alive callback of types deriving from enable_shared_from_this
+    bool (*keep_shared_from_this_alive)(PyObject *) noexcept;
+
+    /// Offset of the instance dictionary (or 0)
+    uint32_t dictoffset;
+
+    /// Offset of the weak reference list (or 0)
+    uint32_t weaklistoffset;
+
+    /// Out-of-line heap storage for an optional nb::supplement<T>
+    void *supplement;
+
+    /// Currently published trampoline table (see trampoline.cpp)
+    void *trampoline_table_pub;
+
+    /// Linked list of trampoline table allocations for later cleanup
+    void *trampoline_allocs;
+#if defined(NB_FREE_THREADED)
+    /// Slot of this type's pool in the packed per-thread pool array
+    uint32_t pool_index;
+#else
+    /// Per-type instance pool for non-FT builds
+    nb_inst_pool pool;
+#endif
+};
+
+/// Runtime record for enumeration bindings; extends the private type record
+/// with the scope that enum_export() consults
+struct enum_type_data : type_data {
+    PyObject *scope;
 };
 
 /// Packed status of a nanobind type instance.
@@ -155,12 +438,16 @@ struct nb_func {
     uint32_t max_nargs; // maximum value of func_data::nargs for any overload
     call_complexity complexity;
     bool doc_uniform;
+    nb_internals *internals; // backend state of the domain that owns this function
+    PyObject *scope; // borrowed; the scope owns this function
+    PyObject *module_name; // '__module__' captured at definition time
 };
 
 /// Python object representing a `nb_ndarray` (which wraps a DLPack ndarray)
 struct nb_ndarray {
     PyObject_HEAD
     ndarray_handle *th;
+    nb_internals *internals; // backend state that owns the nb_ndarray type
 };
 
 /// Python object representing an `nb_method` bound to an instance (analogous to non-public PyMethod_Type)
@@ -198,7 +485,7 @@ public:
         if (NB_UNLIKELY(n > SIZE_MAX / sizeof(T)))
             fail("py_allocator::allocate(): integer overflow!");
         void *p = PyMem_Malloc(n * sizeof(T));
-        if (!p)
+        if (NB_UNLIKELY(!p))
             fail("PyMem_Malloc(): out of memory!");
         return static_cast<pointer>(p);
     }
@@ -247,8 +534,11 @@ using nb_type_map_slow = tsl::robin_map<const std::type_info *, type_data *,
                                         std_typeinfo_hash, std_typeinfo_eq>;
 
 #if defined(NB_FREE_THREADED)
-// Per-thread state
+// Per-thread state of one domain
 struct nb_thread_state {
+    // Backend state that this record belongs to
+    nb_internals *internals;
+
     // C++ -> Python type cache
     nb_type_map_fast type_c2p_fast;
 
@@ -260,15 +550,16 @@ struct nb_thread_state {
     uint32_t pools_size = 0;
 };
 
+/// One-entry cache holding the most recently used domain's thread state
 extern NB_THREAD_LOCAL nb_thread_state *nb_thread_state_tls;
 
-/// Slow path: allocate this thread's state and register a cleanup routine
-extern nb_thread_state *nb_thread_state_alloc() noexcept;
+/// Slow path: fetch or allocate this thread's state for the given domain
+extern nb_thread_state *nb_thread_state_alloc(nb_internals *p) noexcept;
 
-NB_INLINE nb_thread_state *nb_thread_state_get() noexcept {
+NB_INLINE nb_thread_state *nb_thread_state_get(nb_internals *p) noexcept {
     nb_thread_state *ts = nb_thread_state_tls;
-    if (NB_UNLIKELY(!ts))
-        ts = nb_thread_state_alloc();
+    if (NB_UNLIKELY(!ts || ts->internals != p))
+        ts = nb_thread_state_alloc(p);
     return ts;
 }
 #endif
@@ -362,11 +653,60 @@ enum ndarray_export_slot {
     nd_export_count
 };
 
+// Pre-interned strings in the per-domain state, alphabetically sorted.
+// Use NB_INTERNED(p, name) below to access an entry.
+#define NB_INTERNED_STRINGS(X)                                                 \
+    X(__complex__)                                                             \
+    X(__dict__)                                                                \
+    X(__dlpack__)                                                              \
+    X(__init__)                                                                \
+    X(__length_hint__)                                                         \
+    X(__module__)                                                              \
+    X(__mro__)                                                                 \
+    X(__name__)                                                                \
+    X(__new__)                                                                 \
+    X(__qualname__)                                                            \
+    X(astype)                                                                  \
+    X(cast)                                                                    \
+    X(clone)                                                                   \
+    X(contiguous)                                                              \
+    X(copy)                                                                    \
+    X(dl_device)                                                               \
+    X(max_version)                                                             \
+    X(stream)                                                                  \
+    X(to)                                                                      \
+    X(value)
+
+// Names for the PyObject* entries in the per-domain state array.
+// These names are scoped, but will implicitly convert to int.
+struct pyobj_name {
+    enum : int {
+        #define NB_INTERNED_ENTRY(name) interned_##name,
+        NB_INTERNED_STRINGS(NB_INTERNED_ENTRY)
+        #undef NB_INTERNED_ENTRY
+        string_count,
+
+        // Cached constants using the same interning machinery
+        interned_max_version_tpl = string_count, // tuple ("max_version")
+        interned_dl_cpu_tpl,              // tuple (1, 0) == nb::device::cpu
+        interned_dl_version_tpl,          // tuple (dlpack major, minor)
+#if defined(Py_LIMITED_API) || defined(PYPY_VERSION)
+        interned_u64_limit,               // 2**64, used by the integer casters
+#endif
+        total_count
+    };
+};
+
+/// Access a cached PyObject (interned string or constant tuple) of the given
+/// nb_internals by name, e.g. NB_INTERNED(p, __name__)
+#define NB_INTERNED(p, name) ((p)->pyobjects[pyobj_name::interned_##name])
+
 /**
  * `nb_internals` is the central data structure storing information related to
- * function/type bindings and instances. Separate nanobind extensions within the
- * same NB_DOMAIN furthermore share `nb_internals` to communicate with each
- * other, hence any changes here generally require an ABI version bump.
+ * function/type bindings and instances. One instance exists per NB_DOMAIN;
+ * separate nanobind extensions within the same NB_DOMAIN share `nb_internals`
+ * to communicate with each other, hence any changes here generally require an
+ * ABI version bump.
  *
  * The GIL protects the elements of this data structure from concurrent
  * modification. In free-threaded builds, a combination of locking schemes is
@@ -382,13 +722,6 @@ enum ndarray_export_slot {
  *   `*_Type_tp_*`, `shard_count`, `is_alive_ptr`: these are initialized when
  *   loading the first nanobind extension within a domain, which happens within
  *   a critical section. They do not require locking.
- *
- * - `nb_static_property` and `nb_static_propert_descr_set`: created only once
- *   on demand, protected by `mutex`.
- *
- * - `nb_static_property_disabled`: needed to correctly implement assignments to
- *   static properties. Free-threaded builds store this flag using TLS to avoid
- *   concurrent modification.
  *
  * - `nb_static_property` and `nb_static_propert_descr_set`: created only once
  *   on demand, protected by `mutex`.
@@ -437,12 +770,6 @@ struct nb_internals {
     /// Property variant for static attributes (created on demand)
     nb_maybe_atomic<PyTypeObject *> nb_static_property = nullptr;
     descrsetfunc nb_static_property_descr_set = nullptr;
-
-#if defined(NB_FREE_THREADED)
-    Py_tss_t *nb_static_property_disabled = nullptr;
-#else
-    bool nb_static_property_disabled = false;
-#endif
 
     /// N-dimensional array wrapper (created on demand)
     nb_maybe_atomic<PyTypeObject *> nb_ndarray = nullptr;
@@ -494,6 +821,12 @@ struct nb_internals {
     nb_ptr_map funcs;
 #endif
 
+    /// Counter bumped on every type modification (release increment).
+    /// Trampoline override resolution reads it before resolving (acquire)
+    /// and re-checks it before publishing an entry, discarding results
+    /// that raced with a concurrent modification (see trampoline.cpp).
+    nb_maybe_atomic<size_t> trampoline_epoch = 0;
+
     /// Registered C++ -> Python exception translators
     nb_maybe_atomic<nb_translator_seq *> translators = nullptr;
 
@@ -505,17 +838,6 @@ struct nb_internals {
 
     /// Pointer to a boolean that denotes if nanobind is fully initialized.
     bool *is_alive_ptr = nullptr;
-
-#if defined(Py_LIMITED_API)
-    // Cache important functions from PyType_Type and PyProperty_Type
-    freefunc PyType_Type_tp_free;
-    initproc PyType_Type_tp_init;
-    destructor PyType_Type_tp_dealloc;
-    setattrofunc PyType_Type_tp_setattro;
-    descrgetfunc PyProperty_Type_tp_descr_get;
-    descrsetfunc PyProperty_Type_tp_descr_set;
-    ptrdiff_t type_data_offset;
-#endif
 
 #if defined(NB_FREE_THREADED)
     PyMutex mutex { };
@@ -531,58 +853,28 @@ struct nb_internals {
     /// reaches 0.
     PyObject *lifeline = nullptr;
 
-    /// Incremented whenever 'lifeline' is destroyed; used to detect stale
-    /// per-library 'static_pyobjects' arrays (see init_pyobjects())
-    uint32_t lifeline_generation = 0;
-};
+    /// Caches filled by import_cached(); reset along with the lifeline
+    std::vector<import_cache *> import_slots;
 
-// Pre-interned strings in the per-module state array, alphabetically
-// sorted. Use NB_INTERNED(name) below to access an entry.
-#define NB_INTERNED_STRINGS(X)                                                 \
-    X(__complex__)                                                             \
-    X(__dlpack__)                                                              \
-    X(__init__)                                                                \
-    X(__length_hint__)                                                         \
-    X(__module__)                                                              \
-    X(__name__)                                                                \
-    X(__new__)                                                                 \
-    X(__qualname__)                                                            \
-    X(astype)                                                                  \
-    X(cast)                                                                    \
-    X(clone)                                                                   \
-    X(contiguous)                                                              \
-    X(copy)                                                                    \
-    X(dl_device)                                                               \
-    X(max_version)                                                             \
-    X(stream)                                                                  \
-    X(to)                                                                      \
-    X(value)
+    /// Cached interned strings and constant tuples owned by the lifeline,
+    /// indexed by 'pyobj_name' (see NB_INTERNED)
+    PyObject *pyobjects[pyobj_name::total_count] = {};
 
-// Names for the PyObject* entries in the per-module state array.
-// These names are scoped, but will implicitly convert to int.
-struct pyobj_name {
-    enum : int {
-        #define NB_INTERNED_ENTRY(name) interned_##name,
-        NB_INTERNED_STRINGS(NB_INTERNED_ENTRY)
-        #undef NB_INTERNED_ENTRY
-        string_count,
-
-        // Cached constant tuples using the same interning machinery
-        interned_max_version_tpl = string_count, // tuple ("max_version")
-        interned_dl_cpu_tpl,              // tuple (1, 0) == nb::device::cpu
-        interned_dl_version_tpl,          // tuple (dlpack major, minor)
-        total_count
+    /// 2-way set-associative cache of interned strings exposed via
+    /// see cached_string().
+    struct name_cache_entry {
+        uintptr_t key;
+        const char *utf8;
+        size_t len;
+        nb_maybe_atomic<PyObject *> value { nullptr };
     };
+
+    static constexpr uint32_t name_cache_bits = 12;
+    alignas(64) name_cache_entry name_cache[(size_t) 1 << name_cache_bits];
 };
 
-extern PyObject *static_pyobjects[];
-
-/// Access a cached static PyObject (interned string or constant tuple) by name,
-/// e.g. NB_INTERNED(__name__) or NB_INTERNED(copy_tpl)
-#define NB_INTERNED(name) static_pyobjects[pyobj_name::interned_##name]
-
-extern void internals_inc_ref();
-extern void internals_dec_ref();
+extern void internals_inc_ref(nb_internals *p);
+extern void internals_dec_ref(nb_internals *p);
 
 /// Append 'o' to the lifeline and transfer ownership to it
 inline void new_object(nb_internals *p, PyObject *o) {
@@ -598,14 +890,89 @@ inline PyTypeObject *new_type(nb_internals *p, PyType_Spec *spec) {
     return tp;
 }
 
-/// Convenience macro to potentially access cached functions
 #if defined(Py_LIMITED_API)
-#  define NB_SLOT(type, name) internals->type##_##name
-#else
-#  define NB_SLOT(type, name) type.name
+/* Cached functions from PyType_Type and PyProperty_Type along with the
+   offset of the type_data record within a type object. These are constants
+   of the running interpreter, filled in during initialization. */
+extern freefunc PyType_Type_tp_free;
+extern initproc PyType_Type_tp_init;
+extern inquiry PyType_Type_tp_clear;
+extern destructor PyType_Type_tp_dealloc;
+extern setattrofunc PyType_Type_tp_setattro;
+extern descrgetfunc PyProperty_Type_tp_descr_get;
+extern descrsetfunc PyProperty_Type_tp_descr_set;
+extern ptrdiff_t nb_type_data_offset;
 #endif
 
-extern nb_internals *internals;
+/// Convenience macro to potentially access cached functions
+#if defined(Py_LIMITED_API)
+#  define NB_TYPE_SLOT(type, name) nanobind::detail::type##_##name
+#else
+#  define NB_TYPE_SLOT(type, name) type.name
+#endif
+
+#if defined(NB_HAVE_INTERP_VIEW)
+// A view of the main interpreter, created during module initialization and
+// deliberately never closed.
+extern PyInterpreterView *nb_interp_view;
+
+/// Cold path of attach_tstate() for callers that run before 'nb_interp_view'
+extern void *attach_tstate_early() noexcept;
+#endif
+
+/// Token reported by attach_tstate() when there is nothing to undo
+#define NB_TSTATE_ATTACHED ((void *) 1)
+
+/* Implementation of the 'tstate_ensure' and 'tstate_release' backend slots.
+   Hot paths like trampoline dispatch call these directly to skip the
+   indirection through the exported functions. */
+
+/// Does the calling thread have a Python thread state attached? Configurations
+/// that cannot answer this report 'false' and take the slow path below. The
+/// limited API lacks the query. PyPy and Python below 3.12 report a thread
+/// state that the caller may not use (one released by this thread, or the one
+/// of whichever thread holds the GIL), which would wrongly convince an
+/// unattached thread that it can enter Python.
+NB_INLINE bool tstate_attached() noexcept {
+#if defined(Py_LIMITED_API) || defined(PYPY_VERSION) || PY_VERSION_HEX < 0x030C0000
+    return false;
+#elif PY_VERSION_HEX < 0x030D0000
+    return _PyThreadState_UncheckedGet() != nullptr;
+#else
+    return PyThreadState_GetUnchecked() != nullptr;
+#endif
+}
+
+NB_INLINE void *attach_tstate() noexcept {
+    /* Threads that already have a thread state proceed with it and undo
+       nothing later. Besides being much cheaper than the alternatives below,
+       this skips an interpreter guard that would serve no purpose: such a
+       thread cannot observe the interpreter disappearing underneath it. */
+    if (tstate_attached())
+        return NB_TSTATE_ATTACHED;
+
+#if defined(NB_HAVE_INTERP_VIEW)
+    if (NB_UNLIKELY(!nb_interp_view))
+        return attach_tstate_early();
+
+    return PyThreadState_EnsureFromView(nb_interp_view);
+#else
+    /* PyGILState_STATE is an enumeration starting at zero. The shift keeps a
+       successful attachment distinguishable from both a null token and the
+       sentinel above. */
+    return (void *) (uintptr_t) ((int) PyGILState_Ensure() + 2);
+#endif
+}
+
+NB_INLINE void detach_tstate(void *token) noexcept {
+    if (token == NB_TSTATE_ATTACHED)
+        return;
+#if defined(NB_HAVE_INTERP_VIEW)
+    PyThreadState_Release(token);
+#else
+    PyGILState_Release((PyGILState_STATE) ((uintptr_t) token - 2));
+#endif
+}
 
 extern char *type_name(const std::type_info *t);
 
@@ -616,16 +983,65 @@ extern PyTypeObject *nb_type_create_metaclass(nb_internals *p,
 // Forward declarations
 extern PyObject *inst_new_ext(PyTypeObject *tp, void *value);
 extern PyObject *inst_new_int(PyTypeObject *tp, PyObject *args, PyObject *kwds);
-extern PyTypeObject *nb_static_property_tp() noexcept;
+extern PyTypeObject *nb_static_property_tp(nb_internals *p) noexcept;
+
+/// Fetch the raw MRO entry 'key' of 't'. Wraps or emulates _PyType_LookupRef()
+extern PyObject *type_lookup(nb_internals *p, PyObject *t,
+                             PyObject *key) noexcept;
+
 extern type_data *nb_type_c2p(nb_internals *internals,
                               const std::type_info *type);
 extern void nb_type_unregister(type_data *t) noexcept;
 
+/// Drop the published trampoline tables of 'tp' and its subclasses after a
+/// type modification so that overrides are re-resolved (GIL held)
+extern void nb_trampoline_invalidate(PyObject *tp) noexcept;
+
+/// Free the trampoline allocations owned by a type record (GIL held)
+extern void nb_trampoline_free(type_data *t) noexcept;
+
 extern PyObject *call_one_arg(PyObject *fn, PyObject *arg) noexcept;
+
+// String-keyed attribute access helpers for backend code. The header-side
+// operators inject the extension's state pointer, which backend code does not
+// have. These variants take it explicitly.
+
+inline bool str_hasattr(nb_internals *p, handle h, const char *key) noexcept {
+    return hasattr_str(p, h.ptr(), key, strlen(key) + 1);
+}
+
+inline object str_getattr(nb_internals *p, handle h, const char *key) {
+    return steal(getattr_str(p, h.ptr(), key, strlen(key) + 1));
+}
+
+inline object str_getattr_def(nb_internals *p, handle h, const char *key,
+                              handle def = handle()) noexcept {
+    return steal(
+        getattr_str_def(p, h.ptr(), key, strlen(key) + 1, def.ptr()));
+}
+
+inline void str_setattr(nb_internals *p, handle h, const char *key, handle v) {
+    setattr_str(p, h.ptr(), key, strlen(key) + 1, v.ptr());
+}
+
+/// Call 'base' with borrowed positional arguments, raising on failure
+template <typename... Args>
+object obj_call(nb_internals *p, handle base, const Args &...args) {
+    PyObject *argv[sizeof...(Args) + 1] = { nullptr, args.ptr()... };
+    return steal(obj_vectorcall(p, base.ptr(), argv + 1,
+                                sizeof...(Args) |
+                                    PY_VECTORCALL_ARGUMENTS_OFFSET,
+                                0, 0));
+}
 
 /// Fetch the nanobind function record from a 'nb_func' instance
 NB_INLINE func_data *nb_func_data(void *o) {
     return (func_data *) (((char *) o) + sizeof(nb_func));
+}
+
+/// Fetch the backend state of the domain owning a 'nb_func' instance
+NB_INLINE nb_internals *nb_func_internals(void *o) {
+    return ((nb_func *) o)->internals;
 }
 
 /// Fetch the nanobind type record from a 'nb_type' instance
@@ -635,7 +1051,7 @@ NB_INLINE type_data *nb_type_data(PyTypeObject *o) noexcept{
     #else
         #if 1
             // Fast path that can be inlines without spilling registers
-            return (type_data *) ((char *) o + internals->type_data_offset);
+            return (type_data *) ((char *) o + nb_type_data_offset);
         #else
             // Equivalent non-inlined reference version:
             return (type_data *) PyObject_GetTypeData((PyObject *) o, Py_TYPE((PyObject *) o));
@@ -654,9 +1070,10 @@ NB_INLINE nb_inst_pool *nb_pool_lookup(type_data *td) noexcept {
     // In GIL-protected Python, global pool data structure is reachable via `td`
     return &td->pool;
 #else
-    // In FT builds, the pool is per thread and stored in a packed pointer array
-    nb_thread_state *ts = nb_thread_state_tls;
-    if (ts && td->pool_index < ts->pools_size)
+    // In FT builds, the pool is per thread. Resolve the thread state through
+    // the domain key so that a stale TLS cache does not bypass the pool.
+    nb_thread_state *ts = nb_thread_state_get(td->internals);
+    if (td->pool_index < ts->pools_size)
         return ts->pools + td->pool_index;
     return nullptr;
 #endif
@@ -676,7 +1093,7 @@ template <typename T> struct scoped_pymalloc {
             fail("scoped_pymalloc(): integer overflow!");
         total += extra_bytes;
         ptr = (T *) PyMem_Malloc(total);
-        if (!ptr)
+        if (NB_UNLIKELY(!ptr))
             fail("scoped_pymalloc(): could not allocate %llu bytes of memory!",
                  (unsigned long long) total);
     }
@@ -717,6 +1134,16 @@ struct lock_internals { lock_internals(nb_internals *) { } };
 struct unlock_internals { unlock_internals(nb_internals *) { } };
 struct lock_obj { lock_obj(PyObject *) { } };
 #endif
+
+/// Report a warning that a warnings-as-errors filter turned into an exception
+inline void warning_failed() noexcept {
+#if !defined(Py_LIMITED_API) && !defined(PYPY_VERSION) && \
+    PY_VERSION_HEX >= 0x030D0000
+    PyErr_FormatUnraisable("Exception ignored while issuing a nanobind warning");
+#else
+    PyErr_WriteUnraisable(nullptr);
+#endif
+}
 
 extern char *strdup_check(const char *);
 extern void *malloc_check(size_t size);

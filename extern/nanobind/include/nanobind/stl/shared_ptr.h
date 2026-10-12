@@ -19,10 +19,8 @@ NAMESPACE_BEGIN(detail)
 struct py_deleter {
     void operator()(void *) noexcept {
         // Don't run the deleter if the interpreter has been shut down
-        if (!is_alive())
-            return;
-        gil_scoped_acquire guard;
-        Py_DECREF(o);
+        if (cleanup_guard guard{})
+            Py_DECREF(o);
     }
 
     PyObject *o;
@@ -53,7 +51,7 @@ shared_from_python(T *ptr, handle h) noexcept {
 
 inline NB_NOINLINE void shared_from_cpp(std::shared_ptr<void> &&ptr,
                                         PyObject *o) noexcept {
-    keep_alive(o, new std::shared_ptr<void>(std::move(ptr)),
+    NB_CALL(keep_alive_ptr)(NB_CTX, o, new std::shared_ptr<void>(std::move(ptr)),
                [](void *p) noexcept { delete (std::shared_ptr<void> *) p; });
 }
 
@@ -70,9 +68,9 @@ template <typename T> struct type_caster<std::shared_ptr<T>> {
                   "However, a type caster was registered to intercept this "
                   "particular type, which is not allowed.");
 
-    bool from_python(handle src, uint8_t flags,
+    bool from_python(handle src, uint32_t flags,
                      cleanup_list *cleanup) noexcept {
-        flags &= ~((uint8_t) cast_flags::convert);
+        flags &= ~cast_flags::convert;
 
         Caster caster;
         if (!caster.from_python(src, flags, cleanup))
@@ -116,16 +114,12 @@ template <typename T> struct type_caster<std::shared_ptr<T>> {
         if constexpr (has_type_hook)
             type = type_hook<Td>::get(ptr);
 
-        if constexpr (!std::is_polymorphic_v<Td>) {
-            result = nb_type_put(type, ptr, rv_policy::reference,
-                                 cleanup, &is_new);
-        } else {
-            const std::type_info *type_p =
-                (!has_type_hook && ptr) ? &typeid(*ptr) : nullptr;
+        const std::type_info *type_p = nullptr;
+        if constexpr (std::is_polymorphic_v<Td>)
+            type_p = (!has_type_hook && ptr) ? &typeid(*ptr) : nullptr;
 
-            result = nb_type_put_p(type, type_p, ptr, rv_policy::reference,
-                                   cleanup, &is_new);
-        }
+        result = NB_CALL(nb_type_put)(NB_CTX_C(cleanup), type, type_p, ptr,
+                                      rv_policy::reference, cleanup, &is_new);
 
         if (is_new) {
             std::shared_ptr<void> pp;

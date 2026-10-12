@@ -1,6 +1,8 @@
 #include <nanobind/nanobind.h>
 
+#include <limits>
 #include <string.h>
+#include <thread>
 
 #include <nanobind/stl/function.h>
 #include <nanobind/stl/pair.h>
@@ -69,7 +71,7 @@ struct numeric_string {
 template <> struct nb::detail::type_caster<numeric_string> {
     NB_TYPE_CASTER(numeric_string, const_name("str"))
 
-    bool from_python(handle h, uint8_t flags, cleanup_list* cleanup) noexcept {
+    bool from_python(handle h, uint32_t flags, cleanup_list* cleanup) noexcept {
         make_caster<const char*> str_caster;
         if (!str_caster.from_python(h, flags, cleanup))
             return false;
@@ -156,6 +158,51 @@ NB_MODULE(test_functions_ext, m) {
     m.def("test_bad_tuple", []() -> nb::typed<nb::object, std::pair<std::string, nb::object>> {
         struct Foo{}; return nb::make_tuple("Hello", Foo()); });
 
+    /// Incremental construction of dynamically sized tuples/lists
+    m.def("test_tuple_builder", [](nb::list l) {
+        nb::tuple_builder b(l.size());
+        for (nb::handle h : l)
+            b.put(h);
+        return b.commit();
+    });
+    m.def("test_list_builder", [](nb::tuple t) {
+        nb::list_builder b(t.size());
+        for (nb::handle h : t)
+            b.put(h);
+        return b.commit();
+    });
+    m.def("test_builder_incomplete", []() {
+        nb::tuple_builder b(2);
+        b.put(1);
+        return b.commit();
+    });
+    m.def("test_builder_put_fail", []() {
+        struct Foo { };
+        nb::list_builder b(2);
+        b.put(1);
+        b.put(Foo()); // Returns false, making the later commit() raise
+        return b.commit();
+    });
+    m.def("test_builder_abandon", [](nb::handle h) {
+        nb::list_builder b(3);
+        b.put(h);
+        b.put(h);
+        throw std::runtime_error("abandoned");
+    });
+    m.def("test_builder_reuse", []() {
+        nb::tuple_builder b(1);
+        b.put(1);
+        nb::tuple t = b.commit();
+        return b.commit();
+    });
+    m.def("test_builder_checks", []() {
+#if !defined(NDEBUG)
+        return true;
+#else
+        return false;
+#endif
+    });
+
     /// Perform a Python function call from C++
     m.def("test_call_1", [](nb::typed<nb::object, std::function<int(int)>> o) {
         return o(1);
@@ -169,6 +216,86 @@ NB_MODULE(test_functions_ext, m) {
                                 nb::args args, nb::kwargs kwargs) {
         return o(1, 2, *args, **kwargs, "extra"_a = 5);
     });
+
+    /// Test '*' and '**' expansion of arbitrary iterables and mappings
+    m.def("test_call_star", [](nb::object f, nb::object seq) {
+        return f(*seq);
+    });
+    m.def("test_call_dstar", [](nb::object f, nb::object map) {
+        return f(**map);
+    });
+    m.def("test_call_star_dstar", [](nb::object f, nb::object seq, nb::object map) {
+        return f(*seq, **map);
+    });
+
+    /// A keyword argument object may be reused across calls
+    m.def("test_call_kwarg_lvalue", [](nb::object f) {
+        nb::arg_v kw = nb::arg("x") = 42;
+        return nb::make_tuple(f(kw), f(kw));
+    });
+
+    /// Method call with keyword arguments and expansions
+    m.def("test_call_method_complex", [](nb::object o, nb::object seq, nb::object map) {
+        return o.attr("meth")(1, *seq, "k"_a = 2, **map);
+    });
+
+    /// Attribute and keyword names passed through a reused buffer must not
+    /// be confused by the interned-string cache
+    m.def("test_attr_dynamic", [](nb::object o) {
+        char buf[32];
+        nb::list result;
+        for (int i = 0; i < 3; ++i) {
+            snprintf(buf, sizeof(buf), "field_%i", i);
+            result.append(o.attr(buf));
+        }
+        for (int i = 0; i < 3; ++i) {
+            snprintf(buf, sizeof(buf), "kw_%i", i);
+            result.append(o.attr("collect")(nb::arg(buf) = i));
+        }
+        return result;
+    });
+
+    /// Raw vector calls, once with two positional arguments and once with one
+    /// positional and one keyword argument. 'stack[0]' is the scratch slot
+    /// that NB_VECTORCALL_ARGUMENTS_OFFSET promises to the callee.
+    m.def("test_vectorcall_raw", [](nb::object f, nb::object a, nb::object b) {
+        PyObject *stack[3] = { nullptr, a.ptr(), b.ptr() };
+        size_t nargsf = 2 | NB_VECTORCALL_ARGUMENTS_OFFSET;
+
+        nb::object pos = nb::steal(
+            nb::detail::vectorcall(f.ptr(), stack + 1, nargsf, nullptr));
+
+        nb::object kwnames = nb::make_tuple("x");
+        nb::object kw = nb::steal(nb::detail::vectorcall(
+            f.ptr(), stack + 1, 1 | NB_VECTORCALL_ARGUMENTS_OFFSET,
+            kwnames.ptr()));
+
+        return nb::make_tuple(pos, kw, NB_VECTORCALL_NARGS(nargsf));
+    });
+
+    /// The method flavor looks 'name' up on 'stack[1]', which counts towards
+    /// 'nargsf'. A failure returns null with an error set and does not raise.
+    m.def("test_vectorcall_raw_method", [](nb::object o, nb::object a) {
+        PyObject *stack[3] = { nullptr, o.ptr(), a.ptr() };
+        size_t nargsf = 2 | NB_VECTORCALL_ARGUMENTS_OFFSET;
+        nb::object name = nb::cast("meth"), missing = nb::cast("nonexistent");
+
+        nb::object r = nb::steal(nb::detail::vectorcall_method(
+            name.ptr(), stack + 1, nargsf, nullptr));
+
+        PyObject *bad = nb::detail::vectorcall_method(
+            missing.ptr(), stack + 1, nargsf, nullptr);
+        bool raised = !bad && PyErr_Occurred();
+        Py_XDECREF(bad);
+        PyErr_Clear();
+
+        return nb::make_tuple(r, raised);
+    });
+
+    /// Calls involving null objects must raise instead of crashing
+    m.def("test_call_null_base", []() { return nb::object()(1); });
+    m.def("test_call_null_arg", [](nb::object f) { return f(nb::object()); });
+    m.def("test_call_null_kwarg", [](nb::object f) { return f("x"_a = nb::object()); });
 
     /// Test list manipulation
     m.def("test_list", [](nb::list l) {
@@ -203,6 +330,32 @@ NB_MODULE(test_functions_ext, m) {
 #else
         return PyGILState_Check();
 #endif
+    }, nb::call_guard<nb::gil_scoped_release>());
+
+    // Acquire on a thread that already has a thread state
+    m.def("test_acquire_gil_nested", []() -> bool {
+        nb::gil_scoped_acquire g1;
+        nb::gil_scoped_acquire g2;
+        return g1.is_valid() && g2.is_valid() &&
+               nb::cast<int>(nb::int_(3) + nb::int_(4)) == 7;
+    });
+
+    // Reattach a thread state from a thread that just gave one up
+    m.def("test_reacquire_gil", []() -> bool {
+        nb::gil_scoped_acquire guard;
+        return guard.is_valid() && nb::cast<int>(nb::int_(3) + nb::int_(4)) == 7;
+    }, nb::call_guard<nb::gil_scoped_release>());
+
+    // Same from a thread that Python has never seen
+    m.def("test_acquire_gil_foreign", []() -> bool {
+        bool result = false;
+        std::thread t([&] {
+            nb::gil_scoped_acquire guard;
+            result = guard.is_valid() &&
+                     nb::cast<int>(nb::int_(3) + nb::int_(4)) == 7;
+        });
+        t.join();
+        return result;
     }, nb::call_guard<nb::gil_scoped_release>());
 
     m.def("test_print", []{
@@ -251,12 +404,6 @@ NB_MODULE(test_functions_ext, m) {
     m.def("test_10_contains", [](nb::dict d) {
         return d.contains("foo"_s);
     });
-
-    // Test implicit conversion of various types
-    m.def("test_11_sl",  [](signed long x)        { return x; });
-    m.def("test_11_ul",  [](unsigned long x)      { return x; });
-    m.def("test_11_sll", [](signed long long x)   { return x; });
-    m.def("test_11_ull", [](unsigned long long x) { return x; });
 
     // Test string caster
     m.def("test_12", [](const char *c) { return nb::str(c); });
@@ -334,14 +481,37 @@ NB_MODULE(test_functions_ext, m) {
     m.def("test_31", &test_31);
     m.def("test_32", [](int i) noexcept { return i; });
 
-    m.def("identity_i8", [](int8_t  i) { return i; });
-    m.def("identity_u8", [](uint8_t i) { return i; });
-    m.def("identity_i16", [](int16_t  i) { return i; });
-    m.def("identity_u16", [](uint16_t i) { return i; });
-    m.def("identity_i32", [](int32_t  i) { return i; });
-    m.def("identity_u32", [](uint32_t i) { return i; });
-    m.def("identity_i64", [](int64_t  i) { return i; });
-    m.def("identity_u64", [](uint64_t i) { return i; });
+    // An identity function for every integer type that the type caster
+    // handles, plus a table with the range of each of them. The Python test
+    // 'test31_range' iterates over this table.
+    nb::dict int_limits;
+    auto bind_int = [&](const char *name, auto tag) {
+        using T = decltype(tag);
+        m.def(("identity_" + std::string(name)).c_str(), [](T value) { return value; });
+        int_limits[name] = nb::make_tuple(std::numeric_limits<T>::min(),
+                                          std::numeric_limits<T>::max());
+    };
+
+    bind_int("i8",     (int8_t) 0);
+    bind_int("u8",     (uint8_t) 0);
+    bind_int("i16",    (int16_t) 0);
+    bind_int("u16",    (uint16_t) 0);
+    bind_int("i32",    (int32_t) 0);
+    bind_int("u32",    (uint32_t) 0);
+    bind_int("i64",    (int64_t) 0);
+    bind_int("u64",    (uint64_t) 0);
+    bind_int("schar",  (signed char) 0);
+    bind_int("uchar",  (unsigned char) 0);
+    bind_int("short",  (short) 0);
+    bind_int("ushort", (unsigned short) 0);
+    bind_int("int",    (int) 0);
+    bind_int("uint",   (unsigned int) 0);
+    bind_int("long",   (long) 0);
+    bind_int("ulong",  (unsigned long) 0);
+    bind_int("llong",  (long long) 0);
+    bind_int("ullong", (unsigned long long) 0);
+
+    m.attr("int_limits") = int_limits;
 
     m.attr("test_33") = nb::cpp_function([](nb::object self, int y) {
         return nb::cast<int>(self.attr("x")) + y;
@@ -421,6 +591,16 @@ NB_MODULE(test_functions_ext, m) {
 
     // kw_only specified twice:
     //m.def("bad_args5", [](int, int) {}, nb::kw_only(), "i"_a, nb::kw_only(), "j"_a);
+
+    // Wrong number of nb::arg annotations. A parameter that supplies an
+    // implicit annotation (here 'std::nullptr_t') does not relax the count,
+    // which must be zero or one per parameter:
+    //m.def("bad_args6", [](std::nullptr_t) {}, "i"_a, "j"_a);
+    //m.def("bad_args7", [](std::nullptr_t, int, int) {}, "i"_a);
+
+    // No nb::arg annotations, as in 'bad_args1'. An implicit annotation has no
+    // name and cannot make the keyword-only parameter usable:
+    //m.def("bad_args8", [](nb::args, std::nullptr_t) {});
 
     m.def("test_args_kwonly",
           [](int i, double j, nb::args args, int z) {
@@ -542,7 +722,7 @@ NB_MODULE(test_functions_ext, m) {
               return ret;
           });
 
-    m.def("abi_tag", [](){ return nb::detail::abi_tag(); });
+    m.def("abi_tag", [](){ return NB_PLATFORM_ABI_TAG; });
 
     // Test the nb::fallback type
     m.def("test_fallback_1", [](double){ return 0; });

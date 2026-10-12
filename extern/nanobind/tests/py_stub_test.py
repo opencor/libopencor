@@ -80,3 +80,44 @@ class AClass:
 
     def overloaded_2(self, x):
         "docstr 3"
+
+    def _set_write_only(self, value: int) -> None:
+        pass
+
+    def _set_write_only_untyped(self, value):
+        pass
+
+    # Write-only properties are emitted as plain attributes with the setter's
+    # value type (or typing.Any if unannotated)
+    write_only = property(fset=_set_write_only)
+    write_only_untyped = property(fset=_set_write_only_untyped)
+
+
+class Sentinel:
+    pass
+
+
+# A class attribute holding an instance of the enclosing class. Stubgen used
+# to render it as an enum member and crash.
+Sentinel.INSTANCE = Sentinel()
+
+
+class SigMember:
+    # A member type that dictates the stub declaration of the member holding
+    # it, which stubgen emits in place of the usual 'name: type = value'
+    __nb_signature__ = "MODULE_MEMBER: tuple[int, ...]"
+
+
+MODULE_MEMBER = SigMember()
+
+
+class LazySigMember:
+    # The declaration may also be computed on demand, and span several lines
+    @property
+    def __nb_signature__(self):
+        return "# a comment\n_private: dict[str, int]\n"
+
+
+class Holder:
+    # Providing a declaration opts an otherwise private name into the stub
+    _private = LazySigMember()

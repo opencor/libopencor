@@ -18,8 +18,8 @@ NAMESPACE_BEGIN(detail)
 template <> struct type_caster<std::wstring> {
     NB_TYPE_CASTER(std::wstring, const_name("str"))
 
-    bool from_python(handle src, uint8_t, cleanup_list *) noexcept {
-        if (!PyUnicode_Check(src.ptr()))
+    bool from_python(handle src, uint32_t, cleanup_list *) noexcept {
+        if (!str_check(src.ptr()))
             return false;
         Py_ssize_t size;
         const wchar_t *str = PyUnicode_AsWideCharString(src.ptr(), &size);
