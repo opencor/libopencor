@@ -168,6 +168,36 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(document.models[0].file.isAliasOf(neededFile), true);
   });
 
+  test('Remote SED-ML file with absolute CellML file', () => {
+    // An absolute model source is relative to the origin of the remote SED-ML file, i.e. never a local file name.
+
+    const file = new loc.File('https://example.com/simulations/simulation.sedml?a=b/c#d/e');
+
+    file.setContents(sedmlContents('/models/./model.cellml'));
+
+    const neededFile = new loc.File('https://example.com/models/model.cellml');
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.isAliasOf(neededFile), true);
+  });
+
+  test('Remote SED-ML file with network-path CellML file', () => {
+    // A network-path model source is relative to the scheme of the remote SED-ML file, i.e. never a local file name.
+
+    const file = new loc.File('https://example.com/simulations/simulation.sedml');
+
+    file.setContents(sedmlContents('//example.org/models/model.cellml'));
+
+    const neededFile = new loc.File('https://example.org/models/model.cellml');
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.isAliasOf(neededFile), true);
+  });
+
   test('SED-ML file with remote CellML file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/remote_cellml_file.sedml'));
 

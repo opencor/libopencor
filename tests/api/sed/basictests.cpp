@@ -166,6 +166,38 @@ TEST(BasicSedTest, remoteSedmlFileWithoutPathWithRelativeCellmlFile)
     EXPECT_EQ(document->models()[0]->file(), neededFile);
 }
 
+TEST(BasicSedTest, remoteSedmlFileWithAbsoluteCellmlFile)
+{
+    // An absolute model source is relative to the origin of the remote SED-ML file, i.e. never a local file name.
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml?a=b/c#d/e", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("/models/./model.cellml").c_str()));
+
+    auto neededFile {libOpenCOR::File::create("https://example.com/models/model.cellml", false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
+TEST(BasicSedTest, remoteSedmlFileWithNetworkPathCellmlFile)
+{
+    // A network-path model source is relative to the scheme of the remote SED-ML file, i.e. never a local file name.
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("//example.org/models/model.cellml").c_str()));
+
+    auto neededFile {libOpenCOR::File::create("https://example.org/models/model.cellml", false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
 TEST(BasicSedTest, sedmlFileWithRemoteCellmlFile)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/remote_cellml_file.sedml"))};

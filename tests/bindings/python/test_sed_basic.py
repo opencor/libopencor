@@ -158,6 +158,38 @@ def test_remote_sedml_file_without_path_with_relative_cellml_file():
     assert document.models[0].file == needed_file
 
 
+def test_remote_sedml_file_with_absolute_cellml_file():
+    # An absolute model source is relative to the origin of the remote SED-ML file, i.e. never a local file name.
+
+    file = loc.File("https://example.com/simulations/simulation.sedml?a=b/c#d/e", False)
+
+    file.contents = utils.text_to_list(sedml_contents("/models/./model.cellml"))
+
+    needed_file = loc.File("https://example.com/models/model.cellml", False)
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == needed_file
+
+
+def test_remote_sedml_file_with_network_path_cellml_file():
+    # A network-path model source is relative to the scheme of the remote SED-ML file, i.e. never a local file name.
+
+    file = loc.File("https://example.com/simulations/simulation.sedml", False)
+
+    file.contents = utils.text_to_list(
+        sedml_contents("//example.org/models/model.cellml")
+    )
+
+    needed_file = loc.File("https://example.org/models/model.cellml", False)
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == needed_file
+
+
 def test_sedml_file_with_remote_cellml_file():
     file = loc.File(utils.resource_path("api/sed/remote_cellml_file.sedml"))
     document = loc.SedDocument(file)
