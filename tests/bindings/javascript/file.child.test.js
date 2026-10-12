@@ -191,4 +191,45 @@ test.describe('File type tests', () => {
       assert.deepStrictEqual(childFile.contents(), new TextEncoder().encode(fileName));
     }
   });
+
+  test('COMBINE archive with duplicate locations', () => {
+    // Different locations may refer to the same file (e.g., "./my%20file.txt" and "./my file.txt", or "./file.txt" and
+    // "file.txt"), in which case only the first one is kept and the other ones are ignored. The ignored locations can,
+    // however, still be used to retrieve the child file since they refer to the same file.
+
+    const expectedIssues = [
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file 'file.txt' is the same as the file './file.txt'. It has been ignored."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored."
+      ]
+    ];
+    const locationsFileNamesAndDuplicateLocations = [
+      ['./file.txt', 'file.txt', 'file.txt'],
+      ['./my%20file.txt', 'my file.txt', './my file.txt']
+    ];
+    const file = new loc.File(utils.resourcePath('api/file/duplicate_locations.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    utils.assertIssues(loc, file, expectedIssues);
+    assert.strictEqual(file.childFileCount, locationsFileNamesAndDuplicateLocations.length);
+
+    for (const [i, [location, fileName, duplicateLocation]] of locationsFileNamesAndDuplicateLocations.entries()) {
+      const childFile = file.childFileFromFileName(location);
+
+      assert.notStrictEqual(childFile, null);
+      assert.strictEqual(file.childFileNames.get(i), location);
+      assert.strictEqual(file.childFile(i).isAliasOf(childFile), true);
+      assert.strictEqual(file.childFileFromFileName(fileName).isAliasOf(childFile), true);
+      assert.strictEqual(file.childFileFromFileName(duplicateLocation).isAliasOf(childFile), true);
+      assert.deepStrictEqual(childFile.contents(), new TextEncoder().encode(fileName));
+    }
+
+    assert.strictEqual(loc.FileManager.instance().fileCount, 3);
+  });
 });

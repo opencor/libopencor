@@ -195,3 +195,43 @@ def test_type_combine_archive_with_percent_encoded_locations():
         assert file.child_file(i) == child_file
         assert file.child_file(file_name) == child_file
         assert child_file.contents == utils.text_to_list(file_name)
+
+
+def test_type_combine_archive_with_duplicate_locations():
+    # Different locations may refer to the same file (e.g., "./my%20file.txt" and "./my file.txt", or "./file.txt" and
+    # "file.txt"), in which case only the first one is kept and the other ones are ignored. The ignored locations can,
+    # however, still be used to retrieve the child file since they refer to the same file.
+
+    expected_issues = [
+        [
+            Issue.Type.Warning,
+            "COMBINE archive: the file 'file.txt' is the same as the file './file.txt'. It has been ignored.",
+        ],
+        [
+            Issue.Type.Warning,
+            "COMBINE archive: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored.",
+        ],
+    ]
+    locations_file_names_and_duplicate_locations = [
+        ("./file.txt", "file.txt", "file.txt"),
+        ("./my%20file.txt", "my file.txt", "./my file.txt"),
+    ]
+    file = File(utils.resource_path("api/file/duplicate_locations.omex"))
+
+    assert file.type == File.Type.CombineArchive
+    utils.assert_issues(file, expected_issues)
+    assert file.child_file_count == len(locations_file_names_and_duplicate_locations)
+
+    for i, (location, file_name, duplicate_location) in enumerate(
+        locations_file_names_and_duplicate_locations
+    ):
+        child_file = file.child_file(location)
+
+        assert child_file is not None
+        assert file.child_file_names[i] == location
+        assert file.child_file(i) == child_file
+        assert file.child_file(file_name) == child_file
+        assert file.child_file(duplicate_location) == child_file
+        assert child_file.contents == utils.text_to_list(file_name)
+
+    assert FileManager.instance().file_count == 3

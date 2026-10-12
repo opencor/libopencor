@@ -185,3 +185,39 @@ TEST(ChildFileTest, combineArchiveWithPercentEncodedLocations)
         EXPECT_EQ(libOpenCOR::toString(childFile->contents()), fileName);
     }
 }
+
+TEST(ChildFileTest, combineArchiveWithDuplicateLocations)
+{
+    // Different locations may refer to the same file (e.g., "./my%20file.txt" and "./my file.txt", or "./file.txt" and
+    // "file.txt"), in which case only the first one is kept and the other ones are ignored. The ignored locations can,
+    // however, still be used to retrieve the child file since they refer to the same file.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file 'file.txt' is the same as the file './file.txt'. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored."},
+    }};
+    static const std::vector<std::tuple<std::string, std::string, std::string>> LOCATIONS_FILE_NAMES_AND_DUPLICATE_LOCATIONS {
+        {"./file.txt", "file.txt", "file.txt"},
+        {"./my%20file.txt", "my file.txt", "./my file.txt"},
+    };
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/duplicate_locations.omex"))};
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ_ISSUES(file, EXPECTED_ISSUES);
+    EXPECT_EQ(file->childFileCount(), LOCATIONS_FILE_NAMES_AND_DUPLICATE_LOCATIONS.size());
+
+    for (size_t i {0}; i < LOCATIONS_FILE_NAMES_AND_DUPLICATE_LOCATIONS.size(); ++i) {
+        const auto &[location, fileName, duplicateLocation] {LOCATIONS_FILE_NAMES_AND_DUPLICATE_LOCATIONS[i]};
+        auto childFile {file->childFile(location)};
+
+        GTEST_ASSERT_NE(childFile, nullptr);
+        EXPECT_EQ(file->childFileNames()[i], location);
+        EXPECT_EQ(file->childFile(i), childFile);
+        EXPECT_EQ(file->childFile(fileName), childFile);
+        EXPECT_EQ(file->childFile(duplicateLocation), childFile);
+        EXPECT_EQ(libOpenCOR::toString(childFile->contents()), fileName);
+    }
+
+    EXPECT_EQ(libOpenCOR::FileManager::instance().fileCount(), 3U);
+}

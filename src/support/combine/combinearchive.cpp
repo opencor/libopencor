@@ -25,6 +25,7 @@ limitations under the License.
 #include <atomic>
 #include <filesystem>
 #include <regex>
+#include <unordered_map>
 
 namespace libOpenCOR {
 
@@ -88,6 +89,7 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
 
     FilePtr cellmlFile;
     FilePtr sedmlFile;
+    std::unordered_map<std::string, std::string> fileLocations;
 
     for (int i {0}; i < mArchive->getNumEntries(); ++i) {
         const auto *entry {mArchive->getEntry(i)};
@@ -120,6 +122,30 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
 
             continue;
         }
+
+        // Make sure that the file is not the same as a file that we have already extracted.
+        // Note: different locations may refer to the same file (e.g., "./my%20file.cellml" and "./my file.cellml", or
+        //       "./file.cellml" and "file.cellml"). This is an ambiguity in the COMBINE archive itself, so we keep the
+        //       first file and ignore the other ones (File::create() would otherwise return the same file, which
+        //       contents would get replaced and which would be counted several times).
+
+        if (auto fileLocation {fileLocations.find(fileName)}; fileLocation != fileLocations.end()) {
+            std::string warning;
+
+            warning.reserve(location.size() + fileLocation->second.size() + 64); // NOLINT
+
+            warning += "The file '";
+            warning += location;
+            warning += "' is the same as the file '";
+            warning += fileLocation->second;
+            warning += "'. It has been ignored.";
+
+            addWarning(warning);
+
+            continue;
+        }
+
+        fileLocations.emplace(fileName, location);
 
         // Retrieve the contents of the file.
         // Note #1: a location is a URI reference while the name of an entry in the ZIP file is a file name, so the
