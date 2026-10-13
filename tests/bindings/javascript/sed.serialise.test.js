@@ -219,6 +219,51 @@ test.describe('Sed serialise tests', () => {
     );
   });
 
+  test('Local CellML file with non-XML character', () => {
+    // A model source is an XML attribute, so the characters in the file name of a local model that are not allowed in
+    // an XML document (e.g., U+0001 and U+FFFF) must be percent-encoded for the SED-ML file to be valid and for the
+    // model source to refer to that model when the SED-ML file is loaded back.
+
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const file = new loc.File(utils.resourcePath('\x01￿.cellml'));
+
+    file.setContents(cellmlContents);
+
+    const document = new loc.SedDocument(file);
+    const encodedFileUrl = `file://${utils.resourcePath('%01%EF%BF%BF.cellml')}`;
+
+    assert.strictEqual(document.serialise(utils.resourcePath()), cvodeExpectedSerialisation('%01%EF%BF%BF.cellml'));
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation(encodedFileUrl));
+
+    // Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    // (which we never generate, but which a third-party tool might).
+
+    for (const source of ['%01%EF%BF%BF.cellml', encodedFileUrl, utils.resourcePath('%01%EF%BF%BF.cellml')]) {
+      const sedmlFile = new loc.File(utils.resourcePath('my_model.sedml'));
+
+      sedmlFile.setContents(new TextEncoder().encode(cvodeExpectedSerialisation(source)));
+
+      const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+      assert.strictEqual(sedmlDocument.models.length, 1);
+      assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+      loc.FileManager.instance().unmanage(sedmlFile);
+    }
+
+    // A null character is also percent-encoded, so that the model source doesn't get truncated (and refer to another
+    // file).
+
+    const nullFile = new loc.File(`${utils.resourcePath('model')}\0.cellml`);
+
+    nullFile.setContents(cellmlContents);
+
+    assert.strictEqual(
+      new loc.SedDocument(nullFile).serialise(utils.resourcePath()),
+      cvodeExpectedSerialisation('model%00.cellml')
+    );
+  });
+
   test('Remote CellML file with non-UTF-8 character', () => {
     // A model source is an XML attribute, so the bytes in the URL of a remote model that are not valid UTF-8 must be
     // percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the SED-ML

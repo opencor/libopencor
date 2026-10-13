@@ -18,37 +18,53 @@ limitations under the License.
 
 #include "tests/utils.h"
 
-TEST(UtilsTest, percentEncodeInvalidUtf8)
+TEST(UtilsTest, percentEncodeNonXmlCharacters)
 {
     // Valid UTF-8 is kept as is.
 
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8(""), "");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("model.cellml"), "model.cellml");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("%20"), "%20");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xC3\xA9"), "\xC3\xA9"); // U+00E9.
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xE0\xA0\x80"), "\xE0\xA0\x80"); // U+0800.
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xE2\x82\xAC"), "\xE2\x82\xAC"); // U+20AC.
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xED\x9F\xBF"), "\xED\x9F\xBF"); // U+D7FF.
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF0\x9F\x98\x80"), "\xF0\x9F\x98\x80"); // U+1F600.
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF1\x80\x80\x80"), "\xF1\x80\x80\x80"); // U+40000.
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF4\x8F\xBF\xBF"), "\xF4\x8F\xBF\xBF"); // U+10FFFF.
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters(""), "");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("model.cellml"), "model.cellml");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("%20"), "%20");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xC3\xA9"), "\xC3\xA9"); // U+00E9.
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xE0\xA0\x80"), "\xE0\xA0\x80"); // U+0800.
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xE2\x82\xAC"), "\xE2\x82\xAC"); // U+20AC.
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xED\x9F\xBF"), "\xED\x9F\xBF"); // U+D7FF.
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xF0\x9F\x98\x80"), "\xF0\x9F\x98\x80"); // U+1F600.
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xF1\x80\x80\x80"), "\xF1\x80\x80\x80"); // U+40000.
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xF4\x8F\xBF\xBF"), "\xF4\x8F\xBF\xBF"); // U+10FFFF.
 
     // A byte that is not part of a valid UTF-8 sequence is percent-encoded, i.e. a continuation byte without a lead
     // byte, a lead byte that is never valid, an overlong encoding, a surrogate, a code point above U+10FFFF, a
     // truncated sequence, or a sequence with an invalid continuation byte.
 
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("/some/path/\xFF.cellml"), "/some/path/%FF.cellml");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\x80"), "%80");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xC0\xAF"), "%C0%AF");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF5\x80\x80\x80"), "%F5%80%80%80");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xE0\x80\xAF"), "%E0%80%AF");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF0\x80\x80\xAF"), "%F0%80%80%AF");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xED\xA0\x80"), "%ED%A0%80");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF4\x90\x80\x80"), "%F4%90%80%80");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xC3"), "%C3");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF0\x9F\x98"), "%F0%9F%98");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xE2\x82\x41"), "%E2%82A");
-    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xE2\x82\xC3\xA9"), "%E2%82\xC3\xA9");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("/some/path/\xFF.cellml"), "/some/path/%FF.cellml");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\x80"), "%80");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xC0\xAF"), "%C0%AF");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xF5\x80\x80\x80"), "%F5%80%80%80");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xE0\x80\xAF"), "%E0%80%AF");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xF0\x80\x80\xAF"), "%F0%80%80%AF");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xED\xA0\x80"), "%ED%A0%80");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xF4\x90\x80\x80"), "%F4%90%80%80");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xC3"), "%C3");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xF0\x9F\x98"), "%F0%9F%98");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xE2\x82\x41"), "%E2%82A");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xE2\x82\xC3\xA9"), "%E2%82\xC3\xA9");
+
+    // A control character that is not allowed in an XML document is percent-encoded, unlike the tab, line feed, and
+    // carriage return control characters, and unlike the delete character.
+
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("/some/path/" + std::string(1, '\0') + ".cellml"), "/some/path/%00.cellml");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\x01"), "%01");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\x08\x0B\x0C\x0E\x1F"), "%08%0B%0C%0E%1F");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\t\n\r\x7F"), "\t\n\r\x7F");
+
+    // The U+FFFE and U+FFFF noncharacters are not allowed in an XML document, so they are percent-encoded, unlike the
+    // code points next to them.
+
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xEF\xBF\xBE"), "%EF%BF%BE");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xEF\xBF\xBF"), "%EF%BF%BF");
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xEF\xBF\xBD"), "\xEF\xBF\xBD"); // U+FFFD.
+    EXPECT_EQ(libOpenCOR::percentEncodeNonXmlCharacters("\xF0\x90\x80\x80"), "\xF0\x90\x80\x80"); // U+10000.
 }
 
 TEST(UtilsTest, encodeUrl)

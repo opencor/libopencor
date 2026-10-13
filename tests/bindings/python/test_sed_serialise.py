@@ -259,6 +259,63 @@ def test_local_cellml_file_with_non_utf8_character():
     ) == cvode_expected_serialisation("model.cellml")
 
 
+def test_local_cellml_file_with_non_xml_character():
+    # A model source is an XML attribute, so the characters in the file name of a local model that are not allowed in
+    # an XML document (e.g., U+0001 and U+FFFF) must be percent-encoded for the SED-ML file to be valid and for the
+    # model source to refer to that model when the SED-ML file is loaded back.
+
+    cellml_contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+    file = loc.File(utils.resource_path("\x01￿.cellml"), False)
+
+    file.contents = cellml_contents
+
+    document = loc.SedDocument(file)
+
+    if platform.system() == "Windows":
+        encoded_file_url = "file:///" + utils.forward_slash_path(
+            utils.resource_path("%01%EF%BF%BF.cellml")
+        )
+    else:
+        encoded_file_url = "file://" + utils.resource_path("%01%EF%BF%BF.cellml")
+
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
+        "%01%EF%BF%BF.cellml"
+    )
+    assert document.serialise() == cvode_expected_serialisation(encoded_file_url)
+
+    # Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    # (which we never generate, but which a third-party tool might).
+
+    for source in [
+        "%01%EF%BF%BF.cellml",
+        encoded_file_url,
+        utils.resource_path("%01%EF%BF%BF.cellml"),
+    ]:
+        sedml_file = loc.File(utils.resource_path("my_model.sedml"), False)
+
+        sedml_file.contents = utils.text_to_list(cvode_expected_serialisation(source))
+
+        sedml_document = loc.SedDocument(sedml_file)
+
+        assert len(sedml_document.models) == 1
+        assert sedml_document.models[0].file == file
+
+        loc.FileManager.instance().unmanage(sedml_file)
+
+    # A null character is also percent-encoded, so that the model source doesn't get truncated (and refer to another
+    # file).
+
+    null_file = loc.File(utils.resource_path("model") + "\0.cellml", False)
+
+    null_file.contents = cellml_contents
+
+    assert loc.SedDocument(null_file).serialise(
+        utils.ResourceLocation
+    ) == cvode_expected_serialisation("model%00.cellml")
+
+
 def test_remote_cellml_file_with_non_utf8_character():
     # A model source is an XML attribute, so the bytes in the URL of a remote model that are not valid UTF-8 must be
     # percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the SED-ML

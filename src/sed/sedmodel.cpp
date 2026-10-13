@@ -186,13 +186,18 @@ void SedModel::Impl::serialise(xmlNodePtr pNode) const
     }
 
     // The file name or URL of the model may not be valid UTF-8 (e.g., "file:///some/path/%FF.cellml" gets
-    // percent-decoded to "/some/path/\xFF.cellml"), but the model source must be since it is an XML attribute. So, we
-    // percent-encode the bytes that are not valid UTF-8 (e.g., "\xFF.cellml" becomes "%FF.cellml"), which get decoded
-    // back when the SED-ML file is loaded.
-    // Note: this must be done after percent-encoding the percent signs of a local file name, so that the percent signs
-    //       that we add here don't get percent-encoded.
+    // percent-decoded to "/some/path/\xFF.cellml") or may contain characters that are not allowed in an XML document
+    // (e.g., "/some/path/\x01.cellml"), but the model source must be valid since it is an XML attribute. So, we
+    // percent-encode those bytes (e.g., "\xFF.cellml" becomes "%FF.cellml"), which get decoded back when the SED-ML
+    // file is loaded.
+    // Note #1: this must be done after percent-encoding the percent signs of a local file name, so that the percent
+    //          signs that we add here don't get percent-encoded.
+    // Note #2: a null character is also percent-encoded (i.e. "%00"), so that the model source doesn't get truncated
+    //          (and refer to another file). It doesn't, however, get decoded back (see decodeUrl()), so the model
+    //          source won't refer to the model when the SED-ML file is loaded, but such a model cannot exist on disk
+    //          anyway.
 
-    source = percentEncodeInvalidUtf8(source);
+    source = percentEncodeNonXmlCharacters(source);
 
     xmlNewProp(node, toConstXmlCharPtr("source"), toConstXmlCharPtr(source));
 

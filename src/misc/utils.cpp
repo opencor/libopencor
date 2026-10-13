@@ -256,22 +256,44 @@ std::tuple<size_t, char32_t> utf8Sequence(const std::string &pString, size_t pIn
 
 } // namespace
 
-std::string percentEncodeInvalidUtf8(const std::string &pString)
+std::string percentEncodeNonXmlCharacters(const std::string &pString)
 {
     // Percent-encode the bytes of the given string that are not part of a valid UTF-8 sequence (e.g., "\xFF.cellml"
-    // becomes "%FF.cellml"), leaving everything else as is.
+    // becomes "%FF.cellml") or that are part of a valid UTF-8 sequence for a code point that is not allowed in an XML
+    // document (e.g., "\x01.cellml" becomes "%01.cellml" and "\xEF\xBF\xBF.cellml" becomes "%EF%BF%BF.cellml"), leaving
+    // everything else as is.
+    // Note #1: an XML document may only contain the tab, line feed, and carriage return control characters, and no
+    //          U+FFFE and U+FFFF noncharacters (see https://www.w3.org/TR/xml/#charsets). A null character would, in
+    //          addition, truncate the string when used as a C string (e.g., by libxml2).
+    // Note #2: libxml2 escapes the tab, line feed, and carriage return control characters in an XML attribute (e.g.,
+    //          "\t" becomes "&#9;"), so that they don't get normalised to a space when the XML document is parsed,
+    //          hence we leave them as is.
+
+    static constexpr char32_t TAB {0x09};
+    static constexpr char32_t LINE_FEED {0x0A};
+    static constexpr char32_t CARRIAGE_RETURN {0x0D};
+    static constexpr char32_t FIRST_NON_CONTROL_CHARACTER {0x20};
+    static constexpr char32_t FIRST_NONCHARACTER {0xFFFE};
+    static constexpr char32_t LAST_NONCHARACTER {0xFFFF};
 
     std::string res;
 
     res.reserve(pString.size());
 
     for (size_t i {0}; i < pString.size();) {
-        const auto length {std::get<0>(utf8Sequence(pString, i))};
+        auto [length, codePoint] {utf8Sequence(pString, i)};
 
-        if (length == 0) {
-            appendPercentEncodedByte(res, static_cast<unsigned char>(pString[i]));
+        if ((length == 0)
+            || ((codePoint < FIRST_NON_CONTROL_CHARACTER) && (codePoint != TAB) && (codePoint != LINE_FEED)
+                && (codePoint != CARRIAGE_RETURN))
+            || ((codePoint >= FIRST_NONCHARACTER) && (codePoint <= LAST_NONCHARACTER))) {
+            const auto byteCount {std::max<size_t>(length, 1)};
 
-            ++i;
+            for (size_t j {0}; j < byteCount; ++j) {
+                appendPercentEncodedByte(res, static_cast<unsigned char>(pString[i + j]));
+            }
+
+            i += byteCount;
         } else {
             res.append(pString, i, length);
 

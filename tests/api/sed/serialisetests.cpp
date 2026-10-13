@@ -237,6 +237,54 @@ TEST(SerialiseSedTest, localCellmlFileWithNonUtf8Character)
     EXPECT_EQ(libOpenCOR::SedDocument::create(otherFile)->serialise(libOpenCOR::resourcePath("\xFF")), cvodeExpectedSerialisation("model.cellml"));
 }
 
+TEST(SerialiseSedTest, localCellmlFileWithNonXmlCharacter)
+{
+    // A model source is an XML attribute, so the characters in the file name of a local model that are not allowed in
+    // an XML document (e.g., U+0001 and U+FFFF) must be percent-encoded for the SED-ML file to be valid and for the
+    // model source to refer to that model when the SED-ML file is loaded back.
+
+    auto cellmlContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.cellml")).c_str())};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("\x01\xEF\xBF\xBF.cellml"), false)};
+
+    file->setContents(cellmlContents);
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+#ifdef BUILDING_ON_WINDOWS
+    auto encodedFileUrl {std::string("file:///").append(libOpenCOR::forwardSlashPath(libOpenCOR::resourcePath("%01%EF%BF%BF.cellml")))};
+#else
+    auto encodedFileUrl {std::string("file://").append(libOpenCOR::resourcePath("%01%EF%BF%BF.cellml"))};
+#endif
+
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("%01%EF%BF%BF.cellml"));
+    EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation(encodedFileUrl));
+
+    // Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    // (which we never generate, but which a third-party tool might).
+
+    for (const auto &source : std::vector<std::string> {"%01%EF%BF%BF.cellml", encodedFileUrl, libOpenCOR::resourcePath("%01%EF%BF%BF.cellml")}) {
+        auto sedmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("my_model.sedml"), false)};
+
+        sedmlFile->setContents(libOpenCOR::charArrayToUnsignedChars(cvodeExpectedSerialisation(source).c_str()));
+
+        auto sedmlDocument {libOpenCOR::SedDocument::create(sedmlFile)};
+
+        EXPECT_EQ(sedmlDocument->models().size(), 1U);
+        EXPECT_EQ(sedmlDocument->models()[0]->file(), file);
+
+        libOpenCOR::FileManager::instance().unmanage(sedmlFile);
+    }
+
+    // A null character is also percent-encoded, so that the model source doesn't get truncated (and refer to another
+    // file).
+
+    auto nullFile {libOpenCOR::File::create(libOpenCOR::resourcePath("model") + std::string(1, '\0') + ".cellml", false)};
+
+    nullFile->setContents(cellmlContents);
+
+    EXPECT_EQ(libOpenCOR::SedDocument::create(nullFile)->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("model%00.cellml"));
+}
+
 TEST(SerialiseSedTest, remoteCellmlFileWithNonUtf8Character)
 {
     // A model source is an XML attribute, so the bytes in the URL of a remote model that are not valid UTF-8 must be
