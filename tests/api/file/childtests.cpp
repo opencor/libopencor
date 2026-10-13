@@ -188,6 +188,38 @@ TEST(ChildFileTest, combineArchiveWithPercentEncodedLocations)
     }
 }
 
+TEST(ChildFileTest, combineArchiveWithNonUtf8Locations)
+{
+    // A location may get percent-decoded to a file name that is not valid UTF-8 (e.g., "./%FF.txt" gets decoded to
+    // "\xFF.txt") or that has a character outside of the Basic Multilingual Plane (e.g., "./%F0%9F%98%80.txt" gets
+    // decoded to an emoji), which must not result in an exception being thrown. Either way, a child file must have the
+    // contents of its ZIP entry and be retrievable using either its location or its file name.
+    // Note: the contents of a ZIP entry is the location of its child file.
+
+    static const std::vector<std::pair<std::string, std::string>> LOCATIONS_AND_FILE_NAMES {
+        {"./%FF.txt", "\xFF.txt"},
+        {"./%F0%9F%98%80.txt", "\xF0\x9F\x98\x80.txt"},
+    };
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/non_utf8_locations.omex"))};
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_FALSE(file->hasIssues());
+    EXPECT_EQ(file->childFileCount(), LOCATIONS_AND_FILE_NAMES.size());
+
+    for (size_t i {0}; i < LOCATIONS_AND_FILE_NAMES.size(); ++i) {
+        const auto &[location, fileName] {LOCATIONS_AND_FILE_NAMES[i]};
+        auto childFile {file->childFile(location)};
+
+        GTEST_ASSERT_NE(childFile, nullptr);
+        EXPECT_EQ(file->childFileNames()[i], location);
+        EXPECT_EQ(file->childFile(i), childFile);
+        EXPECT_EQ(file->childFile(fileName), childFile);
+        EXPECT_TRUE(childFile->fileName().ends_with(fileName));
+        EXPECT_EQ(libOpenCOR::toString(childFile->contents()), location);
+    }
+}
+
 TEST(ChildFileTest, combineArchiveWithDuplicateLocations)
 {
     // Different locations may refer to the same file (e.g., "./my%20file.txt" and "./my file.txt", or "./file.txt" and

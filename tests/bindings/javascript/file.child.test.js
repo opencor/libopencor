@@ -193,6 +193,37 @@ test.describe('File child tests', () => {
     }
   });
 
+  test('COMBINE archive with non-UTF-8 locations', () => {
+    // A location may get percent-decoded to a file name that is not valid UTF-8 (e.g., "./%FF.txt" gets decoded to
+    // "\xFF.txt") or that has a character outside of the Basic Multilingual Plane (e.g., "./%F0%9F%98%80.txt" gets
+    // decoded to an emoji), which must not result in an exception being thrown. Either way, a child file must have the
+    // contents of its ZIP entry and be retrievable using either its location or its file name.
+    // Note: the contents of a ZIP entry is the location of its child file.
+
+    const locationsAndFileNames = [
+      ['./%FF.txt', '\udcff.txt'],
+      ['./%F0%9F%98%80.txt', '\u{1f600}.txt']
+    ];
+    const file = new loc.File(utils.resourcePath('api/file/non_utf8_locations.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.hasIssues, false);
+    assert.strictEqual(file.childFileCount, locationsAndFileNames.length);
+
+    for (const [i, [location, fileName]] of locationsAndFileNames.entries()) {
+      const childFile = file.childFileFromFileName(location);
+
+      assert.notStrictEqual(childFile, null);
+      assert.strictEqual(file.childFileNames.get(i), location);
+      assert.strictEqual(file.childFile(i).isAliasOf(childFile), true);
+      assert.strictEqual(file.childFileFromFileName(fileName).isAliasOf(childFile), true);
+      assert.strictEqual(childFile.fileName.endsWith(fileName), true);
+      assert.deepStrictEqual(childFile.contents(), new TextEncoder().encode(location));
+    }
+  });
+
   test('COMBINE archive with duplicate locations', () => {
     // Different locations may refer to the same file (e.g., "./my%20file.txt" and "./my file.txt", or "./file.txt" and
     // "file.txt"), in which case only the first one is kept and the other ones are ignored. The ignored locations can,

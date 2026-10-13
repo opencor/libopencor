@@ -40,10 +40,6 @@ limitations under the License.
 #include <sstream>
 #include <vector>
 
-#ifdef BUILDING_USING_MSVC
-#    include <codecvt>
-#endif
-
 #ifdef ERROR
 #    undef ERROR
 #endif
@@ -304,9 +300,176 @@ std::string forwardSlashPath(const std::string &pPath)
 }
 #endif
 
+#ifdef BUILDING_USING_MSVC
+namespace {
+
+// Conversion between a UTF-8 std::string and a UTF-16 std::wstring, to be used instead of the one done by
+// std::filesystem::path since a std::string may not be valid UTF-8 (e.g., "file:///some/path/%FF.txt" gets
+// percent-decoded to "/some/path/\xFF.txt"), in which case std::filesystem::path would throw an exception. So, we map
+// an invalid byte to a lone surrogate (e.g., 0xFF to U+DCFF), which a Windows file name may contain, and back, meaning
+// that a file name can always be converted to a path and back without being altered.
+// Note: a path may also contain some other lone surrogates (e.g., U+D800), which cannot be mapped to a byte, in which
+//       case we encode them as if they were valid code points (i.e. using three bytes).
+
+constexpr unsigned char LAST_ASCII_BYTE {0x7F};
+constexpr unsigned char FIRST_CONTINUATION_BYTE {0x80};
+constexpr unsigned char LAST_CONTINUATION_BYTE {0xBF};
+constexpr unsigned char CONTINUATION_BYTE_MASK {0x3F};
+constexpr unsigned int CONTINUATION_BYTE_SHIFT {6U};
+constexpr char32_t FIRST_TWO_BYTE_CODE_POINT {0x80};
+constexpr char32_t FIRST_THREE_BYTE_CODE_POINT {0x800};
+constexpr char32_t FIRST_FOUR_BYTE_CODE_POINT {0x10000};
+constexpr char32_t FIRST_HIGH_SURROGATE {0xD800};
+constexpr char32_t LAST_HIGH_SURROGATE {0xDBFF};
+constexpr char32_t FIRST_LOW_SURROGATE {0xDC00};
+constexpr char32_t LAST_LOW_SURROGATE {0xDFFF};
+constexpr char32_t FIRST_ESCAPED_BYTE_SURROGATE {FIRST_LOW_SURROGATE + FIRST_CONTINUATION_BYTE};
+constexpr char32_t LAST_ESCAPED_BYTE_SURROGATE {FIRST_LOW_SURROGATE + 0xFF};
+constexpr unsigned int SURROGATE_SHIFT {10U};
+constexpr char32_t SURROGATE_MASK {0x3FF};
+
+std::wstring utf8ToUtf16(const std::string &pString)
+{
+    std::wstring res;
+
+    res.reserve(pString.size());
+
+    for (size_t i {0}; i < pString.size();) {
+        // Determine the number of continuation bytes that should follow the current byte, as well as the range of the
+        // first one, so that an overlong encoding, a surrogate, or a code point above U+10FFFF is considered invalid
+        // (see https://www.rfc-editor.org/rfc/rfc3629#section-4).
+
+        const auto byte {static_cast<unsigned char>(pString[i])};
+
+        if (byte <= LAST_ASCII_BYTE) {
+            res += static_cast<wchar_t>(byte);
+
+            ++i;
+
+            continue;
+        }
+
+        static constexpr unsigned int FIRST_TWO_BYTE_LEAD {0xC2};
+        static constexpr unsigned int LAST_TWO_BYTE_LEAD {0xDF};
+        static constexpr unsigned int FIRST_THREE_BYTE_LEAD {0xE0};
+        static constexpr unsigned int SURROGATE_THREE_BYTE_LEAD {0xED};
+        static constexpr unsigned int LAST_THREE_BYTE_LEAD {0xEF};
+        static constexpr unsigned int FIRST_FOUR_BYTE_LEAD {0xF0};
+        static constexpr unsigned int LAST_FOUR_BYTE_LEAD {0xF4};
+        static constexpr unsigned int FIRST_THREE_BYTE_LEAD_LOW {0xA0};
+        static constexpr unsigned int SURROGATE_THREE_BYTE_LEAD_HIGH {0x9F};
+        static constexpr unsigned int FIRST_FOUR_BYTE_LEAD_LOW {0x90};
+        static constexpr unsigned int LAST_FOUR_BYTE_LEAD_HIGH {0x8F};
+
+        size_t length {0};
+        unsigned int low {FIRST_CONTINUATION_BYTE};
+        unsigned int high {LAST_CONTINUATION_BYTE};
+
+        if ((byte >= FIRST_TWO_BYTE_LEAD) && (byte <= LAST_TWO_BYTE_LEAD)) {
+            length = 1;
+        } else if ((byte >= FIRST_THREE_BYTE_LEAD) && (byte <= LAST_THREE_BYTE_LEAD)) {
+            length = 2;
+            low = (byte == FIRST_THREE_BYTE_LEAD) ? FIRST_THREE_BYTE_LEAD_LOW : FIRST_CONTINUATION_BYTE;
+            high = (byte == SURROGATE_THREE_BYTE_LEAD) ? SURROGATE_THREE_BYTE_LEAD_HIGH : LAST_CONTINUATION_BYTE;
+        } else if ((byte >= FIRST_FOUR_BYTE_LEAD) && (byte <= LAST_FOUR_BYTE_LEAD)) {
+            length = 3;
+            low = (byte == FIRST_FOUR_BYTE_LEAD) ? FIRST_FOUR_BYTE_LEAD_LOW : FIRST_CONTINUATION_BYTE;
+            high = (byte == LAST_FOUR_BYTE_LEAD) ? LAST_FOUR_BYTE_LEAD_HIGH : LAST_CONTINUATION_BYTE;
+        }
+
+        auto codePoint {static_cast<char32_t>(byte & (CONTINUATION_BYTE_MASK >> length))};
+        size_t j {1};
+
+        while ((j <= length) && (i + j < pString.size())) {
+            const auto nextByte {static_cast<unsigned char>(pString[i + j])};
+
+            if ((nextByte < ((j == 1) ? low : FIRST_CONTINUATION_BYTE))
+                || (nextByte > ((j == 1) ? high : LAST_CONTINUATION_BYTE))) {
+                break;
+            }
+
+            codePoint = (codePoint << CONTINUATION_BYTE_SHIFT) | (nextByte & CONTINUATION_BYTE_MASK);
+
+            ++j;
+        }
+
+        if ((length > 0) && (j > length)) {
+            if (codePoint >= FIRST_FOUR_BYTE_CODE_POINT) {
+                codePoint -= FIRST_FOUR_BYTE_CODE_POINT;
+
+                res += static_cast<wchar_t>(FIRST_HIGH_SURROGATE + (codePoint >> SURROGATE_SHIFT));
+                res += static_cast<wchar_t>(FIRST_LOW_SURROGATE + (codePoint & SURROGATE_MASK));
+            } else {
+                res += static_cast<wchar_t>(codePoint);
+            }
+
+            i += j;
+        } else {
+            res += static_cast<wchar_t>(FIRST_LOW_SURROGATE + byte);
+
+            ++i;
+        }
+    }
+
+    return res;
+}
+
+std::string utf16ToUtf8(const std::wstring &pString)
+{
+    static constexpr unsigned char TWO_BYTE_LEAD {0xC0};
+    static constexpr unsigned char THREE_BYTE_LEAD {0xE0};
+    static constexpr unsigned char FOUR_BYTE_LEAD {0xF0};
+
+    std::string res;
+
+    res.reserve(pString.size());
+
+    for (size_t i {0}; i < pString.size(); ++i) {
+        auto codePoint {static_cast<char32_t>(pString[i])};
+
+        if ((codePoint >= FIRST_HIGH_SURROGATE) && (codePoint <= LAST_HIGH_SURROGATE) && (i + 1 < pString.size())
+            && (static_cast<char32_t>(pString[i + 1]) >= FIRST_LOW_SURROGATE)
+            && (static_cast<char32_t>(pString[i + 1]) <= LAST_LOW_SURROGATE)) {
+            codePoint = FIRST_FOUR_BYTE_CODE_POINT + ((codePoint - FIRST_HIGH_SURROGATE) << SURROGATE_SHIFT)
+                        + (static_cast<char32_t>(pString[i + 1]) - FIRST_LOW_SURROGATE);
+
+            ++i;
+        } else if ((codePoint >= FIRST_ESCAPED_BYTE_SURROGATE) && (codePoint <= LAST_ESCAPED_BYTE_SURROGATE)) {
+            res += static_cast<char>(codePoint - FIRST_LOW_SURROGATE);
+
+            continue;
+        }
+
+        if (codePoint < FIRST_TWO_BYTE_CODE_POINT) {
+            res += static_cast<char>(codePoint);
+        } else if (codePoint < FIRST_THREE_BYTE_CODE_POINT) {
+            res += static_cast<char>(TWO_BYTE_LEAD | (codePoint >> CONTINUATION_BYTE_SHIFT));
+            res += static_cast<char>(FIRST_CONTINUATION_BYTE | (codePoint & CONTINUATION_BYTE_MASK));
+        } else if (codePoint < FIRST_FOUR_BYTE_CODE_POINT) {
+            res += static_cast<char>(THREE_BYTE_LEAD | (codePoint >> (2 * CONTINUATION_BYTE_SHIFT)));
+            res += static_cast<char>(FIRST_CONTINUATION_BYTE | ((codePoint >> CONTINUATION_BYTE_SHIFT) & CONTINUATION_BYTE_MASK));
+            res += static_cast<char>(FIRST_CONTINUATION_BYTE | (codePoint & CONTINUATION_BYTE_MASK));
+        } else {
+            res += static_cast<char>(FOUR_BYTE_LEAD | (codePoint >> (3 * CONTINUATION_BYTE_SHIFT)));
+            res += static_cast<char>(FIRST_CONTINUATION_BYTE | ((codePoint >> (2 * CONTINUATION_BYTE_SHIFT)) & CONTINUATION_BYTE_MASK));
+            res += static_cast<char>(FIRST_CONTINUATION_BYTE | ((codePoint >> CONTINUATION_BYTE_SHIFT) & CONTINUATION_BYTE_MASK));
+            res += static_cast<char>(FIRST_CONTINUATION_BYTE | (codePoint & CONTINUATION_BYTE_MASK));
+        }
+    }
+
+    return res;
+}
+
+} // namespace
+#endif
+
 std::filesystem::path stringToPath(const std::string &pString)
 {
+#ifdef BUILDING_USING_MSVC
+    return utf8ToUtf16(pString);
+#else
     return std::u8string {pString.begin(), pString.end()};
+#endif
 }
 
 std::string pathToString(const std::filesystem::path &pPath)
@@ -314,7 +477,7 @@ std::string pathToString(const std::filesystem::path &pPath)
     auto path {pPath};
 
 #ifdef BUILDING_USING_MSVC
-    return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(path.make_preferred().wstring());
+    return utf16ToUtf8(path.make_preferred().native());
 #else
     return path.make_preferred().string();
 #endif

@@ -136,6 +136,42 @@ def test_local_file_with_null_character():
     assert loc.File(file_path) != file
 
 
+def test_local_file_with_non_utf8_character():
+    # A file name that is not valid UTF-8 (e.g., "/some/path/\xFF.cellml", which is what "file:///some/path/%FF.cellml"
+    # gets percent-decoded to) must not result in an exception being thrown and must be kept as is.
+
+    file_name = utils.resource_path("\udcff.cellml")
+    file = loc.File(file_name)
+
+    assert file.type == loc.File.Type.IrretrievableFile
+    assert file.file_name.endswith("\udcff.cellml")
+    assert file.file_name == file_name
+    assert file.url == ""
+    assert file.path == file_name
+    assert file.contents == []
+    assert_issues(file, expected_non_existing_file_issues)
+
+    if platform.system() == "Windows":
+        assert loc.File("file:///" + utils.forward_slash_path(utils.resource_path("%FF.cellml"))) == file
+    else:
+        assert loc.File("file://" + utils.resource_path("%FF.cellml")) == file
+
+    # A file name with a character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also kept as is.
+
+    emoji_file_name = utils.resource_path("\U0001f600.cellml")
+    emoji_file = loc.File(emoji_file_name)
+
+    assert emoji_file.type == loc.File.Type.IrretrievableFile
+    assert emoji_file.file_name.endswith("\U0001f600.cellml")
+    assert emoji_file.file_name == emoji_file_name
+    assert_issues(emoji_file, expected_non_existing_file_issues)
+
+    if platform.system() == "Windows":
+        assert loc.File("file:///" + utils.forward_slash_path(utils.resource_path("%F0%9F%98%80.cellml"))) == emoji_file
+    else:
+        assert loc.File("file://" + utils.resource_path("%F0%9F%98%80.cellml")) == emoji_file
+
+
 def test_local_directory():
     # A directory is not a file, but it must not result in an exception being thrown.
 

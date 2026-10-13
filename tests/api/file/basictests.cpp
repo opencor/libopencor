@@ -152,6 +152,43 @@ TEST(BasicFileTest, localFileWithNullCharacter)
     EXPECT_NE(libOpenCOR::File::create(filePath), file);
 }
 
+TEST(BasicFileTest, localFileWithNonUtf8Character)
+{
+    // A file name that is not valid UTF-8 (e.g., "/some/path/\xFF.cellml", which is what "file:///some/path/%FF.cellml"
+    // gets percent-decoded to) must not result in an exception being thrown and must be kept as is.
+
+    auto fileName {libOpenCOR::resourcePath("\xFF.cellml")};
+    auto file {libOpenCOR::File::create(fileName)};
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_TRUE(file->fileName().ends_with("\xFF.cellml"));
+    EXPECT_EQ(file->fileName(), fileName);
+    EXPECT_EQ(file->url(), "");
+    EXPECT_EQ(file->path(), fileName);
+    EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
+#ifdef BUILDING_ON_WINDOWS
+    EXPECT_EQ(libOpenCOR::File::create(std::string("file:///") + libOpenCOR::forwardSlashPath(libOpenCOR::resourcePath("%FF.cellml"))), file);
+#else
+    EXPECT_EQ(libOpenCOR::File::create(std::string("file://") + libOpenCOR::resourcePath("%FF.cellml")), file);
+#endif
+
+    // A file name with a character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also kept as is.
+
+    auto emojiFileName {libOpenCOR::resourcePath("\xF0\x9F\x98\x80.cellml")};
+    auto emojiFile {libOpenCOR::File::create(emojiFileName)};
+
+    EXPECT_EQ(emojiFile->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_TRUE(emojiFile->fileName().ends_with("\xF0\x9F\x98\x80.cellml"));
+    EXPECT_EQ(emojiFile->fileName(), emojiFileName);
+    EXPECT_EQ_ISSUES(emojiFile, expectedNonExistingFileIssues());
+#ifdef BUILDING_ON_WINDOWS
+    EXPECT_EQ(libOpenCOR::File::create(std::string("file:///") + libOpenCOR::forwardSlashPath(libOpenCOR::resourcePath("%F0%9F%98%80.cellml"))), emojiFile);
+#else
+    EXPECT_EQ(libOpenCOR::File::create(std::string("file://") + libOpenCOR::resourcePath("%F0%9F%98%80.cellml")), emojiFile);
+#endif
+}
+
 TEST(BasicFileTest, localDirectory)
 {
     // A directory is not a file, but it must not result in an exception being thrown.

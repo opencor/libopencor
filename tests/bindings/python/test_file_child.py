@@ -200,6 +200,34 @@ def test_combine_archive_with_percent_encoded_locations():
         assert child_file.contents == utils.text_to_list(file_name)
 
 
+def test_combine_archive_with_non_utf8_locations():
+    # A location may get percent-decoded to a file name that is not valid UTF-8 (e.g., "./%FF.txt" gets decoded to
+    # "\xFF.txt") or that has a character outside of the Basic Multilingual Plane (e.g., "./%F0%9F%98%80.txt" gets
+    # decoded to an emoji), which must not result in an exception being thrown. Either way, a child file must have the
+    # contents of its ZIP entry and be retrievable using either its location or its file name.
+    # Note: the contents of a ZIP entry is the location of its child file.
+
+    locations_and_file_names = [
+        ("./%FF.txt", "\udcff.txt"),
+        ("./%F0%9F%98%80.txt", "\U0001f600.txt"),
+    ]
+    file = File(utils.resource_path("api/file/non_utf8_locations.omex"))
+
+    assert file.type == File.Type.CombineArchive
+    assert not file.has_issues
+    assert file.child_file_count == len(locations_and_file_names)
+
+    for i, (location, file_name) in enumerate(locations_and_file_names):
+        child_file = file.child_file(location)
+
+        assert child_file is not None
+        assert file.child_file_names[i] == location
+        assert file.child_file(i) == child_file
+        assert file.child_file(file_name) == child_file
+        assert child_file.file_name.endswith(file_name)
+        assert child_file.contents == utils.text_to_list(location)
+
+
 def test_combine_archive_with_duplicate_locations():
     # Different locations may refer to the same file (e.g., "./my%20file.txt" and "./my file.txt", or "./file.txt" and
     # "file.txt"), in which case only the first one is kept and the other ones are ignored. The ignored locations can,

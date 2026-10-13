@@ -112,6 +112,36 @@ test.describe('File basic tests', () => {
     assert.strictEqual(new loc.File(filePath).isAliasOf(file), false);
   });
 
+  test('Local file with non-UTF-8 character', () => {
+    // A file name that is not valid UTF-8 (e.g., "/some/path/\xFF.cellml", which is what "file:///some/path/%FF.cellml"
+    // gets percent-decoded to) must not result in an exception being thrown and must be kept as is.
+    // Note: the file is of unknown type and has no issues since our JavaScript bindings never retrieve the contents of
+    //       a file.
+
+    const fileName = utils.resourcePath('\udcff.cellml');
+    const file = new loc.File(fileName);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.fileName.endsWith('\udcff.cellml'), true);
+    assert.strictEqual(file.fileName, fileName);
+    assert.strictEqual(file.url, '');
+    assert.strictEqual(file.path, fileName);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
+    assert.strictEqual(new loc.File(`file://${utils.resourcePath('%FF.cellml')}`).isAliasOf(file), true);
+
+    // A file name with a character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also kept as is.
+
+    const emojiFileName = utils.resourcePath('\u{1f600}.cellml');
+    const emojiFile = new loc.File(emojiFileName);
+
+    assert.strictEqual(emojiFile.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(emojiFile.fileName.endsWith('\u{1f600}.cellml'), true);
+    assert.strictEqual(emojiFile.fileName, emojiFileName);
+    assertIssues(loc, emojiFile, expectedNoIssues);
+    assert.strictEqual(new loc.File(`file://${utils.resourcePath('%F0%9F%98%80.cellml')}`).isAliasOf(emojiFile), true);
+  });
+
   test('Local directory', () => {
     // A directory is not a file, but it must not result in an exception being thrown.
 
