@@ -216,6 +216,49 @@ TEST(UtilsTest, retrieveFileInfo)
 #endif
 }
 
+TEST(UtilsTest, stringToPathAndPathToString)
+{
+    // A file name can always be converted to a path and back without being altered, be it valid UTF-8 or not, and even
+    // if it contains the three-byte encoding of a surrogate (e.g., "\xED\xA0\x80" for U+D800), possibly followed by a
+    // byte that is not valid UTF-8 (in which case they must not be converted to a valid surrogate pair on Windows).
+
+    for (const auto &fileName : std::vector<std::string> {"model.cellml", "\xC3\xA9t\xC3\xA9.cellml", "\xF0\x9F\x98\x80.cellml",
+                                                          "\xFF.cellml", "\xC3.cellml", "\xED\xA0\x80.cellml", "\xED\xB0\x80.cellml",
+                                                          "\xED\xA0\x80\xED\xB0\x80.cellml", "\xED\xA0\x80\xFF.cellml", "\xED\xB2\x80.cellml"}) {
+        EXPECT_EQ(libOpenCOR::pathToString(libOpenCOR::stringToPath(fileName)), fileName);
+    }
+
+#ifdef BUILDING_USING_MSVC
+    // On Windows, a path may contain lone surrogates, which can be converted to a file name and back without being
+    // altered.
+
+    static constexpr wchar_t HIGH_SURROGATE {0xD800};
+    static constexpr wchar_t LOW_SURROGATE {0xDC00};
+    static constexpr wchar_t LAST_LOW_SURROGATE {0xDFFF};
+    static constexpr wchar_t ESCAPED_BYTE_SURROGATE {0xDCFF};
+
+    for (const auto &path : std::vector<std::wstring> {std::wstring {HIGH_SURROGATE} + L".cellml",
+                                                       std::wstring {LOW_SURROGATE} + L".cellml",
+                                                       std::wstring {LAST_LOW_SURROGATE} + L".cellml",
+                                                       std::wstring {HIGH_SURROGATE, HIGH_SURROGATE} + L".cellml",
+                                                       std::wstring {LOW_SURROGATE, HIGH_SURROGATE} + L".cellml",
+                                                       std::wstring {ESCAPED_BYTE_SURROGATE} + L".cellml",
+                                                       std::wstring {HIGH_SURROGATE} + L"a" + std::wstring {ESCAPED_BYTE_SURROGATE} + L".cellml"}) {
+        EXPECT_EQ(libOpenCOR::stringToPath(libOpenCOR::pathToString(path)).native(), path);
+    }
+
+    // A path with lone surrogates that stand for bytes that form a valid UTF-8 sequence cannot, however, be converted
+    // to a file name and back without being altered (e.g., U+DCC3 U+DCA9 and U+00E9 are both converted to
+    // "\xC3\xA9").
+
+    static constexpr wchar_t ESCAPED_C3_SURROGATE {0xDCC3};
+    static constexpr wchar_t ESCAPED_A9_SURROGATE {0xDCA9};
+    static constexpr wchar_t E_ACUTE {0xE9};
+
+    EXPECT_EQ(libOpenCOR::stringToPath(libOpenCOR::pathToString(std::wstring {ESCAPED_C3_SURROGATE, ESCAPED_A9_SURROGATE})).native(), std::wstring {E_ACUTE});
+#endif
+}
+
 TEST(UtilsTest, hasScheme)
 {
     EXPECT_TRUE(libOpenCOR::hasScheme("urn:miriam:biomodels.db:BIOMD0000000012"));

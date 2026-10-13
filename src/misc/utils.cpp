@@ -432,8 +432,15 @@ namespace {
 // percent-decoded to "/some/path/\xFF.txt"), in which case std::filesystem::path would throw an exception. So, we map
 // an invalid byte to a lone surrogate (e.g., 0xFF to U+DCFF), which a Windows file name may contain, and back, meaning
 // that a file name can always be converted to a path and back without being altered.
-// Note: a path may also contain some other lone surrogates (e.g., U+D800), which cannot be mapped to a byte, in which
-//       case we encode them as if they were valid code points (i.e. using three bytes).
+// Note #1: a path may also contain some other lone surrogates (e.g., U+D800), which cannot be mapped to a byte, in
+//          which case we encode them as if they were valid code points (i.e. using three bytes, e.g., "\xED\xA0\x80"
+//          for U+D800) and decode them back (see stringToUtf16()), meaning that such a path can be converted to a file
+//          name and back without being altered.
+// Note #2: a path with lone surrogates that stand for bytes (i.e. U+DC80 to U+DCFF) that form a valid UTF-8 sequence
+//          (e.g., U+DCC3 U+DCA9, i.e. "\xC3\xA9") cannot, however, be converted to a file name and back without being
+//          altered since that file name is also the one for another path (e.g., U+00E9, i.e. "\xC3\xA9"). This is
+//          inherent to mapping an invalid byte to a lone surrogate, and only a path that was not created by us could
+//          have such lone surrogates.
 
 constexpr char32_t FIRST_TWO_BYTE_CODE_POINT {0x80};
 constexpr char32_t FIRST_THREE_BYTE_CODE_POINT {0x800};
@@ -447,8 +454,15 @@ constexpr char32_t LAST_ESCAPED_BYTE_SURROGATE {FIRST_LOW_SURROGATE + 0xFF};
 constexpr unsigned int SURROGATE_SHIFT {10U};
 constexpr char32_t SURROGATE_MASK {0x3FF};
 
-std::wstring utf8ToUtf16(const std::string &pString)
+std::wstring utf8ToUtf16(const std::string &pString, bool pDecodeSurrogates)
 {
+    // Convert the given string to UTF-16, mapping an invalid byte to a lone surrogate (e.g., 0xFF to U+DCFF) and, if
+    // requested, decoding a three-byte encoding of a surrogate (e.g., "\xED\xA0\x80" for U+D800) to that surrogate.
+
+    static constexpr unsigned char SURROGATE_LEAD {0xED};
+    static constexpr unsigned char FIRST_SURROGATE_CONTINUATION_BYTE {0xA0};
+    static constexpr unsigned int THREE_BYTE_LEAD_MASK {0x0FU};
+
     std::wstring res;
 
     res.reserve(pString.size());
@@ -456,7 +470,18 @@ std::wstring utf8ToUtf16(const std::string &pString)
     for (size_t i {0}; i < pString.size();) {
         auto [length, codePoint] {utf8Sequence(pString, i)};
 
-        if (length == 0) {
+        if ((length == 0) && pDecodeSurrogates && (i + 2 < pString.size())
+            && (static_cast<unsigned char>(pString[i]) == SURROGATE_LEAD)
+            && (static_cast<unsigned char>(pString[i + 1]) >= FIRST_SURROGATE_CONTINUATION_BYTE)
+            && (static_cast<unsigned char>(pString[i + 1]) <= LAST_CONTINUATION_BYTE)
+            && (static_cast<unsigned char>(pString[i + 2]) >= FIRST_CONTINUATION_BYTE)
+            && (static_cast<unsigned char>(pString[i + 2]) <= LAST_CONTINUATION_BYTE)) {
+            res += static_cast<wchar_t>(((SURROGATE_LEAD & THREE_BYTE_LEAD_MASK) << (2 * CONTINUATION_BYTE_SHIFT))
+                                        | ((static_cast<unsigned char>(pString[i + 1]) & CONTINUATION_BYTE_MASK) << CONTINUATION_BYTE_SHIFT)
+                                        | (static_cast<unsigned char>(pString[i + 2]) & CONTINUATION_BYTE_MASK));
+
+            i += 3;
+        } else if (length == 0) {
             res += static_cast<wchar_t>(FIRST_LOW_SURROGATE + static_cast<unsigned char>(pString[i]));
 
             ++i;
@@ -523,13 +548,26 @@ std::string utf16ToUtf8(const std::wstring &pString)
     return res;
 }
 
+std::wstring stringToUtf16(const std::string &pString)
+{
+    // Convert the given string to UTF-16, decoding a three-byte encoding of a surrogate (e.g., "\xED\xA0\x80" for
+    // U+D800) to that surrogate, as long as the result converts back to the given string. This may not be the case
+    // (e.g., "\xED\xA0\x80\xFF" would be converted to U+D800 U+DCFF, which is a valid surrogate pair, i.e. U+100FF,
+    // that converts back to "\xF4\x80\x83\xBF"), in which case we don't decode such an encoding (i.e. each of its bytes
+    // is mapped to a lone surrogate), which always converts back to the given string.
+
+    auto res {utf8ToUtf16(pString, true)};
+
+    return (utf16ToUtf8(res) == pString) ? res : utf8ToUtf16(pString, false);
+}
+
 } // namespace
 #endif
 
 std::filesystem::path stringToPath(const std::string &pString)
 {
 #ifdef BUILDING_USING_MSVC
-    return utf8ToUtf16(pString);
+    return stringToUtf16(pString);
 #else
     return std::u8string {pString.begin(), pString.end()};
 #endif
