@@ -190,6 +190,42 @@ def test_remote_sedml_file_with_network_path_cellml_file():
     assert document.models[0].file == needed_file
 
 
+def test_remote_sedml_file_with_query_only_cellml_file():
+    # A query-only model source is relative to the URL of the remote SED-ML file without its query and fragment, i.e.
+    # never a local file name.
+
+    file = loc.File("https://example.com/simulations/simulation.sedml?a=b/c#d/e", False)
+
+    file.contents = utils.text_to_list(sedml_contents("?model=1"))
+
+    needed_file = loc.File(
+        "https://example.com/simulations/simulation.sedml?model=1", False
+    )
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == needed_file
+
+
+def test_remote_sedml_file_with_fragment_only_cellml_file():
+    # A fragment-only model source is relative to the URL of the remote SED-ML file without its fragment, i.e. never a
+    # local file name.
+
+    file = loc.File("https://example.com/simulations/simulation.sedml?a=b/c#d/e", False)
+
+    file.contents = utils.text_to_list(sedml_contents("#model"))
+
+    needed_file = loc.File(
+        "https://example.com/simulations/simulation.sedml?a=b/c#model", False
+    )
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == needed_file
+
+
 def test_remote_sedml_file_with_remote_cellml_file():
     # A model source that is a URL is used as is (its scheme being normalised), i.e. it is not relative to the remote
     # SED-ML file.

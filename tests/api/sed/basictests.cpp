@@ -198,6 +198,40 @@ TEST(BasicSedTest, remoteSedmlFileWithNetworkPathCellmlFile)
     EXPECT_EQ(document->models()[0]->file(), neededFile);
 }
 
+TEST(BasicSedTest, remoteSedmlFileWithQueryOnlyCellmlFile)
+{
+    // A query-only model source is relative to the URL of the remote SED-ML file without its query and fragment, i.e.
+    // never a local file name.
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml?a=b/c#d/e", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("?model=1").c_str()));
+
+    auto neededFile {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml?model=1", false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
+TEST(BasicSedTest, remoteSedmlFileWithFragmentOnlyCellmlFile)
+{
+    // A fragment-only model source is relative to the URL of the remote SED-ML file without its fragment, i.e. never a
+    // local file name.
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml?a=b/c#d/e", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("#model").c_str()));
+
+    auto neededFile {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml?a=b/c#model", false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
 TEST(BasicSedTest, remoteSedmlFileWithRemoteCellmlFile)
 {
     // A model source that is a URL is used as is (its scheme being normalised), i.e. it is not relative to the remote

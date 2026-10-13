@@ -39,6 +39,8 @@ public:
     std::string mLocation;
     std::string mUrlScheme;
     std::string mUrlOrigin;
+    std::string mUrlWithoutQueryAndFragment;
+    std::string mUrlWithoutFragment;
     bool mIsLocalLocation;
     libsedml::SedDocument *mDocument;
     std::string mContents;

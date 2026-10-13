@@ -74,20 +74,24 @@ SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
         // Note #1: the URL may have no path (e.g., "https://example.com?a=b"), in which case its location is its root
         //          (e.g., "https://example.com/").
         // Note #2: we also keep track of the scheme (e.g., "https:") and origin (e.g., "https://example.com") of the
-        //          URL, which a network-path and an absolute-path model source, respectively, are relative to (see
-        //          populateDocument()).
+        //          URL, as well as of the URL without its query and fragment (e.g.,
+        //          "https://example.com/dir/file.sedml") and without its fragment (e.g.,
+        //          "https://example.com/dir/file.sedml?a=b"), which a network-path, an absolute-path, a query-only, and
+        //          a fragment-only model source, respectively, are relative to (see populateDocument()).
 
         static constexpr std::string_view SCHEME_SEPARATOR {"://"};
 
-        auto urlWithoutQueryAndFragment {url.substr(0, url.find_first_of("?#"))};
-        auto schemeSeparatorPos {urlWithoutQueryAndFragment.find(SCHEME_SEPARATOR)};
-        auto pathPos {urlWithoutQueryAndFragment.find('/', schemeSeparatorPos + SCHEME_SEPARATOR.size())};
+        mUrlWithoutQueryAndFragment = url.substr(0, url.find_first_of("?#"));
+        mUrlWithoutFragment = url.substr(0, url.find('#'));
+
+        auto schemeSeparatorPos {mUrlWithoutQueryAndFragment.find(SCHEME_SEPARATOR)};
+        auto pathPos {mUrlWithoutQueryAndFragment.find('/', schemeSeparatorPos + SCHEME_SEPARATOR.size())};
 
         mLocation = (pathPos == std::string::npos) ?
-                        urlWithoutQueryAndFragment + "/" :
-                        urlWithoutQueryAndFragment.substr(0, urlWithoutQueryAndFragment.rfind('/') + 1);
-        mUrlScheme = urlWithoutQueryAndFragment.substr(0, schemeSeparatorPos + 1);
-        mUrlOrigin = urlWithoutQueryAndFragment.substr(0, pathPos);
+                        mUrlWithoutQueryAndFragment + "/" :
+                        mUrlWithoutQueryAndFragment.substr(0, mUrlWithoutQueryAndFragment.rfind('/') + 1);
+        mUrlScheme = mUrlWithoutQueryAndFragment.substr(0, schemeSeparatorPos + 1);
+        mUrlOrigin = mUrlWithoutQueryAndFragment.substr(0, pathPos);
     }
 }
 
@@ -396,8 +400,10 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         // Note #3: if the SED-ML file is a remote file then a model source that is a file name is never a local file
         //          name, but a reference that is relative to the URL of the SED-ML file, i.e. a network-path reference
         //          (e.g., "//example.org/models/model.cellml") is relative to its scheme, an absolute-path reference
-        //          (e.g., "/models/model.cellml") to its origin, and a relative-path reference (e.g.,
-        //          "../models/model.cellml") to its location (see https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2).
+        //          (e.g., "/models/model.cellml") to its origin, a query-only reference (e.g., "?model=1") to its URL
+        //          without its query and fragment, a fragment-only reference (e.g., "#model") to its URL without its
+        //          fragment, and a relative-path reference (e.g., "../models/model.cellml") to its location (see
+        //          https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2).
 
         auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(source, false)};
         auto isRelativeFileName {isLocalFile && !stringToPath(fileNameOrUrl).has_root_directory()};
@@ -410,9 +416,17 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         std::string modelSource;
 
         if (!mIsLocalLocation && isFileName) {
-            modelSource = source.starts_with("//") ?
-                              mUrlScheme + source :
-                              (source.starts_with('/') ? mUrlOrigin : mLocation) + source;
+            if (source.starts_with("//")) {
+                modelSource = mUrlScheme + source;
+            } else if (source.starts_with('/')) {
+                modelSource = mUrlOrigin + source;
+            } else if (source.starts_with('?')) {
+                modelSource = mUrlWithoutQueryAndFragment + source;
+            } else if (source.starts_with('#')) {
+                modelSource = mUrlWithoutFragment + source;
+            } else {
+                modelSource = mLocation + source;
+            }
         } else {
             modelSource = isRelativeFileName ? mLocation + fileNameOrUrl : fileNameOrUrl;
         }

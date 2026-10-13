@@ -198,6 +198,38 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(document.models[0].file.isAliasOf(neededFile), true);
   });
 
+  test('Remote SED-ML file with query-only CellML file', () => {
+    // A query-only model source is relative to the URL of the remote SED-ML file without its query and fragment, i.e.
+    // never a local file name.
+
+    const file = new loc.File('https://example.com/simulations/simulation.sedml?a=b/c#d/e');
+
+    file.setContents(sedmlContents('?model=1'));
+
+    const neededFile = new loc.File('https://example.com/simulations/simulation.sedml?model=1');
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.isAliasOf(neededFile), true);
+  });
+
+  test('Remote SED-ML file with fragment-only CellML file', () => {
+    // A fragment-only model source is relative to the URL of the remote SED-ML file without its fragment, i.e. never a
+    // local file name.
+
+    const file = new loc.File('https://example.com/simulations/simulation.sedml?a=b/c#d/e');
+
+    file.setContents(sedmlContents('#model'));
+
+    const neededFile = new loc.File('https://example.com/simulations/simulation.sedml?a=b/c#model');
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.isAliasOf(neededFile), true);
+  });
+
   test('Remote SED-ML file with remote CellML file', () => {
     // A model source that is a URL is used as is (its scheme being normalised), i.e. it is not relative to the remote
     // SED-ML file.
