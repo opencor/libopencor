@@ -20,10 +20,6 @@ limitations under the License.
 
 void fileApi()
 {
-    // JavaScript string.
-
-    emscripten::register_type<JsString>("string");
-
     // File API.
 
     emscripten::enum_<libOpenCOR::File::Type>("File.Type")
@@ -38,15 +34,9 @@ void fileApi()
             return libOpenCOR::File::create(fromJsString(pFileNameOrUrl));
         }))
         .property("type", &libOpenCOR::File::type)
-        .property("fileName", emscripten::optional_override([](const libOpenCOR::File &pThis) {
-            return toJsString(pThis.fileName());
-        }))
-        .property("url", emscripten::optional_override([](const libOpenCOR::File &pThis) {
-            return toJsString(pThis.url());
-        }))
-        .property("path", emscripten::optional_override([](const libOpenCOR::File &pThis) {
-            return toJsString(pThis.path());
-        }))
+        .property("fileName", &JsStringResult<&libOpenCOR::File::fileName>::call)
+        .property("url", &JsStringResult<&libOpenCOR::File::url>::call)
+        .property("path", &JsStringResult<&libOpenCOR::File::path>::call)
         .function("contents", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis) {
             const auto &contents {pThis->contents()};
             auto size = contents.size();

@@ -18,6 +18,39 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+TEST(UtilsTest, percentEncodeInvalidUtf8)
+{
+    // Valid UTF-8 is kept as is.
+
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8(""), "");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("model.cellml"), "model.cellml");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("%20"), "%20");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xC3\xA9"), "\xC3\xA9"); // U+00E9.
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xE0\xA0\x80"), "\xE0\xA0\x80"); // U+0800.
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xE2\x82\xAC"), "\xE2\x82\xAC"); // U+20AC.
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xED\x9F\xBF"), "\xED\x9F\xBF"); // U+D7FF.
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF0\x9F\x98\x80"), "\xF0\x9F\x98\x80"); // U+1F600.
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF1\x80\x80\x80"), "\xF1\x80\x80\x80"); // U+40000.
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF4\x8F\xBF\xBF"), "\xF4\x8F\xBF\xBF"); // U+10FFFF.
+
+    // A byte that is not part of a valid UTF-8 sequence is percent-encoded, i.e. a continuation byte without a lead
+    // byte, a lead byte that is never valid, an overlong encoding, a surrogate, a code point above U+10FFFF, a
+    // truncated sequence, or a sequence with an invalid continuation byte.
+
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("/some/path/\xFF.cellml"), "/some/path/%FF.cellml");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\x80"), "%80");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xC0\xAF"), "%C0%AF");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF5\x80\x80\x80"), "%F5%80%80%80");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xE0\x80\xAF"), "%E0%80%AF");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF0\x80\x80\xAF"), "%F0%80%80%AF");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xED\xA0\x80"), "%ED%A0%80");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF4\x90\x80\x80"), "%F4%90%80%80");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xC3"), "%C3");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xF0\x9F\x98"), "%F0%9F%98");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xE2\x82\x41"), "%E2%82A");
+    EXPECT_EQ(libOpenCOR::percentEncodeInvalidUtf8("\xE2\x82\xC3\xA9"), "%E2%82\xC3\xA9");
+}
+
 TEST(UtilsTest, encodeUrl)
 {
     EXPECT_EQ(libOpenCOR::encodeUrl(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"),

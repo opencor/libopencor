@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "stringconverter.h"
+
 #include <libopencor>
 
 void solverApi()
@@ -26,8 +28,8 @@ void solverApi()
 
     emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
         .property("type", &libOpenCOR::Solver::type)
-        .property("id", &libOpenCOR::Solver::id)
-        .property("name", &libOpenCOR::Solver::name);
+        .property("id", &JsStringResult<&libOpenCOR::Solver::id>::call)
+        .property("name", &JsStringResult<&libOpenCOR::Solver::name>::call);
 
     // clang-format off
     EM_ASM({

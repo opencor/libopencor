@@ -397,6 +397,25 @@ test.describe('Sed coverage tests', () => {
     const simulation = new loc.SedOneStep(document);
 
     assert.strictEqual(simulation.id, 'simulation2');
+
+    simulation.id = 'my_simulation';
+
+    assert.strictEqual(simulation.id, 'my_simulation');
+
+    // An ID that is not valid UTF-8 is kept as is.
+
+    simulation.id = '\udcff';
+
+    assert.strictEqual(simulation.id, '\udcff');
+
+    // A string with a lone surrogate that doesn't stand for an invalid byte (i.e. other than U+DC80 to U+DCFF) is
+    // rejected.
+    // Note: this has no C++ equivalent since a std::string cannot contain a lone surrogate.
+
+    assert.throws(() => {
+      simulation.id = '\ud800';
+    }, TypeError);
+    assert.strictEqual(simulation.id, '\udcff');
   });
 
   test('SedOneStep', () => {

@@ -172,14 +172,119 @@ bool isPercentEncodedCharacter(const std::string &pUrl, size_t pIndex)
            && (std::isxdigit(static_cast<unsigned char>(pUrl[pIndex + 2])) != 0);
 }
 
+void appendPercentEncodedByte(std::string &pString, unsigned char pByte)
+{
+    // Append the percent-encoded version of the given byte (e.g., "%FF" for 0xFF) to the given string.
+
+    static constexpr std::string_view HEX_DIGITS {"0123456789ABCDEF"};
+    static constexpr unsigned int HEX_HIGH_NIBBLE_SHIFT {4U};
+    static constexpr unsigned int HEX_LOW_NIBBLE_MASK {0x0FU};
+
+    pString += '%';
+    pString += HEX_DIGITS[pByte >> HEX_HIGH_NIBBLE_SHIFT];
+    pString += HEX_DIGITS[pByte & HEX_LOW_NIBBLE_MASK];
+}
+
+constexpr unsigned char LAST_ASCII_BYTE {0x7F};
+constexpr unsigned char FIRST_CONTINUATION_BYTE {0x80};
+constexpr unsigned char LAST_CONTINUATION_BYTE {0xBF};
+constexpr unsigned int CONTINUATION_BYTE_MASK {0x3FU};
+constexpr unsigned int CONTINUATION_BYTE_SHIFT {6U};
+
+std::tuple<size_t, char32_t> utf8Sequence(const std::string &pString, size_t pIndex)
+{
+    // Return the length of the valid UTF-8 sequence that starts at the given index of the given string (or 0 if there
+    // is none) and the code point that it encodes.
+    // Note: an overlong encoding, a surrogate, or a code point above U+10FFFF is not valid UTF-8 (see
+    //       https://www.rfc-editor.org/rfc/rfc3629#section-4), hence we check the range of the first continuation byte.
+
+    static constexpr unsigned int FIRST_TWO_BYTE_LEAD {0xC2};
+    static constexpr unsigned int LAST_TWO_BYTE_LEAD {0xDF};
+    static constexpr unsigned int FIRST_THREE_BYTE_LEAD {0xE0};
+    static constexpr unsigned int SURROGATE_THREE_BYTE_LEAD {0xED};
+    static constexpr unsigned int LAST_THREE_BYTE_LEAD {0xEF};
+    static constexpr unsigned int FIRST_FOUR_BYTE_LEAD {0xF0};
+    static constexpr unsigned int LAST_FOUR_BYTE_LEAD {0xF4};
+    static constexpr unsigned int FIRST_THREE_BYTE_LEAD_LOW {0xA0};
+    static constexpr unsigned int SURROGATE_THREE_BYTE_LEAD_HIGH {0x9F};
+    static constexpr unsigned int FIRST_FOUR_BYTE_LEAD_LOW {0x90};
+    static constexpr unsigned int LAST_FOUR_BYTE_LEAD_HIGH {0x8F};
+
+    const auto byte {static_cast<unsigned char>(pString[pIndex])};
+
+    if (byte <= LAST_ASCII_BYTE) {
+        return {1, byte};
+    }
+
+    size_t continuationByteCount {0};
+    unsigned int low {FIRST_CONTINUATION_BYTE};
+    unsigned int high {LAST_CONTINUATION_BYTE};
+
+    if ((byte >= FIRST_TWO_BYTE_LEAD) && (byte <= LAST_TWO_BYTE_LEAD)) {
+        continuationByteCount = 1;
+    } else if ((byte >= FIRST_THREE_BYTE_LEAD) && (byte <= LAST_THREE_BYTE_LEAD)) {
+        continuationByteCount = 2;
+        low = (byte == FIRST_THREE_BYTE_LEAD) ? FIRST_THREE_BYTE_LEAD_LOW : FIRST_CONTINUATION_BYTE;
+        high = (byte == SURROGATE_THREE_BYTE_LEAD) ? SURROGATE_THREE_BYTE_LEAD_HIGH : LAST_CONTINUATION_BYTE;
+    } else if ((byte >= FIRST_FOUR_BYTE_LEAD) && (byte <= LAST_FOUR_BYTE_LEAD)) {
+        continuationByteCount = 3;
+        low = (byte == FIRST_FOUR_BYTE_LEAD) ? FIRST_FOUR_BYTE_LEAD_LOW : FIRST_CONTINUATION_BYTE;
+        high = (byte == LAST_FOUR_BYTE_LEAD) ? LAST_FOUR_BYTE_LEAD_HIGH : LAST_CONTINUATION_BYTE;
+    } else {
+        return {0, 0};
+    }
+
+    auto codePoint {static_cast<char32_t>(byte & (CONTINUATION_BYTE_MASK >> continuationByteCount))};
+
+    for (size_t i {1}; i <= continuationByteCount; ++i) {
+        if (pIndex + i >= pString.size()) {
+            return {0, 0};
+        }
+
+        const auto continuationByte {static_cast<unsigned char>(pString[pIndex + i])};
+
+        if ((continuationByte < ((i == 1) ? low : FIRST_CONTINUATION_BYTE))
+            || (continuationByte > ((i == 1) ? high : LAST_CONTINUATION_BYTE))) {
+            return {0, 0};
+        }
+
+        codePoint = (codePoint << CONTINUATION_BYTE_SHIFT) | (continuationByte & CONTINUATION_BYTE_MASK);
+    }
+
+    return {continuationByteCount + 1, codePoint};
+}
+
 } // namespace
+
+std::string percentEncodeInvalidUtf8(const std::string &pString)
+{
+    // Percent-encode the bytes of the given string that are not part of a valid UTF-8 sequence (e.g., "\xFF.cellml"
+    // becomes "%FF.cellml"), leaving everything else as is.
+
+    std::string res;
+
+    res.reserve(pString.size());
+
+    for (size_t i {0}; i < pString.size();) {
+        const auto length {std::get<0>(utf8Sequence(pString, i))};
+
+        if (length == 0) {
+            appendPercentEncodedByte(res, static_cast<unsigned char>(pString[i]));
+
+            ++i;
+        } else {
+            res.append(pString, i, length);
+
+            i += length;
+        }
+    }
+
+    return res;
+}
 
 std::string encodeUrl(const std::string &pUrl)
 {
     static constexpr std::string_view URL_SAFE_CHARACTERS {"!#$&'()*+,-./:;=?@_~"};
-    static constexpr std::string_view HEX_DIGITS {"0123456789ABCDEF"};
-    static constexpr unsigned int HEX_HIGH_NIBBLE_SHIFT {4U};
-    static constexpr unsigned int HEX_LOW_NIBBLE_MASK {0x0FU};
 
     static constexpr std::string_view SCHEME_SEPARATOR {"://"};
     static constexpr std::string_view AUTHORITY_TERMINATORS {"/?#"};
@@ -201,7 +306,6 @@ std::string encodeUrl(const std::string &pUrl)
     for (size_t i {0}; i < pUrl.size(); ++i) {
         const auto urlChar {pUrl[i]};
         const auto unsignedChar {static_cast<unsigned char>(urlChar)};
-        const auto encodedChar {static_cast<unsigned int>(unsignedChar)};
 
         // Keep a percent-encoded character as is (e.g., "%2F" in "https://example.com/a%2Fb"), so that it doesn't get
         // encoded twice.
@@ -229,9 +333,7 @@ std::string encodeUrl(const std::string &pUrl)
         if ((isalnum(unsignedChar) != 0) || (URL_SAFE_CHARACTERS.find(urlChar) != std::string::npos)) {
             res += urlChar;
         } else {
-            res += '%';
-            res += HEX_DIGITS[encodedChar >> HEX_HIGH_NIBBLE_SHIFT];
-            res += HEX_DIGITS[encodedChar & HEX_LOW_NIBBLE_MASK];
+            appendPercentEncodedByte(res, unsignedChar);
         }
     }
 
@@ -311,11 +413,6 @@ namespace {
 // Note: a path may also contain some other lone surrogates (e.g., U+D800), which cannot be mapped to a byte, in which
 //       case we encode them as if they were valid code points (i.e. using three bytes).
 
-constexpr unsigned char LAST_ASCII_BYTE {0x7F};
-constexpr unsigned char FIRST_CONTINUATION_BYTE {0x80};
-constexpr unsigned char LAST_CONTINUATION_BYTE {0xBF};
-constexpr unsigned char CONTINUATION_BYTE_MASK {0x3F};
-constexpr unsigned int CONTINUATION_BYTE_SHIFT {6U};
 constexpr char32_t FIRST_TWO_BYTE_CODE_POINT {0x80};
 constexpr char32_t FIRST_THREE_BYTE_CODE_POINT {0x800};
 constexpr char32_t FIRST_FOUR_BYTE_CODE_POINT {0x10000};
@@ -335,65 +432,13 @@ std::wstring utf8ToUtf16(const std::string &pString)
     res.reserve(pString.size());
 
     for (size_t i {0}; i < pString.size();) {
-        // Determine the number of continuation bytes that should follow the current byte, as well as the range of the
-        // first one, so that an overlong encoding, a surrogate, or a code point above U+10FFFF is considered invalid
-        // (see https://www.rfc-editor.org/rfc/rfc3629#section-4).
+        auto [length, codePoint] {utf8Sequence(pString, i)};
 
-        const auto byte {static_cast<unsigned char>(pString[i])};
-
-        if (byte <= LAST_ASCII_BYTE) {
-            res += static_cast<wchar_t>(byte);
+        if (length == 0) {
+            res += static_cast<wchar_t>(FIRST_LOW_SURROGATE + static_cast<unsigned char>(pString[i]));
 
             ++i;
-
-            continue;
-        }
-
-        static constexpr unsigned int FIRST_TWO_BYTE_LEAD {0xC2};
-        static constexpr unsigned int LAST_TWO_BYTE_LEAD {0xDF};
-        static constexpr unsigned int FIRST_THREE_BYTE_LEAD {0xE0};
-        static constexpr unsigned int SURROGATE_THREE_BYTE_LEAD {0xED};
-        static constexpr unsigned int LAST_THREE_BYTE_LEAD {0xEF};
-        static constexpr unsigned int FIRST_FOUR_BYTE_LEAD {0xF0};
-        static constexpr unsigned int LAST_FOUR_BYTE_LEAD {0xF4};
-        static constexpr unsigned int FIRST_THREE_BYTE_LEAD_LOW {0xA0};
-        static constexpr unsigned int SURROGATE_THREE_BYTE_LEAD_HIGH {0x9F};
-        static constexpr unsigned int FIRST_FOUR_BYTE_LEAD_LOW {0x90};
-        static constexpr unsigned int LAST_FOUR_BYTE_LEAD_HIGH {0x8F};
-
-        size_t length {0};
-        unsigned int low {FIRST_CONTINUATION_BYTE};
-        unsigned int high {LAST_CONTINUATION_BYTE};
-
-        if ((byte >= FIRST_TWO_BYTE_LEAD) && (byte <= LAST_TWO_BYTE_LEAD)) {
-            length = 1;
-        } else if ((byte >= FIRST_THREE_BYTE_LEAD) && (byte <= LAST_THREE_BYTE_LEAD)) {
-            length = 2;
-            low = (byte == FIRST_THREE_BYTE_LEAD) ? FIRST_THREE_BYTE_LEAD_LOW : FIRST_CONTINUATION_BYTE;
-            high = (byte == SURROGATE_THREE_BYTE_LEAD) ? SURROGATE_THREE_BYTE_LEAD_HIGH : LAST_CONTINUATION_BYTE;
-        } else if ((byte >= FIRST_FOUR_BYTE_LEAD) && (byte <= LAST_FOUR_BYTE_LEAD)) {
-            length = 3;
-            low = (byte == FIRST_FOUR_BYTE_LEAD) ? FIRST_FOUR_BYTE_LEAD_LOW : FIRST_CONTINUATION_BYTE;
-            high = (byte == LAST_FOUR_BYTE_LEAD) ? LAST_FOUR_BYTE_LEAD_HIGH : LAST_CONTINUATION_BYTE;
-        }
-
-        auto codePoint {static_cast<char32_t>(byte & (CONTINUATION_BYTE_MASK >> length))};
-        size_t j {1};
-
-        while ((j <= length) && (i + j < pString.size())) {
-            const auto nextByte {static_cast<unsigned char>(pString[i + j])};
-
-            if ((nextByte < ((j == 1) ? low : FIRST_CONTINUATION_BYTE))
-                || (nextByte > ((j == 1) ? high : LAST_CONTINUATION_BYTE))) {
-                break;
-            }
-
-            codePoint = (codePoint << CONTINUATION_BYTE_SHIFT) | (nextByte & CONTINUATION_BYTE_MASK);
-
-            ++j;
-        }
-
-        if ((length > 0) && (j > length)) {
+        } else {
             if (codePoint >= FIRST_FOUR_BYTE_CODE_POINT) {
                 codePoint -= FIRST_FOUR_BYTE_CODE_POINT;
 
@@ -403,11 +448,7 @@ std::wstring utf8ToUtf16(const std::string &pString)
                 res += static_cast<wchar_t>(codePoint);
             }
 
-            i += j;
-        } else {
-            res += static_cast<wchar_t>(FIRST_LOW_SURROGATE + byte);
-
-            ++i;
+            i += length;
         }
     }
 

@@ -20,14 +20,14 @@ limitations under the License.
 
 #include <string>
 
-// Conversion between a std::string and a JavaScript string, to be used instead of Embind's conversion for a std::string
-// that may not be valid UTF-8 (e.g., the URL "https://example.com/%FF" gets percent-decoded to
-// "https://example.com/\xFF"), in which case Embind would replace an invalid byte with U+FFFD and the original
-// std::string couldn't be retrieved. So, we map an invalid byte to a lone surrogate (e.g., 0xFF to U+DCFF) and back,
-// meaning that a string can always be retrieved from libOpenCOR and given back to it without being altered. We
-// do, however, reject a string with any other lone surrogate (e.g., U+D800) since replacing it with U+FFFD would
+// Conversion between a std::string and a JavaScript string, to be used instead of Embind's conversion for all our
+// std::string values since a std::string may not be valid UTF-8 (e.g., the URL "https://example.com/%FF" gets
+// percent-decoded to "https://example.com/\xFF"), in which case Embind would replace an invalid byte with U+FFFD and
+// the original std::string couldn't be retrieved. So, we map an invalid byte to a lone surrogate (e.g., 0xFF to U+DCFF)
+// and back, meaning that a string can always be retrieved from libOpenCOR and given back to it without being altered.
+// We do, however, reject a string with any other lone surrogate (e.g., U+D800) since replacing it with U+FFFD would
 // silently alter the string (e.g., a file name or URL would then refer to another file).
-// Note #1: JsString must be registered as a "string" (see fileApi()), so that it is a string in our TypeScript
+// Note #1: JsString must be registered as a "string" (see main.cpp), so that it is a string in our TypeScript
 //          declarations.
 // Note #2: the code within the EM_ASM() blocks is such that it doesn't rely on top-level commas since those can get
 //          interpreted as macro argument separators by the C++ preprocessor (see main.cpp).
@@ -48,7 +48,7 @@ inline JsString toJsString(const std::string &pString)
         } catch (e) {
         }
 
-        let res = '';
+        let res = "";
         let i = 0;
 
         while (i < bytes.length) {
@@ -173,3 +173,41 @@ inline std::string fromJsString(const JsString &pString)
     return res;
     // clang-format on
 }
+
+// Wrappers for a method or a function that returns a std::string (e.g., libOpenCOR::Issue::description()) and for a
+// method that takes a std::string (e.g., libOpenCOR::SedBase::setId()), so that they can be bound using a JsString
+// rather than a std::string, e.g.:
+//     .property("id", &JsStringResult<&libOpenCOR::SedBase::id>::call, &JsStringArgument<&libOpenCOR::SedBase::setId>::call)
+
+template<auto Method, typename = decltype(Method)>
+struct JsStringResult;
+
+template<auto Method, typename Result, typename Class, typename... Args, bool IsNoexcept>
+struct JsStringResult<Method, Result (Class::*)(Args...) const noexcept(IsNoexcept)>
+{
+    static JsString call(const Class &pThis, Args... pArgs)
+    {
+        return toJsString((pThis.*Method)(pArgs...));
+    }
+};
+
+template<auto Function, typename Result, typename... Args, bool IsNoexcept>
+struct JsStringResult<Function, Result (*)(Args...) noexcept(IsNoexcept)>
+{
+    static JsString call(Args... pArgs)
+    {
+        return toJsString(Function(pArgs...));
+    }
+};
+
+template<auto Method, typename = decltype(Method)>
+struct JsStringArgument;
+
+template<auto Method, typename Class, bool IsNoexcept>
+struct JsStringArgument<Method, void (Class::*)(const std::string &) noexcept(IsNoexcept)>
+{
+    static void call(Class &pThis, const JsString &pValue)
+    {
+        (pThis.*Method)(fromJsString(pValue));
+    }
+};

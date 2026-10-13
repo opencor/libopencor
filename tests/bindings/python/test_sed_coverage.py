@@ -17,6 +17,7 @@ import libopencor as loc
 import math
 import numpy
 import platform
+import pytest
 import utils
 from utils import assert_issues, assert_values
 
@@ -397,6 +398,25 @@ def test_sed_base():
     simulation = loc.SedOneStep(document)
 
     assert simulation.id == "simulation2"
+
+    simulation.id = "my_simulation"
+
+    assert simulation.id == "my_simulation"
+
+    # An ID that is not valid UTF-8 is kept as is.
+
+    simulation.id = "\udcff"
+
+    assert simulation.id == "\udcff"
+
+    # A string with a lone surrogate that doesn't stand for an invalid byte (i.e. other than U+DC80 to U+DCFF) is
+    # rejected.
+    # Note: this has no C++ equivalent since a std::string cannot contain a lone surrogate.
+
+    with pytest.raises(TypeError):
+        simulation.id = "\ud800"
+
+    assert simulation.id == "\udcff"
 
 
 def test_sed_one_step():

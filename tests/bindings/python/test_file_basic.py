@@ -152,7 +152,12 @@ def test_local_file_with_non_utf8_character():
     assert_issues(file, expected_non_existing_file_issues)
 
     if platform.system() == "Windows":
-        assert loc.File("file:///" + utils.forward_slash_path(utils.resource_path("%FF.cellml"))) == file
+        assert (
+            loc.File(
+                "file:///" + utils.forward_slash_path(utils.resource_path("%FF.cellml"))
+            )
+            == file
+        )
     else:
         assert loc.File("file://" + utils.resource_path("%FF.cellml")) == file
 
@@ -167,9 +172,18 @@ def test_local_file_with_non_utf8_character():
     assert_issues(emoji_file, expected_non_existing_file_issues)
 
     if platform.system() == "Windows":
-        assert loc.File("file:///" + utils.forward_slash_path(utils.resource_path("%F0%9F%98%80.cellml"))) == emoji_file
+        assert (
+            loc.File(
+                "file:///"
+                + utils.forward_slash_path(utils.resource_path("%F0%9F%98%80.cellml"))
+            )
+            == emoji_file
+        )
     else:
-        assert loc.File("file://" + utils.resource_path("%F0%9F%98%80.cellml")) == emoji_file
+        assert (
+            loc.File("file://" + utils.resource_path("%F0%9F%98%80.cellml"))
+            == emoji_file
+        )
 
 
 def test_local_directory():

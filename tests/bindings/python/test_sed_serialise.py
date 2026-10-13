@@ -203,6 +203,98 @@ def test_local_cellml_file_with_percent_signs():
         loc.FileManager.instance().unmanage(sedml_file)
 
 
+def test_local_cellml_file_with_non_utf8_character():
+    # A model source is an XML attribute, so the bytes in the file name of a local model that are not valid UTF-8 must
+    # be percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the SED-ML
+    # file is loaded back.
+
+    cellml_contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+    file = loc.File(utils.resource_path("\udcff.cellml"), False)
+
+    file.contents = cellml_contents
+
+    document = loc.SedDocument(file)
+
+    if platform.system() == "Windows":
+        encoded_file_url = "file:///" + utils.forward_slash_path(
+            utils.resource_path("%FF.cellml")
+        )
+    else:
+        encoded_file_url = "file://" + utils.resource_path("%FF.cellml")
+
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
+        "%FF.cellml"
+    )
+    assert document.serialise() == cvode_expected_serialisation(encoded_file_url)
+
+    # Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    # (which we never generate, but which a third-party tool might).
+
+    for source in [
+        "%FF.cellml",
+        encoded_file_url,
+        utils.resource_path("%FF.cellml"),
+    ]:
+        sedml_file = loc.File(utils.resource_path("my_model.sedml"), False)
+
+        sedml_file.contents = utils.text_to_list(cvode_expected_serialisation(source))
+
+        sedml_document = loc.SedDocument(sedml_file)
+
+        assert len(sedml_document.models) == 1
+        assert sedml_document.models[0].file == file
+
+        loc.FileManager.instance().unmanage(sedml_file)
+
+    # A base path that is not valid UTF-8 is also used as is.
+
+    other_file = loc.File(utils.resource_path("\udcff/model.cellml"), False)
+
+    other_file.contents = cellml_contents
+
+    assert loc.SedDocument(other_file).serialise(
+        utils.resource_path("\udcff")
+    ) == cvode_expected_serialisation("model.cellml")
+
+
+def test_remote_cellml_file_with_non_utf8_character():
+    # A model source is an XML attribute, so the bytes in the URL of a remote model that are not valid UTF-8 must be
+    # percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the SED-ML
+    # file is loaded back.
+
+    cellml_contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+    file = loc.File("https://example.com/%FF.cellml", False)
+
+    file.contents = cellml_contents
+
+    document = loc.SedDocument(file)
+
+    assert document.serialise("https://example.com/") == cvode_expected_serialisation(
+        "%FF.cellml"
+    )
+    assert document.serialise() == cvode_expected_serialisation(
+        "https://example.com/%FF.cellml"
+    )
+
+    # Load the SED-ML file back using a relative model source and an absolute model source.
+
+    for source in ["%FF.cellml", "https://example.com/%FF.cellml"]:
+        sedml_file = loc.File("https://example.com/my_model.sedml", False)
+
+        sedml_file.contents = utils.text_to_list(cvode_expected_serialisation(source))
+
+        sedml_document = loc.SedDocument(sedml_file)
+
+        assert len(sedml_document.models) == 1
+        assert sedml_document.models[0].file == file
+
+        loc.FileManager.instance().unmanage(sedml_file)
+
+
 def test_remote_cellml_file_with_base_path():
     file = loc.File(utils.RemoteFile)
     document = loc.SedDocument(file)

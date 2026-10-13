@@ -82,6 +82,8 @@ void LIBOPENCOR_UNIT_TESTING_EXPORT printArray(const std::string &pName, const D
 
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
+std::string LIBOPENCOR_UNIT_TESTING_EXPORT percentEncodeInvalidUtf8(const std::string &pString);
+
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT encodeUrl(const std::string &pUrl);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT decodeUrl(const std::string &pUrl, bool pDecodeReservedCharacters = true);
 

@@ -190,6 +190,85 @@ TEST(SerialiseSedTest, localCellmlFileWithPercentSigns)
     }
 }
 
+TEST(SerialiseSedTest, localCellmlFileWithNonUtf8Character)
+{
+    // A model source is an XML attribute, so the bytes in the file name of a local model that are not valid UTF-8 must
+    // be percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the
+    // SED-ML file is loaded back.
+
+    auto cellmlContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.cellml")).c_str())};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("\xFF.cellml"), false)};
+
+    file->setContents(cellmlContents);
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+#ifdef BUILDING_ON_WINDOWS
+    auto encodedFileUrl {std::string("file:///").append(libOpenCOR::forwardSlashPath(libOpenCOR::resourcePath("%FF.cellml")))};
+#else
+    auto encodedFileUrl {std::string("file://").append(libOpenCOR::resourcePath("%FF.cellml"))};
+#endif
+
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("%FF.cellml"));
+    EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation(encodedFileUrl));
+
+    // Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    // (which we never generate, but which a third-party tool might).
+
+    for (const auto &source : std::vector<std::string> {"%FF.cellml", encodedFileUrl, libOpenCOR::resourcePath("%FF.cellml")}) {
+        auto sedmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("my_model.sedml"), false)};
+
+        sedmlFile->setContents(libOpenCOR::charArrayToUnsignedChars(cvodeExpectedSerialisation(source).c_str()));
+
+        auto sedmlDocument {libOpenCOR::SedDocument::create(sedmlFile)};
+
+        EXPECT_EQ(sedmlDocument->models().size(), 1U);
+        EXPECT_EQ(sedmlDocument->models()[0]->file(), file);
+
+        libOpenCOR::FileManager::instance().unmanage(sedmlFile);
+    }
+
+    // A base path that is not valid UTF-8 is also used as is.
+
+    auto otherFile {libOpenCOR::File::create(libOpenCOR::resourcePath("\xFF/model.cellml"), false)};
+
+    otherFile->setContents(cellmlContents);
+
+    EXPECT_EQ(libOpenCOR::SedDocument::create(otherFile)->serialise(libOpenCOR::resourcePath("\xFF")), cvodeExpectedSerialisation("model.cellml"));
+}
+
+TEST(SerialiseSedTest, remoteCellmlFileWithNonUtf8Character)
+{
+    // A model source is an XML attribute, so the bytes in the URL of a remote model that are not valid UTF-8 must be
+    // percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the SED-ML
+    // file is loaded back.
+
+    auto cellmlContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.cellml")).c_str())};
+    auto file {libOpenCOR::File::create("https://example.com/%FF.cellml", false)};
+
+    file->setContents(cellmlContents);
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ(document->serialise("https://example.com/"), cvodeExpectedSerialisation("%FF.cellml"));
+    EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation("https://example.com/%FF.cellml"));
+
+    // Load the SED-ML file back using a relative model source and an absolute model source.
+
+    for (const auto &source : std::vector<std::string> {"%FF.cellml", "https://example.com/%FF.cellml"}) {
+        auto sedmlFile {libOpenCOR::File::create("https://example.com/my_model.sedml", false)};
+
+        sedmlFile->setContents(libOpenCOR::charArrayToUnsignedChars(cvodeExpectedSerialisation(source).c_str()));
+
+        auto sedmlDocument {libOpenCOR::SedDocument::create(sedmlFile)};
+
+        EXPECT_EQ(sedmlDocument->models().size(), 1U);
+        EXPECT_EQ(sedmlDocument->models()[0]->file(), file);
+
+        libOpenCOR::FileManager::instance().unmanage(sedmlFile);
+    }
+}
+
 TEST(SerialiseSedTest, remoteCellmlFileWithBasePath)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE)};

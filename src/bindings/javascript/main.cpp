@@ -14,7 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "stringconverter.h"
+
 #include <libopencor>
+
+#include <optional>
 
 void fileApi();
 void loggerApi();
@@ -24,6 +28,10 @@ void versionApi();
 
 EMSCRIPTEN_BINDINGS(libOpenCOR)
 {
+    // JavaScript string.
+
+    emscripten::register_type<JsString>("string");
+
     // Vectors.
 
     emscripten::register_vector<double>("Doubles");
@@ -38,7 +46,41 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     emscripten::register_vector<libOpenCOR::SedOutputPtr>("SedOutputPtrs");
     emscripten::register_vector<libOpenCOR::SedSimulationPtr>("SedSimulationPtrs");
     emscripten::register_vector<libOpenCOR::SedStylePtr>("SedStylePtrs");
-    emscripten::register_vector<std::string>("Strings");
+
+    // Note: we register our vector of strings ourselves rather than using emscripten::register_vector() so that its
+    //       strings get converted using toJsString() and fromJsString() (see stringconverter.h). Otherwise, it behaves
+    //       the same as a vector registered using emscripten::register_vector().
+
+    emscripten::register_optional<JsString>();
+    emscripten::class_<libOpenCOR::Strings>("Strings")
+        .constructor<>()
+        // clang-format off
+        .function("push_back", emscripten::optional_override([](libOpenCOR::Strings &pThis, const JsString &pValue) {
+            pThis.push_back(fromJsString(pValue));
+        }))
+        .function("size", emscripten::optional_override([](const libOpenCOR::Strings &pThis) {
+            return static_cast<unsigned int>(pThis.size());
+        }))
+        .function("resize", emscripten::optional_override([](libOpenCOR::Strings &pThis, unsigned int pSize, const JsString &pValue) {
+            pThis.resize(pSize, fromJsString(pValue));
+        }))
+        .function("set", emscripten::optional_override([](libOpenCOR::Strings &pThis, unsigned int pIndex, const JsString &pValue) {
+            if (pIndex >= pThis.size()) {
+                return false;
+            }
+
+            pThis[pIndex] = fromJsString(pValue);
+
+            return true;
+        }))
+        .function("get", emscripten::optional_override([](const libOpenCOR::Strings &pThis, unsigned int pIndex) -> std::optional<JsString> {
+            if (pIndex >= pThis.size()) {
+                return {};
+            }
+
+            return toJsString(pThis[pIndex]);
+        })) // clang-format on
+        .iterable<JsString>("size", "get");
 
     // APIs.
 

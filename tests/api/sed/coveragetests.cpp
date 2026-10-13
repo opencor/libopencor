@@ -368,6 +368,16 @@ TEST(CoverageSedTest, sedBase)
     auto simulation {libOpenCOR::SedOneStep::create(document)};
 
     EXPECT_EQ(simulation->id(), "simulation2");
+
+    simulation->setId("my_simulation");
+
+    EXPECT_EQ(simulation->id(), "my_simulation");
+
+    // An ID that is not valid UTF-8 is kept as is.
+
+    simulation->setId("\xFF");
+
+    EXPECT_EQ(simulation->id(), "\xFF");
 }
 
 TEST(CoverageSedTest, sedOneStep)
