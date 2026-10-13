@@ -24,28 +24,11 @@ limitations under the License.
 
 #include <atomic>
 #include <filesystem>
-#include <regex>
 #include <unordered_map>
 
 namespace libOpenCOR {
 
 namespace {
-
-bool isCellmlFormat(const std::string &pFormat)
-{
-    // Note: we accept versioned formats (e.g., cellml.1.0 or cellml.2.0).
-
-    static const std::regex CELLML_FORMAT_REGEX {R"(^http://identifiers\.org/combine\.specifications/cellml(\..*)?$)"};
-
-    return std::regex_match(pFormat, CELLML_FORMAT_REGEX);
-}
-
-bool isSedmlFormat(const std::string &pFormat)
-{
-    static const std::string SEDML_FORMAT {"http://identifiers.org/combine.specifications/sed-ml"};
-
-    return pFormat == SEDML_FORMAT;
-}
 
 std::string archiveLocation(const FilePtr &pFile)
 {

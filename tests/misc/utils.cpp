@@ -379,6 +379,45 @@ TEST(UtilsTest, isCellmlIdentifier)
     EXPECT_FALSE(libOpenCOR::isCellmlIdentifier(LONG_STRING));
 }
 
+TEST(UtilsTest, isCellmlFormatAndIsSedmlFormat)
+{
+    static const std::string CELLML_FORMAT {"http://identifiers.org/combine.specifications/cellml"};
+    static const std::string SEDML_FORMAT {"http://identifiers.org/combine.specifications/sed-ml"};
+
+    EXPECT_TRUE(libOpenCOR::isCellmlFormat(CELLML_FORMAT));
+    EXPECT_TRUE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".1.0"));
+    EXPECT_TRUE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".2.0"));
+    EXPECT_TRUE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".2"));
+    EXPECT_TRUE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".10.0.1"));
+
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(""));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + "."));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".."));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".1."));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".1..0"));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".x"));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".1.0x"));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".1.0 "));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT.substr(0, CELLML_FORMAT.size() - 1)));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + "2.0"));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + "/1.0"));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat("https://identifiers.org/combine.specifications/cellml"));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(SEDML_FORMAT));
+
+    EXPECT_TRUE(libOpenCOR::isSedmlFormat(SEDML_FORMAT));
+
+    EXPECT_FALSE(libOpenCOR::isSedmlFormat(""));
+    EXPECT_FALSE(libOpenCOR::isSedmlFormat(SEDML_FORMAT + ".1.0"));
+    EXPECT_FALSE(libOpenCOR::isSedmlFormat(CELLML_FORMAT));
+
+    // A very long format can also be checked.
+
+    static const std::string LONG_STRING(1000000, '0');
+
+    EXPECT_TRUE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + "." + LONG_STRING));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + LONG_STRING));
+}
+
 TEST(UtilsTest, isDoubleAndToDouble)
 {
     // A double value is a decimal number with an optional sign, an optional fractional part, and an optional exponent,
@@ -457,6 +496,71 @@ TEST(UtilsTest, isDoubleAndToDouble)
     }
 
     EXPECT_NE(std::setlocale(LC_NUMERIC, previousLocale.c_str()), nullptr);
+}
+
+TEST(UtilsTest, isIntAndToInt)
+{
+    // An int value is 0 or a non-zero decimal number with an optional sign, no leading zero, and an optional
+    // non-negative exponent, which value must fit in an int.
+
+    static const std::vector<std::pair<std::string, int>> INTS {
+        {"0", 0},
+        {"1", 1},
+        {"+1", 1},
+        {"-1", -1},
+        {"123", 123},
+        {"1e3", 1000},
+        {"1E+3", 1000},
+        {"-2e9", -2000000000},
+        {"1e09", 1000000000},
+        {"21474836e2", 2147483600},
+        {"2147483647", std::numeric_limits<int>::max()},
+        {"-2147483648", std::numeric_limits<int>::min()},
+    };
+
+    for (const auto &[string, value] : INTS) {
+        EXPECT_TRUE(libOpenCOR::isInt(string)) << string;
+        EXPECT_EQ(libOpenCOR::toInt(string), value) << string;
+    }
+
+    // Anything else is not an int value, including a value that doesn't fit in an int.
+
+    static const std::vector<std::string> NON_INTS {
+        "",
+        "+",
+        "-",
+        "-0",
+        "+0",
+        "00",
+        "01",
+        "a",
+        "12x",
+        "1.0",
+        " 1",
+        "1 ",
+        "1e",
+        "1e+",
+        "1ex",
+        "1e3x",
+        "1e-3",
+        "1e10",
+        "3e9",
+        "2147483648",
+        "-2147483649",
+        "99999999999",
+    };
+
+    for (const auto &string : NON_INTS) {
+        EXPECT_FALSE(libOpenCOR::isInt(string)) << string;
+        EXPECT_EQ(libOpenCOR::toInt(string), 0) << string;
+    }
+
+    // A very long string can also be checked (e.g., without a stack overflow).
+
+    static const std::string LONG_STRING(1000000, '0');
+
+    EXPECT_FALSE(libOpenCOR::isInt("1" + LONG_STRING));
+    EXPECT_EQ(libOpenCOR::toInt("1e" + LONG_STRING + "3"), 1000);
 }
 
 TEST(UtilsTest, isInfOrNan)

@@ -112,8 +112,8 @@ bool LIBOPENCOR_UNIT_TESTING_EXPORT isInfOrNan(double pNumber);
 bool toBool(const std::string &pString);
 std::string toString(bool pBoolean);
 
-bool isInt(const std::string &pString);
-int toInt(const std::string &pString);
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isInt(const std::string &pString);
+int LIBOPENCOR_UNIT_TESTING_EXPORT toInt(const std::string &pString);
 std::string toString(int pNumber);
 
 std::string toString(size_t pNumber);
@@ -128,6 +128,9 @@ const xmlChar *toConstXmlCharPtr(const std::string &pString);
 
 bool LIBOPENCOR_UNIT_TESTING_EXPORT isSedmlId(const std::string &pString);
 bool LIBOPENCOR_UNIT_TESTING_EXPORT isCellmlIdentifier(const std::string &pString);
+
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isCellmlFormat(const std::string &pFormat);
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isSedmlFormat(const std::string &pFormat);
 
 libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable);
 

@@ -1170,32 +1170,6 @@ std::string toString(bool pBoolean)
     return pBoolean ? "true" : "false";
 }
 
-bool isInt(const std::string &pString)
-{
-    static const auto INT_REGEX {std::regex("^([-+]?[1-9][0-9]*([eE][+]?[0-9]+)?|0)$")};
-
-    if (std::regex_match(pString, INT_REGEX)) {
-        std::istringstream iss(pString);
-        int res {0};
-
-        iss >> res;
-
-        return !iss.fail();
-    }
-
-    return false;
-}
-
-int toInt(const std::string &pString)
-{
-    std::istringstream iss(pString);
-    int res {0};
-
-    iss >> res;
-
-    return res;
-}
-
 std::string toString(int pNumber)
 {
     return std::format("{}", pNumber);
@@ -1208,10 +1182,10 @@ std::string toString(size_t pNumber)
 
 namespace {
 
-// Note: we check the syntax of a double value, a CellML identifier, and a SED-ML identifier ourselves rather than using
-//       std::regex since those strings may come from a SED-ML file (i.e. be arbitrarily long) and std::regex may need
-//       some stack space for each character of a string (e.g., libstdc++ may then crash with a stack overflow while
-//       MSVC may throw an std::regex_error exception).
+// Note: we check the syntax of an int value, a double value, a CellML identifier, and a SED-ML identifier ourselves
+//       rather than using std::regex since those strings may come from a SED-ML file (i.e. be arbitrarily long) and
+//       std::regex may need some stack space for each character of a string (e.g., libstdc++ may then crash with a
+//       stack overflow while MSVC may throw an std::regex_error exception).
 
 bool isAsciiLetter(char pChar)
 {
@@ -1276,6 +1250,89 @@ bool isDecimalNumber(const std::string &pString)
     return i == pString.size();
 }
 
+std::optional<int> parseInt(const std::string &pString)
+{
+    // Parse the given string as an int value, i.e. as 0 or as a non-zero decimal number with an optional sign, no
+    // leading zero, and an optional non-negative exponent (e.g., "-123" or "1e3", i.e. 1000), i.e. whether it matches
+    // "^([-+]?[1-9][0-9]*([eE][+]?[0-9]+)?|0)$", which value must fit in an int (e.g., "1e10" is not a valid int value).
+    // Note: we compute the absolute value of the int value using a 64-bit integer and stop as soon as it is too big, so
+    //       that it never overflows. Also, since that absolute value is at least 1, an exponent of 10 or more would
+    //       always result in a value that is too big.
+
+    static constexpr int64_t BASE {10};
+    static constexpr int64_t MAXIMUM_EXPONENT {9};
+
+    if (pString == "0") {
+        return 0;
+    }
+
+    size_t i {0};
+    auto isNegative {false};
+
+    if (!pString.empty() && ((pString[0] == '+') || (pString[0] == '-'))) {
+        isNegative = pString[0] == '-';
+        i = 1;
+    }
+
+    const auto maximumAbsoluteValue {isNegative ?
+                                         -static_cast<int64_t>(std::numeric_limits<int>::min()) :
+                                         static_cast<int64_t>(std::numeric_limits<int>::max())};
+
+    if ((i == pString.size()) || (pString[i] == '0') || !isAsciiDigit(pString[i])) {
+        return {};
+    }
+
+    int64_t res {0};
+
+    while ((i < pString.size()) && isAsciiDigit(pString[i])) {
+        res = BASE * res + (pString[i] - '0');
+
+        if (res > maximumAbsoluteValue) {
+            return {};
+        }
+
+        ++i;
+    }
+
+    int64_t exponent {0};
+
+    if ((i < pString.size()) && ((pString[i] == 'e') || (pString[i] == 'E'))) {
+        ++i;
+
+        if ((i < pString.size()) && (pString[i] == '+')) {
+            ++i;
+        }
+
+        if ((i == pString.size()) || !isAsciiDigit(pString[i])) {
+            return {};
+        }
+
+        while ((i < pString.size()) && isAsciiDigit(pString[i])) {
+            exponent = BASE * exponent + (pString[i] - '0');
+
+            if (exponent > MAXIMUM_EXPONENT) {
+                return {};
+            }
+
+            ++i;
+        }
+    }
+
+    if (i != pString.size()) {
+        return {};
+    }
+
+    for (int64_t j {0}; j < exponent; ++j) {
+        res *= BASE;
+
+        if (res > maximumAbsoluteValue) {
+            return {};
+        }
+    }
+
+    return static_cast<int>(isNegative ? -res : res);
+}
+
 std::optional<double> parseDouble(const std::string &pString)
 {
     // Parse the given string as a double value, i.e. as a decimal number with an optional sign, an optional fractional
@@ -1322,6 +1379,16 @@ double toDouble(const std::string &pString)
     return parseDouble(pString).value_or(NAN);
 }
 
+bool isInt(const std::string &pString)
+{
+    return parseInt(pString).has_value();
+}
+
+int toInt(const std::string &pString)
+{
+    return parseInt(pString).value_or(0);
+}
+
 std::string toString(double pNumber)
 {
     std::ostringstream res;
@@ -1358,6 +1425,45 @@ bool isCellmlIdentifier(const std::string &pString)
     // https://www.cellml.org/specifications/cellml_2.0).
 
     return isSedmlId(pString) && std::ranges::any_of(pString, isAsciiLetter);
+}
+
+bool isCellmlFormat(const std::string &pFormat)
+{
+    // Check whether the given format is the CellML format of a COMBINE archive entry, including a versioned one, i.e.
+    // one followed by some dot-separated version numbers (e.g.,
+    // "http://identifiers.org/combine.specifications/cellml.1.0" or
+    // "http://identifiers.org/combine.specifications/cellml.2.0").
+
+    static constexpr std::string_view CELLML_FORMAT {"http://identifiers.org/combine.specifications/cellml"};
+
+    if (!pFormat.starts_with(CELLML_FORMAT)) {
+        return false;
+    }
+
+    for (auto i {CELLML_FORMAT.size()}; i < pFormat.size();) {
+        if (pFormat[i] != '.') {
+            return false;
+        }
+
+        const auto versionNumberStart {++i};
+
+        while ((i < pFormat.size()) && isAsciiDigit(pFormat[i])) {
+            ++i;
+        }
+
+        if (i == versionNumberStart) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool isSedmlFormat(const std::string &pFormat)
+{
+    static const std::string SEDML_FORMAT {"http://identifiers.org/combine.specifications/sed-ml"};
+
+    return pFormat == SEDML_FORMAT;
 }
 
 libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable)
