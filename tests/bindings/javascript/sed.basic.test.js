@@ -143,6 +143,25 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(document.models[0].file.path, utils.resourcePath('api/sed/cellml_2.cellml'));
   });
 
+  test('SED-ML file with unsupported scheme CellML file', () => {
+    // A model source with a scheme other than "http", "https", or "file" is an absolute URI that we cannot retrieve, so
+    // its model is ignored rather than considered to be relative to the SED-ML file.
+
+    const file = new loc.File(utils.resourcePath('api/sed/unsupported_scheme_cellml_file.sedml'));
+
+    file.setContents(sedmlContents('urn:miriam:biomodels.db:BIOMD0000000012'));
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the model 'urn:miriam:biomodels.db:BIOMD0000000012' has an unsupported scheme. It has been ignored."
+      ]
+    ]);
+    assert.strictEqual(document.models.length, 0);
+  });
+
   test('Remote SED-ML file with relative CellML file', () => {
     // A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or
     // fragment of the SED-ML file's URL contain some forward slashes.
@@ -250,6 +269,25 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(document.hasIssues, false);
     assert.strictEqual(document.models.length, 1);
     assert.strictEqual(document.models[0].file.isAliasOf(neededFile), true);
+  });
+
+  test('Remote SED-ML file with unsupported scheme CellML file', () => {
+    // A model source with a scheme other than "http", "https", or "file" is an absolute URI that we cannot retrieve, so
+    // its model is ignored rather than considered to be relative to the remote SED-ML file.
+
+    const file = new loc.File('https://example.com/simulations/simulation.sedml');
+
+    file.setContents(sedmlContents('urn:miriam:biomodels.db:BIOMD0000000012'));
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the model 'urn:miriam:biomodels.db:BIOMD0000000012' has an unsupported scheme. It has been ignored."
+      ]
+    ]);
+    assert.strictEqual(document.models.length, 0);
   });
 
   test('SED-ML file with remote CellML file', () => {

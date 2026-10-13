@@ -200,6 +200,21 @@ TEST(UtilsTest, retrieveFileInfo)
 #endif
 }
 
+TEST(UtilsTest, hasScheme)
+{
+    EXPECT_TRUE(libOpenCOR::hasScheme("urn:miriam:biomodels.db:BIOMD0000000012"));
+    EXPECT_TRUE(libOpenCOR::hasScheme("HTTPS://example.com/model.cellml"));
+    EXPECT_TRUE(libOpenCOR::hasScheme("a1+b-c.d:model.cellml"));
+
+    EXPECT_FALSE(libOpenCOR::hasScheme(""));
+    EXPECT_FALSE(libOpenCOR::hasScheme("model.cellml"));
+    EXPECT_FALSE(libOpenCOR::hasScheme(":model.cellml"));
+    EXPECT_FALSE(libOpenCOR::hasScheme("C:/some/path/model.cellml"));
+    EXPECT_FALSE(libOpenCOR::hasScheme("1a:model.cellml"));
+    EXPECT_FALSE(libOpenCOR::hasScheme("./urn:model.cellml"));
+    EXPECT_FALSE(libOpenCOR::hasScheme("some/path:model.cellml"));
+}
+
 TEST(UtilsTest, isInfOrNan)
 {
     EXPECT_FALSE(libOpenCOR::isInfOrNan(0.0));

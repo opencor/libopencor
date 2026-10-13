@@ -784,6 +784,28 @@ std::string urlPath(const std::string &pPath)
     return path;
 }
 
+bool hasScheme(const std::string &pUriReference)
+{
+    // Check whether the given URI reference has a scheme (e.g., "urn" in "urn:miriam:biomodels.db:BIOMD0000000012"),
+    // i.e. whether it starts with a letter followed by any number of letters, digits, plus signs, hyphens, and periods,
+    // and then a colon (see https://www.rfc-editor.org/rfc/rfc3986#section-3.1).
+    // Note: a single-letter scheme is not considered to be a scheme since it is the drive letter of a Windows file name
+    //       (e.g., "C:/some/path/model.cellml").
+
+    static constexpr size_t MINIMUM_SCHEME_LENGTH {2};
+
+    auto colonPos {pUriReference.find(':')};
+
+    if ((colonPos == std::string::npos) || (colonPos < MINIMUM_SCHEME_LENGTH)
+        || (std::isalpha(static_cast<unsigned char>(pUriReference[0])) == 0)) {
+        return false;
+    }
+
+    return std::all_of(pUriReference.begin() + 1, pUriReference.begin() + static_cast<std::ptrdiff_t>(colonPos), [](char pChar) {
+        return (std::isalnum(static_cast<unsigned char>(pChar)) != 0) || (pChar == '+') || (pChar == '-') || (pChar == '.');
+    });
+}
+
 #ifndef __EMSCRIPTEN__
 namespace {
 

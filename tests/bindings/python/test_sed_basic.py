@@ -129,6 +129,31 @@ def test_sedml_file_with_relative_cellml_file_in_working_directory():
     )
 
 
+def test_sedml_file_with_unsupported_scheme_cellml_file():
+    # A model source with a scheme other than "http", "https", or "file" is an absolute URI that we cannot retrieve, so
+    # its model is ignored rather than considered to be relative to the SED-ML file.
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the model 'urn:miriam:biomodels.db:BIOMD0000000012' has an unsupported scheme. It has been ignored.",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path("api/sed/unsupported_scheme_cellml_file.sedml"), False
+    )
+
+    file.contents = utils.text_to_list(
+        sedml_contents("urn:miriam:biomodels.db:BIOMD0000000012")
+    )
+
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+    assert len(document.models) == 0
+
+
 def test_remote_sedml_file_with_relative_cellml_file():
     # A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or
     # fragment of the SED-ML file's URL contain some forward slashes.
@@ -244,6 +269,29 @@ def test_remote_sedml_file_with_remote_cellml_file():
     assert not document.has_issues
     assert len(document.models) == 1
     assert document.models[0].file == needed_file
+
+
+def test_remote_sedml_file_with_unsupported_scheme_cellml_file():
+    # A model source with a scheme other than "http", "https", or "file" is an absolute URI that we cannot retrieve, so
+    # its model is ignored rather than considered to be relative to the remote SED-ML file.
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the model 'urn:miriam:biomodels.db:BIOMD0000000012' has an unsupported scheme. It has been ignored.",
+        ],
+    ]
+
+    file = loc.File("https://example.com/simulations/simulation.sedml", False)
+
+    file.contents = utils.text_to_list(
+        sedml_contents("urn:miriam:biomodels.db:BIOMD0000000012")
+    )
+
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+    assert len(document.models) == 0
 
 
 def test_sedml_file_with_remote_cellml_file():

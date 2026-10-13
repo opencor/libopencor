@@ -137,6 +137,25 @@ TEST(BasicSedTest, sedmlFileWithRelativeCellmlFileInWorkingDirectory)
     EXPECT_EQ(document->models()[0]->file()->path(), libOpenCOR::resourcePath("api/sed/cellml_2.cellml"));
 }
 
+TEST(BasicSedTest, sedmlFileWithUnsupportedSchemeCellmlFile)
+{
+    // A model source with a scheme other than "http", "https", or "file" is an absolute URI that we cannot retrieve, so
+    // its model is ignored rather than considered to be relative to the SED-ML file.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the model 'urn:miriam:biomodels.db:BIOMD0000000012' has an unsupported scheme. It has been ignored."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsupported_scheme_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("urn:miriam:biomodels.db:BIOMD0000000012").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+    EXPECT_TRUE(document->models().empty());
+}
+
 TEST(BasicSedTest, remoteSedmlFileWithRelativeCellmlFile)
 {
     // A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or
@@ -251,6 +270,25 @@ TEST(BasicSedTest, remoteSedmlFileWithRemoteCellmlFile)
     EXPECT_FALSE(document->hasIssues());
     EXPECT_EQ(document->models().size(), 1U);
     EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
+TEST(BasicSedTest, remoteSedmlFileWithUnsupportedSchemeCellmlFile)
+{
+    // A model source with a scheme other than "http", "https", or "file" is an absolute URI that we cannot retrieve, so
+    // its model is ignored rather than considered to be relative to the remote SED-ML file.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the model 'urn:miriam:biomodels.db:BIOMD0000000012' has an unsupported scheme. It has been ignored."},
+    }};
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("urn:miriam:biomodels.db:BIOMD0000000012").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+    EXPECT_TRUE(document->models().empty());
 }
 
 TEST(BasicSedTest, sedmlFileWithRemoteCellmlFile)

@@ -99,6 +99,7 @@ std::string LIBOPENCOR_UNIT_TESTING_EXPORT canonicalUrl(const std::string &pUrl)
 std::tuple<bool, std::string> LIBOPENCOR_UNIT_TESTING_EXPORT retrieveFileInfo(const std::string &pFileNameOrUrl, bool pCanonicalise = true);
 std::string relativePath(const std::string &pPath, const std::string &pBasePath);
 std::string urlPath(const std::string &pPath);
+bool LIBOPENCOR_UNIT_TESTING_EXPORT hasScheme(const std::string &pUriReference);
 
 #ifndef __EMSCRIPTEN__
 std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);

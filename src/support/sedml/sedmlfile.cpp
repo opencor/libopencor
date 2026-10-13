@@ -404,10 +404,28 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         //          without its query and fragment, a fragment-only reference (e.g., "#model") to its URL without its
         //          fragment, and a relative-path reference (e.g., "../models/model.cellml") to its location (see
         //          https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2).
+        // Note #4: a model source with a scheme other than "http", "https", or "file" (e.g.,
+        //          "urn:miriam:biomodels.db:BIOMD0000000012") is an absolute URI (see
+        //          https://www.rfc-editor.org/rfc/rfc3986#section-4.3), not a reference that is relative to the SED-ML
+        //          file. We cannot retrieve such a model, so we ignore it.
 
         auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(source, false)};
         auto isRelativeFileName {isLocalFile && !stringToPath(fileNameOrUrl).has_root_directory()};
         auto isFileName {isLocalFile && (fileNameOrUrl == source)};
+
+        if (isFileName && hasScheme(source)) {
+            std::string warning;
+
+            warning.reserve(source.size() + 64); // NOLINT
+
+            warning += "The model '";
+            warning += source;
+            warning += "' has an unsupported scheme. It has been ignored.";
+
+            addWarning(warning);
+
+            continue;
+        }
 
         if (mIsLocalLocation && isFileName) {
             fileNameOrUrl = decodeUrl(fileNameOrUrl);
