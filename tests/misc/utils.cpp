@@ -161,7 +161,9 @@ TEST(UtilsTest, retrieveFileInfo)
     // A "file" URL refers to a local file if it has no host (with or without an authority) or the "localhost" host
     // (which is case-insensitive and may be percent-encoded), and to a remote file if it has another host (including
     // one with some userinfo since a "file" URL cannot have any). A "file" URL without a path refers to no file, while
-    // a "file" URL which path is not absolute is not a valid "file" URL, so it is a local file name.
+    // a "file" URL which path is not absolute is not a valid "file" URL, so it is a local file name. The query and
+    // fragment of a local "file" URL are ignored, unless they are percent-encoded, in which case they are part of the
+    // file name while those of a remote "file" URL are kept.
 
 #ifdef BUILDING_ON_WINDOWS
     static const std::string PATH {"/C:/some/path/my%20file.txt"};
@@ -187,6 +189,13 @@ TEST(UtilsTest, retrieveFileInfo)
         {"file://localhost", true, ""},
         {"file:", true, "file:"},
         {"file:some/path/my%20file.txt", true, "file:some/path/my%20file.txt"},
+        {"file://" + PATH + "?a=b#c", true, FILE_NAME},
+        {"file:" + PATH + "?a=b", true, FILE_NAME},
+        {"file://localhost" + PATH + "#c", true, FILE_NAME},
+        {"file://localhost?a=b#c", true, ""},
+        {"file://localhost#c", true, ""},
+        {"file://" + PATH + "%3Fa=b%23c", true, FILE_NAME + "?a=b#c"},
+        {"file://example.com" + PATH + "?a=b#c", false, "file://example.com" + DECODED_PATH + "?a=b#c"},
     };
 
     for (const auto &[url, expectedIsLocalFile, expectedFileNameOrUrl] : FILE_URLS) {

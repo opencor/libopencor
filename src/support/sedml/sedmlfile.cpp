@@ -65,7 +65,8 @@ SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
     const auto &url {pFile->url()};
 
     if (mIsLocalLocation) {
-        mLocation = pathToString(stringToPath(pFile->fileName()).parent_path());
+        mFileName = pFile->fileName();
+        mLocation = pathToString(stringToPath(mFileName).parent_path());
 
         if (!mLocation.empty()) {
             mLocation += "/";
@@ -429,6 +430,11 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         //          "urn:miriam:biomodels.db:BIOMD0000000012") is an absolute URI (see
         //          https://www.rfc-editor.org/rfc/rfc3986#section-4.3), not a reference that is relative to the SED-ML
         //          file. We cannot retrieve such a model, so we ignore it.
+        // Note #5: if the SED-ML file is a local file and the model source is a file name then the query and fragment
+        //          of the model source (e.g., "?a=b" and "#c" in "model.cellml?a=b#c") are not part of its path, so we
+        //          ignore them (see retrieveFileInfo()). A query-only or fragment-only model source (e.g., "?model=1"
+        //          or "#model") therefore refers to the SED-ML file itself (see
+        //          https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2).
 
         auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(source, false)};
         auto isRelativeFileName {isLocalFile && !stringToPath(fileNameOrUrl).has_root_directory()};
@@ -449,7 +455,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         }
 
         if (mIsLocalLocation && isFileName) {
-            fileNameOrUrl = decodeUrl(fileNameOrUrl);
+            fileNameOrUrl = decodeUrl(fileNameOrUrl.substr(0, fileNameOrUrl.find_first_of("?#")));
         }
 
         std::string modelSource;
@@ -466,6 +472,8 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
             } else {
                 modelSource = mLocation + source;
             }
+        } else if (mIsLocalLocation && isFileName && fileNameOrUrl.empty()) {
+            modelSource = mFileName;
         } else {
             modelSource = isRelativeFileName ? mLocation + fileNameOrUrl : fileNameOrUrl;
         }

@@ -175,6 +175,43 @@ test.describe('Sed serialise tests', () => {
     }
   });
 
+  test('Local CellML file with question marks and number signs', () => {
+    // A model source is a URI reference, so the question marks and number signs in the file name of a local model must
+    // be percent-encoded for the model source to refer to that model when the SED-ML file is loaded back (rather than
+    // to the file which name is the part of that file name that precedes the first question mark or number sign).
+
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const file = new loc.File(utils.resourcePath('my?model#1.cellml'));
+
+    file.setContents(cellmlContents);
+
+    const otherFile = new loc.File(utils.resourcePath('my'));
+
+    otherFile.setContents(cellmlContents);
+
+    const document = new loc.SedDocument(file);
+    const encodedFileUrl = `file://${utils.resourcePath('my%3Fmodel%231.cellml')}`;
+
+    assert.strictEqual(document.serialise(utils.resourcePath()), cvodeExpectedSerialisation('my%3Fmodel%231.cellml'));
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation(encodedFileUrl));
+
+    // Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    // (which we never generate, but which a third-party tool might).
+
+    for (const source of ['my%3Fmodel%231.cellml', encodedFileUrl, utils.resourcePath('my%3Fmodel%231.cellml')]) {
+      const sedmlFile = new loc.File(utils.resourcePath('my_model.sedml'));
+
+      sedmlFile.setContents(new TextEncoder().encode(cvodeExpectedSerialisation(source)));
+
+      const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+      assert.strictEqual(sedmlDocument.models.length, 1);
+      assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+      loc.FileManager.instance().unmanage(sedmlFile);
+    }
+  });
+
   test('Local CellML file with non-UTF-8 character', () => {
     // A model source is an XML attribute, so the bytes in the file name of a local model that are not valid UTF-8 must
     // be percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the

@@ -796,12 +796,19 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
     //          file name (e.g., "/some/path/my%20file.txt" and "/some/path/my file.txt" are two different files).
     // Note #4: on Windows, the path of a "file" URL starts with a forward slash that precedes the drive letter (e.g.,
     //          "/C:/some/path/file.txt" for "file:///C:/some/path/file.txt"), which is not part of the file name.
+    // Note #5: the query and fragment of a local "file" URL (e.g., "?a=b" and "#c" in
+    //          "file:///some/path/file.txt?a=b#c") are not part of its path, so they are ignored. Indeed, a "file" URL
+    //          cannot have a query (see https://www.rfc-editor.org/rfc/rfc8089#section-2) and a fragment identifies a
+    //          part of a file, not another file. A file name with a question mark or a number sign must therefore be
+    //          percent-encoded (e.g., "file:///some/path/file%3F%23.txt" for "/some/path/file?#.txt").
 
     static constexpr std::string_view FILE_SCHEME {"file:"};
     static constexpr std::string_view HTTP_SCHEME {"http://"};
     static constexpr std::string_view HTTPS_SCHEME {"https://"};
     static constexpr std::string_view REMOTE_FILE_SCHEME {"file://"};
     static constexpr std::string_view LOCALHOST {"localhost"};
+    static constexpr std::string_view PATH_START_OR_QUERY_OR_FRAGMENT_START {"/?#"};
+    static constexpr std::string_view QUERY_OR_FRAGMENT_START {"?#"};
 
     auto remoteFileInfo = [&](std::string_view pScheme) -> std::tuple<bool, std::string> {
         auto res {lowercaseHost(decodeUrl(std::string(pScheme) + pFileNameOrUrl.substr(pScheme.size()), false), pScheme.size())};
@@ -823,7 +830,7 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
 
         if (startsWithIgnoringCase(pFileNameOrUrl, REMOTE_FILE_SCHEME)) {
             auto authorityPos {REMOTE_FILE_SCHEME.size() - FILE_SCHEME.size()};
-            auto pathPos {hierarchicalPart.find('/', authorityPos)};
+            auto pathPos {hierarchicalPart.find_first_of(PATH_START_OR_QUERY_OR_FRAGMENT_START, authorityPos)};
             auto host {decodeUrl(hierarchicalPart.substr(authorityPos, (pathPos == std::string::npos) ? std::string::npos : pathPos - authorityPos))};
 
             if (!host.empty() && ((host.size() != LOCALHOST.size()) || !startsWithIgnoringCase(host, LOCALHOST))) {
@@ -836,7 +843,7 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
         }
 
         if (path.has_value()) {
-            res = decodeUrl(*path);
+            res = decodeUrl(path->substr(0, path->find_first_of(QUERY_OR_FRAGMENT_START)));
 
 #ifdef BUILDING_ON_WINDOWS
             static constexpr size_t DRIVE_PATH_MINIMUM_SIZE {3};

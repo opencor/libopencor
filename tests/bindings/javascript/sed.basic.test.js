@@ -213,6 +213,61 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(document.models[0].file.isAliasOf(neededRemoteFile), true);
   });
 
+  test('SED-ML file with query and fragment CellML file', () => {
+    // The query and fragment of a model source are ignored unless they are percent-encoded, in which case they are part
+    // of the file name of the model.
+
+    const file = new loc.File(utils.resourcePath('api/sed/query_and_fragment_cellml_file.sedml'));
+
+    file.setContents(sedmlContents('../../cellml_2.cellml?a=b#c'));
+
+    const neededFile = new loc.File(utils.resourcePath('cellml_2.cellml'));
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.isAliasOf(neededFile), true);
+
+    const encodedFile = new loc.File(utils.resourcePath('api/sed/encoded_query_and_fragment_cellml_file.sedml'));
+
+    encodedFile.setContents(sedmlContents('../../cellml_2.cellml%3Fa=b%23c'));
+
+    const encodedNeededFile = new loc.File(utils.resourcePath('cellml_2.cellml?a=b#c'));
+    const encodedDocument = new loc.SedDocument(encodedFile);
+
+    assert.strictEqual(encodedDocument.hasIssues, false);
+    assert.strictEqual(encodedDocument.models.length, 1);
+    assert.strictEqual(encodedDocument.models[0].file.isAliasOf(encodedNeededFile), true);
+  });
+
+  test('SED-ML file with query-only CellML file', () => {
+    // A query-only model source refers to the SED-ML file itself since the query of a model source is ignored.
+
+    const file = new loc.File(utils.resourcePath('api/sed/query_only_cellml_file.sedml'));
+
+    file.setContents(sedmlContents('?model=1'));
+
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.isAliasOf(file), true);
+  });
+
+  test('SED-ML file with fragment-only CellML file', () => {
+    // A fragment-only model source refers to the SED-ML file itself since the fragment of a model source is ignored.
+
+    const file = new loc.File(utils.resourcePath('api/sed/fragment_only_cellml_file.sedml'));
+
+    file.setContents(sedmlContents('#model'));
+
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.isAliasOf(file), true);
+  });
+
   test('Remote SED-ML file with relative CellML file', () => {
     // A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or
     // fragment of the SED-ML file's URL contain some forward slashes.

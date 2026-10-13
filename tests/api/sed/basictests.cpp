@@ -213,6 +213,64 @@ TEST(BasicSedTest, sedmlFileWithFileUrlCellmlFile)
     EXPECT_EQ(document->models()[0]->file(), neededRemoteFile);
 }
 
+TEST(BasicSedTest, sedmlFileWithQueryAndFragmentCellmlFile)
+{
+    // The query and fragment of a model source are ignored unless they are percent-encoded, in which case they are part
+    // of the file name of the model.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/query_and_fragment_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("../../cellml_2.cellml?a=b#c").c_str()));
+
+    auto neededFile {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+
+    auto encodedFile {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/encoded_query_and_fragment_cellml_file.sedml"), false)};
+
+    encodedFile->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("../../cellml_2.cellml%3Fa=b%23c").c_str()));
+
+    auto encodedNeededFile {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml?a=b#c"), false)};
+    auto encodedDocument {libOpenCOR::SedDocument::create(encodedFile)};
+
+    EXPECT_FALSE(encodedDocument->hasIssues());
+    EXPECT_EQ(encodedDocument->models().size(), 1U);
+    EXPECT_EQ(encodedDocument->models()[0]->file(), encodedNeededFile);
+}
+
+TEST(BasicSedTest, sedmlFileWithQueryOnlyCellmlFile)
+{
+    // A query-only model source refers to the SED-ML file itself since the query of a model source is ignored.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/query_only_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("?model=1").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), file);
+}
+
+TEST(BasicSedTest, sedmlFileWithFragmentOnlyCellmlFile)
+{
+    // A fragment-only model source refers to the SED-ML file itself since the fragment of a model source is ignored.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/fragment_only_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("#model").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), file);
+}
+
 TEST(BasicSedTest, remoteSedmlFileWithRelativeCellmlFile)
 {
     // A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or

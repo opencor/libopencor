@@ -222,6 +222,70 @@ def test_sedml_file_with_file_url_cellml_file():
     assert document.models[0].file == needed_remote_file
 
 
+def test_sedml_file_with_query_and_fragment_cellml_file():
+    # The query and fragment of a model source are ignored unless they are percent-encoded, in which case they are part
+    # of the file name of the model.
+
+    file = loc.File(
+        utils.resource_path("api/sed/query_and_fragment_cellml_file.sedml"), False
+    )
+
+    file.contents = utils.text_to_list(sedml_contents("../../cellml_2.cellml?a=b#c"))
+
+    needed_file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == needed_file
+
+    encoded_file = loc.File(
+        utils.resource_path("api/sed/encoded_query_and_fragment_cellml_file.sedml"),
+        False,
+    )
+
+    encoded_file.contents = utils.text_to_list(
+        sedml_contents("../../cellml_2.cellml%3Fa=b%23c")
+    )
+
+    encoded_needed_file = loc.File(utils.resource_path("cellml_2.cellml?a=b#c"), False)
+    encoded_document = loc.SedDocument(encoded_file)
+
+    assert not encoded_document.has_issues
+    assert len(encoded_document.models) == 1
+    assert encoded_document.models[0].file == encoded_needed_file
+
+
+def test_sedml_file_with_query_only_cellml_file():
+    # A query-only model source refers to the SED-ML file itself since the query of a model source is ignored.
+
+    file = loc.File(utils.resource_path("api/sed/query_only_cellml_file.sedml"), False)
+
+    file.contents = utils.text_to_list(sedml_contents("?model=1"))
+
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == file
+
+
+def test_sedml_file_with_fragment_only_cellml_file():
+    # A fragment-only model source refers to the SED-ML file itself since the fragment of a model source is ignored.
+
+    file = loc.File(
+        utils.resource_path("api/sed/fragment_only_cellml_file.sedml"), False
+    )
+
+    file.contents = utils.text_to_list(sedml_contents("#model"))
+
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == file
+
+
 def test_remote_sedml_file_with_relative_cellml_file():
     # A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or
     # fragment of the SED-ML file's URL contain some forward slashes.

@@ -171,18 +171,30 @@ void SedModel::Impl::serialise(xmlNodePtr pNode) const
                      relativePath(mFile->path(), mBasePath)};
 #endif
 
-    // A model source is a URI reference, which gets decoded when it is for a local file (see retrieveFileInfo() and
-    // SedmlFile::Impl::populateDocument()). So, for a local file, we must percent-encode the percent signs in its file
-    // name (e.g., "my%20model.cellml" must become "my%2520model.cellml"), so that the model source can be decoded back
-    // to the file name of the model.
+    // A model source is a URI reference, which gets decoded when it is for a local file and which query and fragment
+    // are then ignored (see retrieveFileInfo() and SedmlFile::Impl::populateDocument()). So, for a local file, we must
+    // percent-encode the percent signs, question marks, and number signs in its file name (e.g., "my%20model#1.cellml"
+    // must become "my%2520model%231.cellml"), so that the model source can be decoded back to the file name of the
+    // model.
 
     if (mFile->url().empty()) {
-        static constexpr auto PERCENT_SIGN {'%'};
-        static constexpr std::string_view PERCENT_ENCODED_PERCENT_SIGN {"%25"};
+        std::string encodedSource;
 
-        for (auto pos {source.find(PERCENT_SIGN)}; pos != std::string::npos; pos = source.find(PERCENT_SIGN, pos + PERCENT_ENCODED_PERCENT_SIGN.size())) {
-            source.replace(pos, 1, PERCENT_ENCODED_PERCENT_SIGN);
+        encodedSource.reserve(source.size());
+
+        for (const auto sourceChar : source) {
+            if (sourceChar == '%') {
+                encodedSource += "%25";
+            } else if (sourceChar == '?') {
+                encodedSource += "%3F";
+            } else if (sourceChar == '#') {
+                encodedSource += "%23";
+            } else {
+                encodedSource += sourceChar;
+            }
         }
+
+        source = std::move(encodedSource);
     }
 
     // The file name or URL of the model may not be valid UTF-8 (e.g., "file:///some/path/%FF.cellml" gets
