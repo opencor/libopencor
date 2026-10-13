@@ -26,7 +26,8 @@ limitations under the License.
 //       "https://example.com/\xFF"), in which case nanobind's type caster would raise a UnicodeDecodeError. So, like
 //       Python does for file names (see os.fsdecode() and os.fsencode()), we use the "surrogateescape" error handler
 //       to map an invalid byte to a lone surrogate (e.g., 0xFF to U+DCFF) and back, meaning that a string can always be
-//       retrieved from libOpenCOR and given back to it without being altered.
+//       retrieved from libOpenCOR and given back to it without being altered. A string with any other lone surrogate
+//       (e.g., U+D800) cannot be encoded, so it is rejected (i.e. a TypeError is raised) rather than silently altered.
 
 NAMESPACE_BEGIN(NB_NAMESPACE)
 NAMESPACE_BEGIN(detail)

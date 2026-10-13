@@ -177,6 +177,20 @@ test.describe('File basic tests', () => {
 
     assert.strictEqual(nonUtf8File.url, 'https://example.com/\udcff.cellml');
     assert.strictEqual(new loc.File(nonUtf8File.url).isAliasOf(nonUtf8File), true);
+
+    // A percent-encoded character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also decoded.
+
+    const emojiFile = new loc.File('https://example.com/%F0%9F%98%80.cellml');
+
+    assert.strictEqual(emojiFile.url, 'https://example.com/\u{1f600}.cellml');
+    assert.strictEqual(new loc.File(emojiFile.url).isAliasOf(emojiFile), true);
+
+    // A string with a lone surrogate that doesn't stand for an invalid byte (i.e. other than U+DC80 to U+DCFF) is
+    // rejected.
+    // Note: this has no C++ equivalent since a std::string cannot contain a lone surrogate.
+
+    assert.throws(() => new loc.File('https://example.com/\ud800.cellml'), TypeError);
+    assert.throws(() => new loc.File('https://example.com/\udc41.cellml'), TypeError);
   });
 
   test('Remote file', () => {

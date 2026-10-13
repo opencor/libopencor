@@ -16,6 +16,7 @@
 import libopencor as loc
 import os
 import platform
+import pytest
 import shutil
 import tempfile
 import threading
@@ -246,6 +247,23 @@ def test_remote_files_with_percent_encoded_characters():
     assert non_utf8_file.url == "https://example.com/\udcff.cellml"
     assert loc.File(non_utf8_file.url, False) == non_utf8_file
     assert repr(non_utf8_file) == 'File("https://example.com/\\xff.cellml")'
+
+    # A percent-encoded character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also decoded.
+
+    emoji_file = loc.File("https://example.com/%F0%9F%98%80.cellml", False)
+
+    assert emoji_file.url == "https://example.com/\U0001f600.cellml"
+    assert loc.File(emoji_file.url, False) == emoji_file
+
+    # A string with a lone surrogate that doesn't stand for an invalid byte (i.e. other than U+DC80 to U+DCFF) is
+    # rejected.
+    # Note: this has no C++ equivalent since a std::string cannot contain a lone surrogate.
+
+    with pytest.raises(TypeError):
+        loc.File("https://example.com/\ud800.cellml", False)
+
+    with pytest.raises(TypeError):
+        loc.File("https://example.com/\udc41.cellml", False)
 
 
 def test_remote_file():

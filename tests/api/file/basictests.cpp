@@ -264,6 +264,13 @@ TEST(BasicFileTest, remoteFilesWithPercentEncodedCharacters)
 
     EXPECT_EQ(nonUtf8File->url(), "https://example.com/\xFF.cellml");
     EXPECT_EQ(libOpenCOR::File::create(nonUtf8File->url(), false), nonUtf8File);
+
+    // A percent-encoded character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also decoded.
+
+    auto emojiFile {libOpenCOR::File::create("https://example.com/%F0%9F%98%80.cellml", false)};
+
+    EXPECT_EQ(emojiFile->url(), "https://example.com/\xF0\x9F\x98\x80.cellml");
+    EXPECT_EQ(libOpenCOR::File::create(emojiFile->url(), false), emojiFile);
 }
 
 TEST(BasicFileTest, remoteFile)

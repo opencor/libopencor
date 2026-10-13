@@ -24,7 +24,9 @@ limitations under the License.
 // that may not be valid UTF-8 (e.g., the URL "https://example.com/%FF" gets percent-decoded to
 // "https://example.com/\xFF"), in which case Embind would replace an invalid byte with U+FFFD and the original
 // std::string couldn't be retrieved. So, we map an invalid byte to a lone surrogate (e.g., 0xFF to U+DCFF) and back,
-// meaning that a string can always be retrieved from libOpenCOR and given back to it without being altered.
+// meaning that a string can always be retrieved from libOpenCOR and given back to it without being altered. We
+// do, however, reject a string with any other lone surrogate (e.g., U+D800) since replacing it with U+FFFD would
+// silently alter the string (e.g., a file name or URL would then refer to another file).
 // Note #1: JsString must be registered as a "string" (see fileApi()), so that it is a string in our TypeScript
 //          declarations.
 // Note #2: the code within the EM_ASM() blocks is such that it doesn't rely on top-level commas since those can get
@@ -117,15 +119,29 @@ inline std::string fromJsString(const JsString &pString)
 
         for (let i = 0; i < str.length; ++i) {
             let codeUnit = str.charCodeAt(i);
-            let previousCodeUnit = (i > 0) ? str.charCodeAt(i - 1) : 0;
 
-            if ((codeUnit >= 0xDC80) && (codeUnit <= 0xDCFF)
-                && ((previousCodeUnit < 0xD800) || (previousCodeUnit > 0xDBFF))) {
+            if ((codeUnit < 0xD800) || (codeUnit > 0xDFFF)) {
+                continue;
+            }
+
+            if (codeUnit <= 0xDBFF) {
+                let nextCodeUnit = (i + 1 < str.length) ? str.charCodeAt(i + 1) : 0;
+
+                if ((nextCodeUnit >= 0xDC00) && (nextCodeUnit <= 0xDFFF)) {
+                    ++i;
+
+                    continue;
+                }
+            } else if ((codeUnit >= 0xDC80) && (codeUnit <= 0xDCFF)) {
                 chunks.push(encoder.encode(str.substring(start, i)));
                 chunks.push(Uint8Array.of(codeUnit - 0xDC00));
 
                 start = i + 1;
+
+                continue;
             }
+
+            throw new TypeError('Cannot pass a string with a lone surrogate (other than U+DC80 to U+DCFF) to std::string');
         }
 
         if (start == 0) {
