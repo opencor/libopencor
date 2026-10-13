@@ -246,7 +246,6 @@ def test_remote_files_with_percent_encoded_characters():
 
     assert non_utf8_file.url == "https://example.com/\udcff.cellml"
     assert loc.File(non_utf8_file.url, False) == non_utf8_file
-    assert repr(non_utf8_file) == 'File("https://example.com/\\xff.cellml")'
 
     # A percent-encoded character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also decoded.
 
@@ -254,6 +253,11 @@ def test_remote_files_with_percent_encoded_characters():
 
     assert emoji_file.url == "https://example.com/\U0001f600.cellml"
     assert loc.File(emoji_file.url, False) == emoji_file
+
+    # The representation of a file which URL is not valid UTF-8 has its invalid bytes escaped.
+    # Note: this has no C++ equivalent since a file has no representation in C++.
+
+    assert repr(non_utf8_file) == 'File("https://example.com/\\xff.cellml")'
 
     # A string with a lone surrogate that doesn't stand for an invalid byte (i.e. other than U+DC80 to U+DCFF) is
     # rejected.
