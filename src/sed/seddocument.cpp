@@ -83,6 +83,13 @@ void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, co
 {
     auto sedmlFile {pFile->pimpl()->mSedmlFile};
 
+    // Reserve the ids of the models and simulations of the SED-ML file, so that a model or simulation which id is not a
+    // valid SED-ML identifier doesn't get given the id of another model or simulation (e.g., "model1").
+
+    for (const auto &id : sedmlFile->ids()) {
+        mIds.insert(id);
+    }
+
     sedmlFile->populateDocument(pOwner);
 
     addIssues(sedmlFile, "SED-ML file");

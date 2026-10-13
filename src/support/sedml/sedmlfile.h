@@ -43,6 +43,8 @@ public:
 
     static SedmlFilePtr create(const FilePtr &pFile);
 
+    Strings ids() const;
+
     void populateDocument(const SedDocumentPtr &pDocument);
 
 private:

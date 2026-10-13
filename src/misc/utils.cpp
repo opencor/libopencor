@@ -435,10 +435,12 @@ namespace {
 // Note #1: a path may also contain some other lone surrogates (e.g., U+D800), which cannot be mapped to a byte, in
 //          which case we encode them as if they were valid code points (i.e. using three bytes, e.g., "\xED\xA0\x80"
 //          for U+D800) and decode them back (see stringToUtf16()), meaning that such a path can be converted to a file
-//          name and back without being altered.
+//          name and back without being altered, unless it also has some lone surrogates as described in Note #2 (see
+//          stringToUtf16()).
 // Note #2: a path with lone surrogates that stand for bytes (i.e. U+DC80 to U+DCFF) that form a valid UTF-8 sequence
-//          (e.g., U+DCC3 U+DCA9, i.e. "\xC3\xA9") cannot, however, be converted to a file name and back without being
-//          altered since that file name is also the one for another path (e.g., U+00E9, i.e. "\xC3\xA9"). This is
+//          (e.g., U+DCC3 U+DCA9, i.e. "\xC3\xA9") or the three-byte encoding of a surrogate (e.g., U+DCED U+DCA0
+//          U+DC80, i.e. "\xED\xA0\x80") cannot, however, be converted to a file name and back without being altered
+//          since that file name is also the one for another path (e.g., U+00E9 or U+D800, respectively). This is
 //          inherent to mapping an invalid byte to a lone surrogate, and only a path that was not created by us could
 //          have such lone surrogates.
 
@@ -553,8 +555,8 @@ std::wstring stringToUtf16(const std::string &pString)
     // Convert the given string to UTF-16, decoding a three-byte encoding of a surrogate (e.g., "\xED\xA0\x80" for
     // U+D800) to that surrogate, as long as the result converts back to the given string. This may not be the case
     // (e.g., "\xED\xA0\x80\xFF" would be converted to U+D800 U+DCFF, which is a valid surrogate pair, i.e. U+100FF,
-    // that converts back to "\xF4\x80\x83\xBF"), in which case we don't decode such an encoding (i.e. each of its bytes
-    // is mapped to a lone surrogate), which always converts back to the given string.
+    // that converts back to "\xF4\x80\x83\xBF"), in which case we don't decode any such encoding (i.e. each of its
+    // bytes is mapped to a lone surrogate), which always converts back to the given string.
 
     auto res {utf8ToUtf16(pString, true)};
 
