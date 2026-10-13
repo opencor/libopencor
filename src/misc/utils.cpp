@@ -59,6 +59,10 @@ limitations under the License.
 #    undef min
 #endif
 
+#ifdef max
+#    undef max
+#endif
+
 namespace libOpenCOR {
 
 #ifndef CODE_COVERAGE_ENABLED

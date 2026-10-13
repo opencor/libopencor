@@ -22,6 +22,10 @@ limitations under the License.
 #include <cmath>
 #include <limits>
 
+#ifdef NAN
+#    undef NAN
+#endif
+
 TEST(UtilsTest, percentEncodeNonXmlCharacters)
 {
     // Valid UTF-8 is kept as is.
