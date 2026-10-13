@@ -328,6 +328,19 @@ def test_remote_file_with_upper_case_scheme():
     assert loc.FileManager.instance().file("HTTPS://example.com/model.cellml") == file
 
 
+def test_remote_file_with_upper_case_host():
+    # A host is case-insensitive, so it gets normalised to lowercase, unlike a path which is case-sensitive.
+
+    file = loc.File("https://EXAMPLE.com/model.cellml", False)
+
+    assert file.url == "https://example.com/model.cellml"
+    assert file.path == "https://example.com/model.cellml"
+    assert loc.File("https://example.com/model.cellml", False) == file
+    assert loc.File("https://Example.COM/model.cellml", False) == file
+    assert loc.FileManager.instance().file("https://EXAMPLE.com/model.cellml") == file
+    assert loc.File("https://example.com/MODEL.cellml", False) != file
+
+
 def test_remote_file_matching_local_file():
     orig_dir = os.getcwd()
 

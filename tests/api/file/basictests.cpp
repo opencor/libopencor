@@ -348,6 +348,20 @@ TEST(BasicFileTest, remoteFileWithUpperCaseScheme)
     EXPECT_EQ(libOpenCOR::FileManager::instance().file("HTTPS://example.com/model.cellml"), file);
 }
 
+TEST(BasicFileTest, remoteFileWithUpperCaseHost)
+{
+    // A host is case-insensitive, so it gets normalised to lowercase, unlike a path which is case-sensitive.
+
+    auto file {libOpenCOR::File::create("https://EXAMPLE.com/model.cellml", false)};
+
+    EXPECT_EQ(file->url(), "https://example.com/model.cellml");
+    EXPECT_EQ(file->path(), "https://example.com/model.cellml");
+    EXPECT_EQ(libOpenCOR::File::create("https://example.com/model.cellml", false), file);
+    EXPECT_EQ(libOpenCOR::File::create("https://Example.COM/model.cellml", false), file);
+    EXPECT_EQ(libOpenCOR::FileManager::instance().file("https://EXAMPLE.com/model.cellml"), file);
+    EXPECT_NE(libOpenCOR::File::create("https://example.com/MODEL.cellml", false), file);
+}
+
 TEST(BasicFileTest, remoteFileMatchingLocalFile)
 {
     // The host and path of a URL must never be resolved as a local file, even if such a local file exists.

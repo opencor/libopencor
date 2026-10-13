@@ -466,15 +466,51 @@ bool startsWithScheme(const std::string &pFileNameOrUrl, std::string_view pSchem
               });
 }
 
+std::string lowercaseHost(const std::string &pUrl, size_t pAuthorityPos)
+{
+    // Lowercase the host of the given URL (e.g., "EXAMPLE.com" in "https://user:PASS@EXAMPLE.com:8080/a/b") since it is
+    // case-insensitive (see https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2), but not its userinfo (e.g.,
+    // "user:PASS"), which is case-sensitive.
+    // Note #1: a backslash also ends the authority of the URL since canonicalUrl() considers it to be a forward slash
+    //          on Windows (e.g., "https://EXAMPLE.com\A" would otherwise become "https://example.com/a" on Windows).
+    // Note #2: we don't lowercase a percent-encoded character (e.g., "%2F") since its hexadecimal digits are uppercase
+    //          (see decodeUrl()) nor the zone identifier of an IPv6 address (e.g., "en0" in "[fe80::1%25en0]") since it
+    //          is the name of a network interface.
+    // Note #3: we only lowercase ASCII letters since a non-ASCII character (e.g., in an internationalised domain name)
+    //          is percent-decoded to UTF-8 bytes, which std::tolower() could alter depending on the current locale.
+
+    static constexpr std::string_view AUTHORITY_TERMINATORS {"/?#\\"};
+
+    auto res {pUrl};
+    auto hostEnd {std::min(res.find_first_of(AUTHORITY_TERMINATORS, pAuthorityPos), res.size())};
+    auto userInfoEnd {res.rfind('@', hostEnd)};
+    auto hostStart {(userInfoEnd == std::string::npos) ? pAuthorityPos : userInfoEnd + 1};
+    auto isIpLiteral {res[hostStart] == '['};
+
+    for (auto i {hostStart}; i < hostEnd; ++i) {
+        if (res[i] == '%') {
+            if (isIpLiteral) {
+                break;
+            }
+
+            i += 2;
+        } else if ((res[i] >= 'A') && (res[i] <= 'Z')) {
+            res[i] = static_cast<char>(res[i] - 'A' + 'a');
+        }
+    }
+
+    return res;
+}
+
 } // namespace
 
 std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl, bool pCanonicalise)
 {
     // Check whether the given file name or URL is a local file name or a URL.
     // Note #1: a URL represents a local file when used with the "file" scheme.
-    // Note #2: a scheme is case-insensitive (e.g., "HTTPS://example.com/file.txt" and "https://example.com/file.txt"
-    //          are the same file), so we normalise it to lowercase (see
-    //          https://www.rfc-editor.org/rfc/rfc3986#section-6.2.2.1).
+    // Note #2: a scheme and a host are case-insensitive (e.g., "HTTPS://EXAMPLE.com/file.txt" and
+    //          "https://example.com/file.txt" are the same file), so we normalise them to lowercase (see
+    //          https://www.rfc-editor.org/rfc/rfc3986#section-6.2.2.1 and lowercaseHost()).
     // Note #3: the percent-encoded characters of a URL are decoded (e.g., "https://example.com/my%20file.txt" and
     //          "https://example.com/my file.txt" are the same file), except for those that have a meaning in a URL (see
     //          decodeUrl()). The path of a "file" URL is, however, always fully decoded since it is a local file name.
@@ -491,7 +527,7 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
 
     for (const auto &scheme : {HTTP_SCHEME, HTTPS_SCHEME}) {
         if (startsWithScheme(pFileNameOrUrl, scheme)) {
-            auto res {decodeUrl(std::string(scheme) + pFileNameOrUrl.substr(scheme.size()), false)};
+            auto res {lowercaseHost(decodeUrl(std::string(scheme) + pFileNameOrUrl.substr(scheme.size()), false), scheme.size())};
 
             return {false, pCanonicalise ? canonicalUrl(res) : res};
         }

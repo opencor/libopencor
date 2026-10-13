@@ -110,7 +110,8 @@ TEST(UtilsTest, retrieveFileInfo)
 #endif
 
     // A remote URL is decoded, except for its reserved characters and percent signs, and then canonicalised. Its
-    // scheme is also normalised to lowercase.
+    // scheme and host are also normalised to lowercase, but not its userinfo, path, query, fragment, percent-encoded
+    // characters, and the zone identifier of an IPv6 address.
 
     static const std::vector<std::pair<std::string, std::string>> URLS {
         {"https://example.com/my%20file.cellml", "https://example.com/my file.cellml"},
@@ -130,6 +131,14 @@ TEST(UtilsTest, retrieveFileInfo)
         {"http://example.com/a/../my%20file.cellml?b=%2F%20c", "http://example.com/my file.cellml?b=%2F c"},
         {"HTTPS://example.com/my%20file.cellml", "https://example.com/my file.cellml"},
         {"Http://example.com/a/../my%20file.cellml", "http://example.com/my file.cellml"},
+        {"https://EXAMPLE.com/My%20File.cellml", "https://example.com/My File.cellml"},
+        {"https://EXAMPLE.com", "https://example.com"},
+        {"HTTPS://User:Pass@EXAMPLE.COM:8080/A?B=C#D", "https://User:Pass@example.com:8080/A?B=C#D"},
+        {"https://EXAMPLE.com?A=B", "https://example.com?A=B"},
+        {"https://EXAMPLE.com#A", "https://example.com#A"},
+        {"https://EX%2fAMPLE.com/A", "https://ex%2Fample.com/A"},
+        {"https://EX%41MPLE.com/A", "https://example.com/A"},
+        {"https://[FE80::1%25EN0]:8080/A", "https://[fe80::1%25EN0]:8080/A"},
     };
 
     for (const auto &[url, expectedUrl] : URLS) {
@@ -145,6 +154,17 @@ TEST(UtilsTest, retrieveFileInfo)
         EXPECT_FALSE(isLocalFile);
         EXPECT_EQ(fileNameOrUrl, expectedUrl);
     }
+
+    // A backslash ends the host of a URL since it is considered to be a forward slash on Windows.
+
+    std::tie(isLocalFile, fileNameOrUrl) = libOpenCOR::retrieveFileInfo("https://EXAMPLE.com\\A");
+
+    EXPECT_FALSE(isLocalFile);
+#ifdef BUILDING_USING_MSVC
+    EXPECT_EQ(fileNameOrUrl, "https://example.com/A");
+#else
+    EXPECT_EQ(fileNameOrUrl, "https://example.com\\A");
+#endif
 }
 
 TEST(UtilsTest, isInfOrNan)
