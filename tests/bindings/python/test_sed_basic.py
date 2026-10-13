@@ -15,6 +15,7 @@
 
 import libopencor as loc
 import os
+import platform
 import utils
 from utils import assert_issues
 
@@ -176,6 +177,49 @@ def test_sedml_file_with_empty_source_cellml_file():
 
     assert_issues(document, expected_issues)
     assert len(document.models) == 0
+
+
+def test_sedml_file_with_file_url_cellml_file():
+    # A "file" URL model source refers to a local file if it has no host (e.g., "file:///some/path/model.cellml" or
+    # "file:/some/path/model.cellml") or the "localhost" host (e.g., "file://localhost/some/path/model.cellml"), and to
+    # a remote file otherwise (e.g., "file://example.com/some/path/model.cellml").
+
+    if platform.system() == "Windows":
+        url_path = "/" + utils.forward_slash_path(
+            utils.resource_path("cellml_2.cellml")
+        )
+    else:
+        url_path = utils.resource_path("cellml_2.cellml")
+
+    needed_file = loc.File(utils.resource_path("cellml_2.cellml"))
+
+    for source in [
+        "file://" + url_path,
+        "file:" + url_path,
+        "file://localhost" + url_path,
+    ]:
+        file = loc.File(
+            utils.resource_path("api/sed/file_url_cellml_file.sedml"), False
+        )
+
+        file.contents = utils.text_to_list(sedml_contents(source))
+
+        document = loc.SedDocument(file)
+
+        assert not document.has_issues
+        assert len(document.models) == 1
+        assert document.models[0].file == needed_file
+
+    file = loc.File(utils.resource_path("api/sed/file_url_cellml_file.sedml"), False)
+
+    file.contents = utils.text_to_list(sedml_contents("file://example.com" + url_path))
+
+    needed_remote_file = loc.File("file://example.com" + url_path, False)
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == needed_remote_file
 
 
 def test_remote_sedml_file_with_relative_cellml_file():

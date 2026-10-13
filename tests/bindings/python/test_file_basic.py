@@ -218,6 +218,23 @@ def test_url_based_local_file():
     else:
         assert loc.File("FILE://" + file_path) == file
 
+    # A "file" URL with the "localhost" host or without an authority also refers to a local file while a "file" URL
+    # with another host refers to a remote file.
+
+    if platform.system() == "Windows":
+        url_path = "/" + utils.forward_slash_path(file_path)
+    else:
+        url_path = file_path
+
+    assert loc.File("file://localhost" + url_path) == file
+    assert loc.File("file:" + url_path) == file
+
+    remote_file = loc.File("file://example.com" + url_path, False)
+
+    assert remote_file != file
+    assert remote_file.file_name == ""
+    assert remote_file.url == "file://example.com" + url_path
+
 
 def test_local_files_with_percent_signs():
     # A local file name is never decoded since a percent sign is a valid character in a file name.

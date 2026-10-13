@@ -36,6 +36,7 @@ limitations under the License.
 #include <fstream>
 #include <iostream>
 #include <mutex>
+#include <optional>
 #include <regex>
 #include <sstream>
 #include <vector>
@@ -727,14 +728,15 @@ std::string canonicalUrl(const std::string &pUrl)
 
 namespace {
 
-bool startsWithScheme(const std::string &pFileNameOrUrl, std::string_view pScheme)
+bool startsWithIgnoringCase(const std::string &pString, std::string_view pPrefix)
 {
-    // Check whether the given file name or URL starts with the given (lowercase) scheme, ignoring case since a scheme
-    // is case-insensitive (see https://www.rfc-editor.org/rfc/rfc3986#section-3.1).
+    // Check whether the given string starts with the given (lowercase) prefix, ignoring case, e.g., since a scheme and
+    // a host are case-insensitive (see https://www.rfc-editor.org/rfc/rfc3986#section-3.1 and
+    // https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2).
 
-    return (pFileNameOrUrl.size() >= pScheme.size())
-           && std::equal(pScheme.begin(), pScheme.end(), pFileNameOrUrl.begin(), [](char pSchemeChar, char pChar) {
-                  return pSchemeChar == static_cast<char>(std::tolower(static_cast<unsigned char>(pChar)));
+    return (pString.size() >= pPrefix.size())
+           && std::equal(pPrefix.begin(), pPrefix.end(), pString.begin(), [](char pPrefixChar, char pChar) {
+                  return pPrefixChar == static_cast<char>(std::tolower(static_cast<unsigned char>(pChar)));
               });
 }
 
@@ -779,7 +781,11 @@ std::string lowercaseHost(const std::string &pUrl, size_t pAuthorityPos)
 std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl, bool pCanonicalise)
 {
     // Check whether the given file name or URL is a local file name or a URL.
-    // Note #1: a URL represents a local file when used with the "file" scheme.
+    // Note #1: a URL represents a local file when used with the "file" scheme and either no host or the "localhost"
+    //          host (e.g., "file:///some/path/file.txt", "file://localhost/some/path/file.txt", or
+    //          "file:/some/path/file.txt", see https://www.rfc-editor.org/rfc/rfc8089#section-2). A "file" URL with
+    //          another host (e.g., "file://example.com/some/path/file.txt") represents a remote file, so it is handled
+    //          like an "http" or "https" URL.
     // Note #2: a scheme and a host are case-insensitive (e.g., "HTTPS://EXAMPLE.com/file.txt" and
     //          "https://example.com/file.txt" are the same file), so we normalise them to lowercase (see
     //          https://www.rfc-editor.org/rfc/rfc3986#section-6.2.2.1 and lowercaseHost()).
@@ -788,26 +794,60 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
     //          decodeUrl()). The path of a "file" URL is, however, always fully decoded since it is a local file name.
     //          On the other hand, a local file name is never decoded since a percent sign is a valid character in a
     //          file name (e.g., "/some/path/my%20file.txt" and "/some/path/my file.txt" are two different files).
+    // Note #4: on Windows, the path of a "file" URL starts with a forward slash that precedes the drive letter (e.g.,
+    //          "/C:/some/path/file.txt" for "file:///C:/some/path/file.txt"), which is not part of the file name.
 
-#ifdef BUILDING_ON_WINDOWS
-    static constexpr std::string_view FILE_SCHEME {"file:///"};
-#else
-    static constexpr std::string_view FILE_SCHEME {"file://"};
-#endif
+    static constexpr std::string_view FILE_SCHEME {"file:"};
     static constexpr std::string_view HTTP_SCHEME {"http://"};
     static constexpr std::string_view HTTPS_SCHEME {"https://"};
+    static constexpr std::string_view REMOTE_FILE_SCHEME {"file://"};
+    static constexpr std::string_view LOCALHOST {"localhost"};
+
+    auto remoteFileInfo = [&](std::string_view pScheme) -> std::tuple<bool, std::string> {
+        auto res {lowercaseHost(decodeUrl(std::string(pScheme) + pFileNameOrUrl.substr(pScheme.size()), false), pScheme.size())};
+
+        return {false, pCanonicalise ? canonicalUrl(res) : res};
+    };
 
     for (const auto &scheme : {HTTP_SCHEME, HTTPS_SCHEME}) {
-        if (startsWithScheme(pFileNameOrUrl, scheme)) {
-            auto res {lowercaseHost(decodeUrl(std::string(scheme) + pFileNameOrUrl.substr(scheme.size()), false), scheme.size())};
-
-            return {false, pCanonicalise ? canonicalUrl(res) : res};
+        if (startsWithIgnoringCase(pFileNameOrUrl, scheme)) {
+            return remoteFileInfo(scheme);
         }
     }
 
-    auto res {startsWithScheme(pFileNameOrUrl, FILE_SCHEME) ?
-                  decodeUrl(pFileNameOrUrl.substr(FILE_SCHEME.size())) :
-                  pFileNameOrUrl};
+    auto res {pFileNameOrUrl};
+
+    if (startsWithIgnoringCase(pFileNameOrUrl, FILE_SCHEME)) {
+        auto hierarchicalPart {pFileNameOrUrl.substr(FILE_SCHEME.size())};
+        std::optional<std::string> path;
+
+        if (startsWithIgnoringCase(pFileNameOrUrl, REMOTE_FILE_SCHEME)) {
+            auto authorityPos {REMOTE_FILE_SCHEME.size() - FILE_SCHEME.size()};
+            auto pathPos {hierarchicalPart.find('/', authorityPos)};
+            auto host {decodeUrl(hierarchicalPart.substr(authorityPos, (pathPos == std::string::npos) ? std::string::npos : pathPos - authorityPos))};
+
+            if (!host.empty() && ((host.size() != LOCALHOST.size()) || !startsWithIgnoringCase(host, LOCALHOST))) {
+                return remoteFileInfo(REMOTE_FILE_SCHEME);
+            }
+
+            path = (pathPos == std::string::npos) ? std::string {} : hierarchicalPart.substr(pathPos);
+        } else if (hierarchicalPart.starts_with('/')) {
+            path = hierarchicalPart;
+        }
+
+        if (path.has_value()) {
+            res = decodeUrl(*path);
+
+#ifdef BUILDING_ON_WINDOWS
+            static constexpr size_t DRIVE_PATH_MINIMUM_SIZE {3};
+
+            if ((res.size() >= DRIVE_PATH_MINIMUM_SIZE) && (res[0] == '/')
+                && (std::isalpha(static_cast<unsigned char>(res[1])) != 0) && (res[2] == ':')) {
+                res.erase(0, 1);
+            }
+#endif
+        }
+    }
 
     return {true, pCanonicalise ? canonicalFileName(res) : res};
 }

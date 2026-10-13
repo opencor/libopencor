@@ -158,6 +158,44 @@ TEST(UtilsTest, retrieveFileInfo)
     EXPECT_EQ(fileNameOrUrl, "/some/path/my file%.txt");
 #endif
 
+    // A "file" URL refers to a local file if it has no host (with or without an authority) or the "localhost" host
+    // (which is case-insensitive and may be percent-encoded), and to a remote file if it has another host (including
+    // one with some userinfo since a "file" URL cannot have any). A "file" URL without a path refers to no file, while
+    // a "file" URL which path is not absolute is not a valid "file" URL, so it is a local file name.
+
+#ifdef BUILDING_ON_WINDOWS
+    static const std::string PATH {"/C:/some/path/my%20file.txt"};
+    static const std::string DECODED_PATH {"/C:/some/path/my file.txt"};
+    static const std::string FILE_NAME {"C:/some/path/my file.txt"};
+#else
+    static const std::string PATH {"/some/path/my%20file.txt"};
+    static const std::string DECODED_PATH {"/some/path/my file.txt"};
+    static const std::string FILE_NAME {"/some/path/my file.txt"};
+#endif
+    static const std::vector<std::tuple<std::string, bool, std::string>> FILE_URLS {
+        {"file://" + PATH, true, FILE_NAME},
+        {"file:" + PATH, true, FILE_NAME},
+        {"FILE:" + PATH, true, FILE_NAME},
+        {"file://localhost" + PATH, true, FILE_NAME},
+        {"file://LocalHost" + PATH, true, FILE_NAME},
+        {"file://local%68ost" + PATH, true, FILE_NAME},
+        {"file://example.com" + PATH, false, "file://example.com" + DECODED_PATH},
+        {"file://EXAMPLE.com" + PATH, false, "file://example.com" + DECODED_PATH},
+        {"file://localhose" + PATH, false, "file://localhose" + DECODED_PATH},
+        {"file://user@localhost" + PATH, false, "file://user@localhost" + DECODED_PATH},
+        {"file://", true, ""},
+        {"file://localhost", true, ""},
+        {"file:", true, "file:"},
+        {"file:some/path/my%20file.txt", true, "file:some/path/my%20file.txt"},
+    };
+
+    for (const auto &[url, expectedIsLocalFile, expectedFileNameOrUrl] : FILE_URLS) {
+        std::tie(isLocalFile, fileNameOrUrl) = libOpenCOR::retrieveFileInfo(url, false);
+
+        EXPECT_EQ(isLocalFile, expectedIsLocalFile) << url;
+        EXPECT_EQ(fileNameOrUrl, expectedFileNameOrUrl) << url;
+    }
+
     // A remote URL is decoded, except for its reserved characters and percent signs, and then canonicalised. Its
     // scheme and host are also normalised to lowercase, but not its userinfo, path, query, fragment, percent-encoded
     // characters, and the zone identifier of an IPv6 address.

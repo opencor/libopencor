@@ -179,6 +179,40 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(document.models.length, 0);
   });
 
+  test('SED-ML file with file URL CellML file', () => {
+    // A "file" URL model source refers to a local file if it has no host (e.g., "file:///some/path/model.cellml" or
+    // "file:/some/path/model.cellml") or the "localhost" host (e.g., "file://localhost/some/path/model.cellml"), and to
+    // a remote file otherwise (e.g., "file://example.com/some/path/model.cellml").
+
+    const urlPath = utils.resourcePath('cellml_2.cellml');
+    const neededFile = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    neededFile.setContents(utils.fileContents(neededFile.path));
+
+    for (const source of [`file://${urlPath}`, `file:${urlPath}`, `file://localhost${urlPath}`]) {
+      const file = new loc.File(utils.resourcePath('api/sed/file_url_cellml_file.sedml'));
+
+      file.setContents(sedmlContents(source));
+
+      const document = new loc.SedDocument(file);
+
+      assert.strictEqual(document.hasIssues, false);
+      assert.strictEqual(document.models.length, 1);
+      assert.strictEqual(document.models[0].file.isAliasOf(neededFile), true);
+    }
+
+    const file = new loc.File(utils.resourcePath('api/sed/file_url_cellml_file.sedml'));
+
+    file.setContents(sedmlContents(`file://example.com${urlPath}`));
+
+    const neededRemoteFile = new loc.File(`file://example.com${urlPath}`);
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.isAliasOf(neededRemoteFile), true);
+  });
+
   test('Remote SED-ML file with relative CellML file', () => {
     // A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or
     // fragment of the SED-ML file's URL contain some forward slashes.

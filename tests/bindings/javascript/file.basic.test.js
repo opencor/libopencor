@@ -169,6 +169,18 @@ test.describe('File basic tests', () => {
     // A scheme is case-insensitive.
 
     assert.strictEqual(new loc.File(`FILE://${filePath}`).isAliasOf(file), true);
+
+    // A "file" URL with the "localhost" host or without an authority also refers to a local file while a "file" URL
+    // with another host refers to a remote file.
+
+    assert.strictEqual(new loc.File(`file://localhost${filePath}`).isAliasOf(file), true);
+    assert.strictEqual(new loc.File(`file:${filePath}`).isAliasOf(file), true);
+
+    const remoteFile = new loc.File(`file://example.com${filePath}`);
+
+    assert.strictEqual(remoteFile.isAliasOf(file), false);
+    assert.strictEqual(remoteFile.fileName, '');
+    assert.strictEqual(remoteFile.url, `file://example.com${filePath}`);
   });
 
   test('Local files with percent signs', () => {

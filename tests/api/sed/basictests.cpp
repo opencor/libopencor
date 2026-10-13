@@ -176,6 +176,43 @@ TEST(BasicSedTest, sedmlFileWithEmptySourceCellmlFile)
     EXPECT_TRUE(document->models().empty());
 }
 
+TEST(BasicSedTest, sedmlFileWithFileUrlCellmlFile)
+{
+    // A "file" URL model source refers to a local file if it has no host (e.g., "file:///some/path/model.cellml" or
+    // "file:/some/path/model.cellml") or the "localhost" host (e.g., "file://localhost/some/path/model.cellml"), and to
+    // a remote file otherwise (e.g., "file://example.com/some/path/model.cellml").
+
+#ifdef BUILDING_ON_WINDOWS
+    auto urlPath {"/" + libOpenCOR::forwardSlashPath(libOpenCOR::resourcePath("cellml_2.cellml"))};
+#else
+    auto urlPath {libOpenCOR::resourcePath("cellml_2.cellml")};
+#endif
+    auto neededFile {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+
+    for (const auto &source : {"file://" + urlPath, "file:" + urlPath, "file://localhost" + urlPath}) {
+        auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/file_url_cellml_file.sedml"), false)};
+
+        file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents(source).c_str()));
+
+        auto document {libOpenCOR::SedDocument::create(file)};
+
+        EXPECT_FALSE(document->hasIssues());
+        EXPECT_EQ(document->models().size(), 1U);
+        EXPECT_EQ(document->models()[0]->file(), neededFile);
+    }
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/file_url_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("file://example.com" + urlPath).c_str()));
+
+    auto neededRemoteFile {libOpenCOR::File::create("file://example.com" + urlPath, false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededRemoteFile);
+}
+
 TEST(BasicSedTest, remoteSedmlFileWithRelativeCellmlFile)
 {
     // A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or

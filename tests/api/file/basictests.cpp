@@ -223,6 +223,24 @@ TEST(BasicFileTest, urlBasedLocalFile)
 #else
     EXPECT_EQ(libOpenCOR::File::create(std::string("FILE://") + filePath), file);
 #endif
+
+    // A "file" URL with the "localhost" host or without an authority also refers to a local file while a "file" URL
+    // with another host refers to a remote file.
+
+#ifdef BUILDING_ON_WINDOWS
+    auto urlPath {"/" + libOpenCOR::forwardSlashPath(filePath)};
+#else
+    const auto &urlPath {filePath};
+#endif
+
+    EXPECT_EQ(libOpenCOR::File::create("file://localhost" + urlPath), file);
+    EXPECT_EQ(libOpenCOR::File::create("file:" + urlPath), file);
+
+    auto remoteFile {libOpenCOR::File::create("file://example.com" + urlPath, false)};
+
+    EXPECT_NE(remoteFile, file);
+    EXPECT_EQ(remoteFile->fileName(), "");
+    EXPECT_EQ(remoteFile->url(), "file://example.com" + urlPath);
 }
 
 TEST(BasicFileTest, localFilesWithPercentSigns)
