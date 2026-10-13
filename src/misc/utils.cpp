@@ -1208,22 +1208,88 @@ std::string toString(size_t pNumber)
 
 namespace {
 
+// Note: we check the syntax of a double value, a CellML identifier, and a SED-ML identifier ourselves rather than using
+//       std::regex since those strings may come from a SED-ML file (i.e. be arbitrarily long) and std::regex may need
+//       some stack space for each character of a string (e.g., libstdc++ may then crash with a stack overflow while
+//       MSVC may throw an std::regex_error exception).
+
+bool isAsciiLetter(char pChar)
+{
+    return ((pChar >= 'A') && (pChar <= 'Z')) || ((pChar >= 'a') && (pChar <= 'z'));
+}
+
+bool isAsciiDigit(char pChar)
+{
+    return (pChar >= '0') && (pChar <= '9');
+}
+
+bool isIdentifierCharacter(char pChar)
+{
+    return isAsciiLetter(pChar) || isAsciiDigit(pChar) || (pChar == '_');
+}
+
+bool isDecimalNumber(const std::string &pString)
+{
+    // Check whether the given string is a decimal number with an optional sign, an optional fractional part, and an
+    // optional exponent, i.e. whether it matches "^[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?$".
+
+    size_t i {0};
+    auto skipSign = [&]() {
+        if ((i < pString.size()) && ((pString[i] == '+') || (pString[i] == '-'))) {
+            ++i;
+        }
+    };
+    auto skipDigits = [&]() {
+        auto start {i};
+
+        while ((i < pString.size()) && isAsciiDigit(pString[i])) {
+            ++i;
+        }
+
+        return i - start;
+    };
+
+    skipSign();
+
+    auto mantissaDigitCount {skipDigits()};
+
+    if ((i < pString.size()) && (pString[i] == '.')) {
+        ++i;
+
+        mantissaDigitCount += skipDigits();
+    }
+
+    if (mantissaDigitCount == 0) {
+        return false;
+    }
+
+    if ((i < pString.size()) && ((pString[i] == 'e') || (pString[i] == 'E'))) {
+        ++i;
+
+        skipSign();
+
+        if (skipDigits() == 0) {
+            return false;
+        }
+    }
+
+    return i == pString.size();
+}
+
 std::optional<double> parseDouble(const std::string &pString)
 {
     // Parse the given string as a double value, i.e. as a decimal number with an optional sign, an optional fractional
     // part, and an optional exponent (e.g., "1", "-1.", ".5", or "+1.5e-3"), which value must be finite once rounded to
     // the nearest double value (e.g., "1e400" is not a valid double value while "1e-400" is, i.e. 0).
-    // Note #1: we use our own regular expression since strtod() also accepts some leading whitespace, a hexadecimal
-    //          number, an infinity, and a NaN, none of which we want to accept.
+    // Note #1: we check the syntax of the string ourselves since strtod() also accepts some leading whitespace, a
+    //          hexadecimal number, an infinity, and a NaN, none of which we want to accept.
     // Note #2: strtod() uses the decimal point of the current C locale (e.g., a comma in a French locale, in which case
     //          "1.5" would be parsed as 1), so we use the C locale instead. We don't use std::from_chars() since it is
     //          not available for floating-point numbers before macOS 26 nor an input string stream since its handling
     //          of a value that underflows depends on the C++ standard library (e.g., libc++ considers that "1e-400"
     //          is not a valid double value while libstdc++ considers that it is).
 
-    static const auto DOUBLE_REGEX {std::regex("^[+-]?([0-9]+\\.?[0-9]*|\\.[0-9]+)([eE][+-]?[0-9]+)?$")};
-
-    if (!std::regex_match(pString, DOUBLE_REGEX)) {
+    if (!isDecimalNumber(pString)) {
         return {};
     }
 
@@ -1281,9 +1347,8 @@ bool isSedmlId(const std::string &pString)
     // underscore, followed by any number of letters, digits, and underscores (see
     // https://sed-ml.org/specifications.html).
 
-    static const auto SEDML_ID_REGEX {std::regex("^[A-Za-z_][A-Za-z0-9_]*$")};
-
-    return std::regex_match(pString, SEDML_ID_REGEX);
+    return !pString.empty() && !isAsciiDigit(pString[0])
+           && std::ranges::all_of(pString, isIdentifierCharacter);
 }
 
 bool isCellmlIdentifier(const std::string &pString)
@@ -1292,9 +1357,7 @@ bool isCellmlIdentifier(const std::string &pString)
     // underscores, contains at least one letter, and doesn't start with a digit (see
     // https://www.cellml.org/specifications/cellml_2.0).
 
-    static const auto CELLML_IDENTIFIER_REGEX {std::regex("^(?=[A-Za-z0-9_]*[A-Za-z])[A-Za-z_][A-Za-z0-9_]*$")};
-
-    return std::regex_match(pString, CELLML_IDENTIFIER_REGEX);
+    return isSedmlId(pString) && std::ranges::any_of(pString, isAsciiLetter);
 }
 
 libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable)

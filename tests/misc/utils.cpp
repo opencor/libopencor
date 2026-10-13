@@ -338,10 +338,18 @@ TEST(UtilsTest, isSedmlId)
     EXPECT_FALSE(libOpenCOR::isSedmlId("my model"));
     EXPECT_FALSE(libOpenCOR::isSedmlId("model-1"));
     EXPECT_FALSE(libOpenCOR::isSedmlId("model.1"));
+    EXPECT_FALSE(libOpenCOR::isSedmlId("model{1}"));
     EXPECT_FALSE(libOpenCOR::isSedmlId("model\x01"));
     EXPECT_FALSE(libOpenCOR::isSedmlId("model" + std::string(1, '\0')));
     EXPECT_FALSE(libOpenCOR::isSedmlId("mod\xC3\xA9le"));
     EXPECT_FALSE(libOpenCOR::isSedmlId("\xFF"));
+
+    // A very long string can also be checked (e.g., without a stack overflow).
+
+    static const std::string LONG_STRING(1000000, 'a');
+
+    EXPECT_TRUE(libOpenCOR::isSedmlId(LONG_STRING));
+    EXPECT_FALSE(libOpenCOR::isSedmlId(LONG_STRING + " "));
 }
 
 TEST(UtilsTest, isCellmlIdentifier)
@@ -362,6 +370,13 @@ TEST(UtilsTest, isCellmlIdentifier)
     EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("variable" + std::string(1, '\0')));
     EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("\xC3\xA9t\xC3\xA9"));
     EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("\xFF"));
+
+    // A very long string can also be checked (e.g., without a stack overflow).
+
+    static const std::string LONG_STRING(1000000, '_');
+
+    EXPECT_TRUE(libOpenCOR::isCellmlIdentifier(LONG_STRING + "a"));
+    EXPECT_FALSE(libOpenCOR::isCellmlIdentifier(LONG_STRING));
 }
 
 TEST(UtilsTest, isDoubleAndToDouble)
@@ -418,6 +433,14 @@ TEST(UtilsTest, isDoubleAndToDouble)
         EXPECT_FALSE(libOpenCOR::isDouble(string)) << string;
         EXPECT_TRUE(std::isnan(libOpenCOR::toDouble(string))) << string;
     }
+
+    // A very long string can also be checked (e.g., without a stack overflow).
+
+    static const std::string LONG_STRING(1000000, '0');
+
+    EXPECT_TRUE(libOpenCOR::isDouble("0." + LONG_STRING + "1e+" + LONG_STRING + "1"));
+    EXPECT_EQ(libOpenCOR::toDouble(LONG_STRING + "1.5" + LONG_STRING), 1.5);
+    EXPECT_FALSE(libOpenCOR::isDouble(LONG_STRING + "x"));
 
     // A double value doesn't depend on the current C locale, e.g., a French locale which decimal point is a comma.
     // Note: we check this only if such a locale is available.
