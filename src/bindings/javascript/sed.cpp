@@ -18,13 +18,23 @@ limitations under the License.
 
 #include <libopencor>
 
+namespace {
+
+constexpr std::string_view ID_ERROR {"The id is not a valid SED-ML identifier."};
+constexpr std::string_view COMPONENT_NAME_ERROR {"The component name is not a valid CellML identifier."};
+constexpr std::string_view VARIABLE_NAME_ERROR {"The variable name is not a valid CellML identifier."};
+constexpr std::string_view NEW_VALUE_ERROR {"The new value is not a valid double value."};
+constexpr std::string_view CHANGE_ATTRIBUTE_ERROR {"The component and variable names must be valid CellML identifiers and the new value must be a valid double value."};
+
+} // namespace
+
 void sedApi()
 {
     // SedBase API.
 
     emscripten::class_<libOpenCOR::SedBase, emscripten::base<libOpenCOR::Logger>>("SedBase")
         .smart_ptr<libOpenCOR::SedBasePtr>("SedBase")
-        .property("id", &JsStringResult<&libOpenCOR::SedBase::id>::call, &JsStringArgument<&libOpenCOR::SedBase::setId>::call);
+        .property("id", &JsStringResult<&libOpenCOR::SedBase::id>::call, &JsStringArgument<&libOpenCOR::SedBase::setId, ID_ERROR>::call);
 
     // SedAbstractTask API.
 
@@ -42,11 +52,20 @@ void sedApi()
     emscripten::class_<libOpenCOR::SedChangeAttribute, emscripten::base<libOpenCOR::SedChange>>("SedChangeAttribute")
         // clang-format off
         .smart_ptr_constructor("SedChangeAttribute", emscripten::optional_override([](const JsString &pComponentName, const JsString &pVariableName, const JsString &pNewValue) {
-            return libOpenCOR::SedChangeAttribute::create(fromJsString(pComponentName), fromJsString(pVariableName), fromJsString(pNewValue));
+            // Note: a constructor cannot return nullptr, so we throw a RangeError if the object couldn't be created (in
+            //       which case res doesn't own anything, see throwRangeError()).
+
+            auto res {libOpenCOR::SedChangeAttribute::create(fromJsString(pComponentName), fromJsString(pVariableName), fromJsString(pNewValue))};
+
+            if (res == nullptr) {
+                throwRangeError(CHANGE_ATTRIBUTE_ERROR);
+            }
+
+            return res;
         })) // clang-format on
-        .property("componentName", &JsStringResult<&libOpenCOR::SedChangeAttribute::componentName>::call, &JsStringArgument<&libOpenCOR::SedChangeAttribute::setComponentName>::call)
-        .property("variableName", &JsStringResult<&libOpenCOR::SedChangeAttribute::variableName>::call, &JsStringArgument<&libOpenCOR::SedChangeAttribute::setVariableName>::call)
-        .property("newValue", &JsStringResult<&libOpenCOR::SedChangeAttribute::newValue>::call, &JsStringArgument<&libOpenCOR::SedChangeAttribute::setNewValue>::call);
+        .property("componentName", &JsStringResult<&libOpenCOR::SedChangeAttribute::componentName>::call, &JsStringArgument<&libOpenCOR::SedChangeAttribute::setComponentName, COMPONENT_NAME_ERROR>::call)
+        .property("variableName", &JsStringResult<&libOpenCOR::SedChangeAttribute::variableName>::call, &JsStringArgument<&libOpenCOR::SedChangeAttribute::setVariableName, VARIABLE_NAME_ERROR>::call)
+        .property("newValue", &JsStringResult<&libOpenCOR::SedChangeAttribute::newValue>::call, &JsStringArgument<&libOpenCOR::SedChangeAttribute::setNewValue, NEW_VALUE_ERROR>::call);
 
     // SedDataDescription API.
 

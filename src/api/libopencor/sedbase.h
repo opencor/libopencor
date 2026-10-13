@@ -56,12 +56,15 @@ public:
     /**
      * @brief Set the id.
      *
-     * Set the id.
+     * Set the id, if it is a valid SED-ML identifier (i.e. it starts with a letter or an underscore, followed by any
+     * number of letters, digits, and underscores).
      *
      * @param pId The id as a @c std::string.
+     *
+     * @return @c true if the id was set, @c false otherwise (in which case the id is left unchanged).
      */
 
-    void setId(const std::string &pId);
+    bool setId(const std::string &pId);
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

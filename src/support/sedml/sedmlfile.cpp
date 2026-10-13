@@ -471,7 +471,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
             model = SedModel::create(pDocument, File::create(modelSource));
         }
 
-        model->setId(mDocument->getModel(i)->getId());
+        setId(model, mDocument->getModel(i)->getId(), "model");
 
         for (unsigned int j {0}; j < mDocument->getModel(i)->getNumChanges(); ++j) {
             auto *change {mDocument->getModel(i)->getChange(j)};
@@ -527,6 +527,31 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
                     error += "'.";
 
                     addError(error);
+                } else {
+                    // Make sure that the component and variable names are valid CellML identifiers, since the change
+                    // couldn't otherwise be applied to a CellML model (and SedChangeAttribute::create() would reject
+                    // them).
+
+                    auto checkName = [this, &canAddChange](const char *pNameType, const std::string &pName) {
+                        if (!isCellmlIdentifier(pName)) {
+                            canAddChange = false;
+
+                            std::string warning;
+
+                            warning.reserve(pName.size() + 120); // NOLINT
+
+                            warning += "The ";
+                            warning += pNameType;
+                            warning += " name '";
+                            warning += pName;
+                            warning += "' for the change of type 'changeAttribute' is not a valid CellML identifier. The change has been ignored.";
+
+                            addWarning(warning);
+                        }
+                    };
+
+                    checkName("component", componentName);
+                    checkName("variable", variableName);
                 }
 
                 if (!isDouble(newValue)) {
@@ -593,7 +618,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
             simulation = SedAnalysis::create(pDocument);
         }
 
-        simulation->setId(sedSimulation->getId());
+        setId(simulation, sedSimulation->getId(), "simulation");
 
         pDocument->addSimulation(simulation);
 
@@ -682,6 +707,29 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
     if ((mDocument->getNumModels() == 1) && (mDocument->getNumSimulations() == 1)) {
 #endif
         pDocument->addTask(SedTask::create(pDocument, pDocument->model(0), pDocument->simulation(0)));
+    }
+}
+
+void SedmlFile::Impl::setId(const SedBasePtr &pSedBase, const std::string &pId, const char *pType)
+{
+    // Set the id of the given SED-ML object, unless it is not a valid SED-ML identifier (e.g., "my model"), in which
+    // case the object keeps the id that it was given when it was created (e.g., "model1").
+    // Note: libSEDML doesn't reject an id that is not a valid SED-ML identifier when it loads a SED-ML file.
+
+    if (!pSedBase->setId(pId)) {
+        std::string warning;
+
+        warning.reserve(pId.size() + pSedBase->id().size() + 100); // NOLINT
+
+        warning += "The id '";
+        warning += pId;
+        warning += "' of the ";
+        warning += pType;
+        warning += " is not a valid SED-ML identifier. The id '";
+        warning += pSedBase->id();
+        warning += "' has been used instead.";
+
+        addWarning(warning);
     }
 }
 

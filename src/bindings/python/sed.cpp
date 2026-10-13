@@ -30,7 +30,15 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedBase, libOpenCOR::Logger> sedBase(m, "SedBase");
 
-    sedBase.def_prop_rw("id", &libOpenCOR::SedBase::id, &libOpenCOR::SedBase::setId, "The id.");
+    auto setId = [](libOpenCOR::SedBase &pThis, const std::string &pId) {
+        // Note: a property setter cannot return whether the value was set, so we raise a ValueError if it wasn't.
+
+        if (!pThis.setId(pId)) {
+            throw nb::value_error("The id is not a valid SED-ML identifier.");
+        }
+    };
+
+    sedBase.def_prop_rw("id", &libOpenCOR::SedBase::id, setId, "The id.");
 
     // SedAbstractTask API.
 
@@ -46,10 +54,38 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedChangeAttribute, libOpenCOR::SedChange> sedChangeAttribute(m, "SedChangeAttribute");
 
-    sedChangeAttribute.def(nb::new_(&libOpenCOR::SedChangeAttribute::create), "Create a SedChangeAttribute object.", nb::arg("component"), nb::arg("variable"), nb::arg("new_value"))
-        .def_prop_rw("component_name", &libOpenCOR::SedChangeAttribute::componentName, &libOpenCOR::SedChangeAttribute::setComponentName, "The name of the component.")
-        .def_prop_rw("variable_name", &libOpenCOR::SedChangeAttribute::variableName, &libOpenCOR::SedChangeAttribute::setVariableName, "The name of the variable.")
-        .def_prop_rw("new_value", &libOpenCOR::SedChangeAttribute::newValue, &libOpenCOR::SedChangeAttribute::setNewValue, "The new value.");
+    auto create = [](const std::string &pComponent, const std::string &pVariable, const std::string &pNewValue) {
+        // Note: a constructor cannot return nullptr and a property setter cannot return whether the value was set, so
+        //       we raise a ValueError if the object couldn't be created or the value wasn't set.
+
+        auto res {libOpenCOR::SedChangeAttribute::create(pComponent, pVariable, pNewValue)};
+
+        if (res == nullptr) {
+            throw nb::value_error("The component and variable names must be valid CellML identifiers and the new value must be a valid double value.");
+        }
+
+        return res;
+    };
+    auto setComponentName = [](libOpenCOR::SedChangeAttribute &pThis, const std::string &pComponentName) {
+        if (!pThis.setComponentName(pComponentName)) {
+            throw nb::value_error("The component name is not a valid CellML identifier.");
+        }
+    };
+    auto setVariableName = [](libOpenCOR::SedChangeAttribute &pThis, const std::string &pVariableName) {
+        if (!pThis.setVariableName(pVariableName)) {
+            throw nb::value_error("The variable name is not a valid CellML identifier.");
+        }
+    };
+    auto setNewValue = [](libOpenCOR::SedChangeAttribute &pThis, const std::string &pNewValue) {
+        if (!pThis.setNewValue(pNewValue)) {
+            throw nb::value_error("The new value is not a valid double value.");
+        }
+    };
+
+    sedChangeAttribute.def(nb::new_(create), "Create a SedChangeAttribute object.", nb::arg("component"), nb::arg("variable"), nb::arg("new_value"))
+        .def_prop_rw("component_name", &libOpenCOR::SedChangeAttribute::componentName, setComponentName, "The name of the component.")
+        .def_prop_rw("variable_name", &libOpenCOR::SedChangeAttribute::variableName, setVariableName, "The name of the variable.")
+        .def_prop_rw("new_value", &libOpenCOR::SedChangeAttribute::newValue, setNewValue, "The new value.");
 
     // SedDataDescription API.
 

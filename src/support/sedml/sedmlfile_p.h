@@ -52,6 +52,8 @@ public:
     NlaSolverInfo legacyNlaSolver(const libsedml::SedSimulation *sedSimulation, bool hasNlaSolver) const;
 
     void populateDocument(const SedDocumentPtr &pDocument);
+
+    void setId(const SedBasePtr &pSedBase, const std::string &pId, const char *pType);
 };
 
 } // namespace libOpenCOR

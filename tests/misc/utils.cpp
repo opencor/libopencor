@@ -231,6 +231,45 @@ TEST(UtilsTest, hasScheme)
     EXPECT_FALSE(libOpenCOR::hasScheme("some/path:model.cellml"));
 }
 
+TEST(UtilsTest, isSedmlId)
+{
+    EXPECT_TRUE(libOpenCOR::isSedmlId("a"));
+    EXPECT_TRUE(libOpenCOR::isSedmlId("_"));
+    EXPECT_TRUE(libOpenCOR::isSedmlId("_1"));
+    EXPECT_TRUE(libOpenCOR::isSedmlId("model1"));
+    EXPECT_TRUE(libOpenCOR::isSedmlId("My_Model_1"));
+
+    EXPECT_FALSE(libOpenCOR::isSedmlId(""));
+    EXPECT_FALSE(libOpenCOR::isSedmlId("1model"));
+    EXPECT_FALSE(libOpenCOR::isSedmlId("my model"));
+    EXPECT_FALSE(libOpenCOR::isSedmlId("model-1"));
+    EXPECT_FALSE(libOpenCOR::isSedmlId("model.1"));
+    EXPECT_FALSE(libOpenCOR::isSedmlId("model\x01"));
+    EXPECT_FALSE(libOpenCOR::isSedmlId("model" + std::string(1, '\0')));
+    EXPECT_FALSE(libOpenCOR::isSedmlId("mod\xC3\xA9le"));
+    EXPECT_FALSE(libOpenCOR::isSedmlId("\xFF"));
+}
+
+TEST(UtilsTest, isCellmlIdentifier)
+{
+    EXPECT_TRUE(libOpenCOR::isCellmlIdentifier("a"));
+    EXPECT_TRUE(libOpenCOR::isCellmlIdentifier("_a"));
+    EXPECT_TRUE(libOpenCOR::isCellmlIdentifier("_1a"));
+    EXPECT_TRUE(libOpenCOR::isCellmlIdentifier("a_1"));
+    EXPECT_TRUE(libOpenCOR::isCellmlIdentifier("My_Variable_1"));
+
+    EXPECT_FALSE(libOpenCOR::isCellmlIdentifier(""));
+    EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("_"));
+    EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("_1"));
+    EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("1a"));
+    EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("my variable"));
+    EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("variable-1"));
+    EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("variable\x01"));
+    EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("variable" + std::string(1, '\0')));
+    EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("\xC3\xA9t\xC3\xA9"));
+    EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("\xFF"));
+}
+
 TEST(UtilsTest, isInfOrNan)
 {
     EXPECT_FALSE(libOpenCOR::isInfOrNan(0.0));

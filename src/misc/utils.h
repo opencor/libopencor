@@ -120,11 +120,14 @@ std::string toString(size_t pNumber);
 
 bool isDouble(const std::string &pString);
 double toDouble(const std::string &pString);
-std::string toString(double pNumber);
 
+std::string toString(double pNumber);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedChars &pBytes);
 
 const xmlChar *toConstXmlCharPtr(const std::string &pString);
+
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isSedmlId(const std::string &pString);
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isCellmlIdentifier(const std::string &pString);
 
 libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable);
 

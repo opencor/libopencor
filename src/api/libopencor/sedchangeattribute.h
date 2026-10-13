@@ -57,7 +57,8 @@ public:
      * @param pVariableName The name of the variable, as a @c std::string, corresponding to the target.
      * @param pNewValue The new value, as a @c std::string, for the target.
      *
-     * @return A smart pointer to a @ref SedChangeAttribute object.
+     * @return A smart pointer to a @ref SedChangeAttribute object, or @c nullptr if the name of the component or the
+     *         name of the variable is not a valid CellML identifier, or if the new value is not a valid double value.
      */
 
     static SedChangeAttributePtr create(const std::string &pComponentName, const std::string &pVariableName,
@@ -76,12 +77,16 @@ public:
     /**
      * @brief Set the name of the component.
      *
-     * Set the name of the component.
+     * Set the name of the component, if it is a valid CellML identifier (i.e. it consists only of letters, digits, and
+     * underscores, contains at least one letter, and doesn't start with a digit).
      *
      * @param pComponentName The name of the component as a @c std::string.
+     *
+     * @return @c true if the name of the component was set, @c false otherwise (in which case the name of the component
+     *         is left unchanged).
      */
 
-    void setComponentName(const std::string &pComponentName);
+    bool setComponentName(const std::string &pComponentName);
 
     /**
      * @brief Return the name of the variable.
@@ -96,12 +101,16 @@ public:
     /**
      * @brief Set the name of the variable.
      *
-     * Set the name of the variable.
+     * Set the name of the variable, if it is a valid CellML identifier (i.e. it consists only of letters, digits, and
+     * underscores, contains at least one letter, and doesn't start with a digit).
      *
      * @param pVariableName The name of the variable as a @c std::string.
+     *
+     * @return @c true if the name of the variable was set, @c false otherwise (in which case the name of the variable
+     *         is left unchanged).
      */
 
-    void setVariableName(const std::string &pVariableName);
+    bool setVariableName(const std::string &pVariableName);
 
     /**
      * @brief Return the new value.
@@ -116,12 +125,14 @@ public:
     /**
      * @brief Set the new value.
      *
-     * Set the new value.
+     * Set the new value, if it is a valid double value.
      *
      * @param pNewValue The new value as a @c std::string.
+     *
+     * @return @c true if the new value was set, @c false otherwise (in which case the new value is left unchanged).
      */
 
-    void setNewValue(const std::string &pNewValue);
+    bool setNewValue(const std::string &pNewValue);
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

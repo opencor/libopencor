@@ -60,9 +60,15 @@ const std::string &SedBase::id() const
     return pimpl()->id();
 }
 
-void SedBase::setId(const std::string &pId)
+bool SedBase::setId(const std::string &pId)
 {
+    if (!isSedmlId(pId)) {
+        return false;
+    }
+
     pimpl()->setId(pId);
+
+    return true;
 }
 
 } // namespace libOpenCOR

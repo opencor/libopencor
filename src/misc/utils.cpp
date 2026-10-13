@@ -1153,6 +1153,28 @@ const xmlChar *toConstXmlCharPtr(const std::string &pString)
     return reinterpret_cast<const xmlChar *>(pString.c_str());
 }
 
+bool isSedmlId(const std::string &pString)
+{
+    // Check whether the given string is a valid SED-ML identifier, i.e. an SId, which starts with a letter or an
+    // underscore, followed by any number of letters, digits, and underscores (see
+    // https://sed-ml.org/specifications.html).
+
+    static const auto SEDML_ID_REGEX {std::regex("^[A-Za-z_][A-Za-z0-9_]*$")};
+
+    return std::regex_match(pString, SEDML_ID_REGEX);
+}
+
+bool isCellmlIdentifier(const std::string &pString)
+{
+    // Check whether the given string is a valid CellML identifier, i.e. it consists only of letters, digits, and
+    // underscores, contains at least one letter, and doesn't start with a digit (see
+    // https://www.cellml.org/specifications/cellml_2.0).
+
+    static const auto CELLML_IDENTIFIER_REGEX {std::regex("^(?=[A-Za-z0-9_]*[A-Za-z])[A-Za-z_][A-Za-z0-9_]*$")};
+
+    return std::regex_match(pString, CELLML_IDENTIFIER_REGEX);
+}
+
 libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable)
 {
     return std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());

@@ -19,6 +19,7 @@ limitations under the License.
 #include <emscripten/bind.h>
 
 #include <string>
+#include <string_view>
 
 // Conversion between a std::string and a JavaScript string, to be used instead of Embind's conversion for all our
 // std::string values since a std::string may not be valid UTF-8 (e.g., the URL "https://example.com/%FF" gets
@@ -174,10 +175,27 @@ inline std::string fromJsString(const JsString &pString)
     // clang-format on
 }
 
+[[noreturn]] inline void throwRangeError(std::string_view pMessage)
+{
+    // Throw a JavaScript RangeError with the given message, e.g., when a value is rejected by libOpenCOR.
+    // Note: the error is thrown from JavaScript, so no C++ object that is alive at that point gets destroyed. Our
+    //       caller must therefore make sure that it doesn't own any resource when calling us.
+
+    // clang-format off
+    EM_ASM({
+        throw new RangeError(UTF8ToString($0, $1));
+    }, pMessage.data(), pMessage.size());
+    // clang-format on
+
+    __builtin_unreachable();
+}
+
 // Wrappers for a method or a function that returns a std::string (e.g., libOpenCOR::Issue::description()) and for a
-// method that takes a std::string (e.g., libOpenCOR::SedBase::setId()), so that they can be bound using a JsString
-// rather than a std::string, e.g.:
-//     .property("id", &JsStringResult<&libOpenCOR::SedBase::id>::call, &JsStringArgument<&libOpenCOR::SedBase::setId>::call)
+// method that takes a std::string and returns whether it accepted it (e.g., libOpenCOR::SedBase::setId()), so that they
+// can be bound using a JsString rather than a std::string, e.g.:
+//     .property("id", &JsStringResult<&libOpenCOR::SedBase::id>::call, &JsStringArgument<&libOpenCOR::SedBase::setId, ID_ERROR>::call)
+// Note: a property setter cannot return whether the value was accepted, so we throw a RangeError with the given error
+//       message if it wasn't.
 
 template<auto Method, typename = decltype(Method)>
 struct JsStringResult;
@@ -200,14 +218,18 @@ struct JsStringResult<Function, Result (*)(Args...) noexcept(IsNoexcept)>
     }
 };
 
-template<auto Method, typename = decltype(Method)>
+template<auto Method, const std::string_view &ErrorMessage, typename = decltype(Method)>
 struct JsStringArgument;
 
-template<auto Method, typename Class, bool IsNoexcept>
-struct JsStringArgument<Method, void (Class::*)(const std::string &) noexcept(IsNoexcept)>
+template<auto Method, const std::string_view &ErrorMessage, typename Class, bool IsNoexcept>
+struct JsStringArgument<Method, ErrorMessage, bool (Class::*)(const std::string &) noexcept(IsNoexcept)>
 {
     static void call(Class &pThis, const JsString &pValue)
     {
-        (pThis.*Method)(fromJsString(pValue));
+        // Note: the std::string returned by fromJsString() is destroyed before we (may) throw a RangeError.
+
+        if (!(pThis.*Method)(fromJsString(pValue))) {
+            throwRangeError(ErrorMessage);
+        }
     }
 };
