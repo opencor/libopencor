@@ -197,6 +197,16 @@ void SedModel::Impl::serialise(xmlNodePtr pNode) const
         source = std::move(encodedSource);
     }
 
+    // A relative model source which first segment contains a colon (e.g., "my:model.cellml") would be mistaken for a URI
+    // with a scheme (i.e. "my"), so we prefix it with "./" (i.e. "./my:model.cellml"), as recommended by
+    // https://www.rfc-editor.org/rfc/rfc3986#section-4.2.
+    // Note: a model source is only relative if we were given a base path (see relativePath()), so we don't need to worry
+    //       about the drive letter of a Windows file name (e.g., "C:/some/path/model.cellml").
+
+    if (!mBasePath.empty() && (source.find(':') < source.find('/'))) {
+        source.insert(0, "./");
+    }
+
     // The file name or URL of the model may not be valid UTF-8 (e.g., "file:///some/path/%FF.cellml" gets
     // percent-decoded to "/some/path/\xFF.cellml") or may contain characters that are not allowed in an XML document
     // (e.g., "/some/path/\x01.cellml"), but the model source must be valid since it is an XML attribute. So, we

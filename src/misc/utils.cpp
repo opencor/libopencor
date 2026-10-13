@@ -1431,43 +1431,52 @@ bool isCellmlIdentifier(const std::string &pString)
     return isSedmlId(pString) && std::ranges::any_of(pString, isAsciiLetter);
 }
 
-bool isCellmlFormat(const std::string &pFormat)
+namespace {
+
+bool isCombineSpecificationsFormat(const std::string &pFormat, std::initializer_list<std::string_view> pSpecifications)
 {
-    // Check whether the given format is the CellML format of a COMBINE archive entry, including a versioned one, i.e.
-    // one followed by some dot-separated version numbers (e.g.,
-    // "http://identifiers.org/combine.specifications/cellml.1.0" or
+    // Check whether the given format is one of the given COMBINE specifications (e.g., "cellml.2.0" for
     // "http://identifiers.org/combine.specifications/cellml.2.0").
+    // Note: identifiers.org can be accessed using either the "http" or the "https" scheme, and both are used in COMBINE
+    //       archives (e.g., "https://identifiers.org/combine.specifications/sed-ml.level-1.version-2" is used by some
+    //       COMBINE archives on BioModels).
 
-    static constexpr std::string_view CELLML_FORMAT {"http://identifiers.org/combine.specifications/cellml"};
+    static constexpr std::string_view HTTP_COMBINE_SPECIFICATIONS {"http://identifiers.org/combine.specifications/"};
+    static constexpr std::string_view HTTPS_COMBINE_SPECIFICATIONS {"https://identifiers.org/combine.specifications/"};
 
-    if (!pFormat.starts_with(CELLML_FORMAT)) {
+    std::string_view specification {pFormat};
+
+    if (specification.starts_with(HTTP_COMBINE_SPECIFICATIONS)) {
+        specification.remove_prefix(HTTP_COMBINE_SPECIFICATIONS.size());
+    } else if (specification.starts_with(HTTPS_COMBINE_SPECIFICATIONS)) {
+        specification.remove_prefix(HTTPS_COMBINE_SPECIFICATIONS.size());
+    } else {
         return false;
     }
 
-    for (auto i {CELLML_FORMAT.size()}; i < pFormat.size();) {
-        if (pFormat[i] != '.') {
-            return false;
-        }
+    return std::ranges::find(pSpecifications, specification) != pSpecifications.end();
+}
 
-        const auto versionNumberStart {++i};
+} // namespace
 
-        while ((i < pFormat.size()) && isAsciiDigit(pFormat[i])) {
-            ++i;
-        }
+bool isCellmlFormat(const std::string &pFormat)
+{
+    // Check whether the given format is the CellML format of a COMBINE archive entry, i.e. one of the CellML
+    // specifications listed in the COMBINE specifications registry (see
+    // https://github.com/combine-org/combine-specifications/tree/main/specifications).
 
-        if (i == versionNumberStart) {
-            return false;
-        }
-    }
-
-    return true;
+    return isCombineSpecificationsFormat(pFormat, {"cellml", "cellml.1", "cellml.1.0", "cellml.1.1", "cellml.2.0"});
 }
 
 bool isSedmlFormat(const std::string &pFormat)
 {
-    static const std::string SEDML_FORMAT {"http://identifiers.org/combine.specifications/sed-ml"};
+    // Check whether the given format is the SED-ML format of a COMBINE archive entry, i.e. one of the SED-ML
+    // specifications listed in the COMBINE specifications registry (see
+    // https://github.com/combine-org/combine-specifications/tree/main/specifications).
 
-    return pFormat == SEDML_FORMAT;
+    return isCombineSpecificationsFormat(pFormat, {"sed-ml", "sed-ml.level-1", "sed-ml.level-1.version-1",
+                                                   "sed-ml.level-1.version-2", "sed-ml.level-1.version-3",
+                                                   "sed-ml.level-1.version-4", "sed-ml.level-1.version-5"});
 }
 
 libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable)

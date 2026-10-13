@@ -212,6 +212,38 @@ test.describe('Sed serialise tests', () => {
     }
   });
 
+  test('Local CellML file with colon', () => {
+    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
+    // mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const file = new loc.File(utils.resourcePath('my:model.cellml'));
+
+    file.setContents(cellmlContents);
+
+    const document = new loc.SedDocument(file);
+    const fileUrl = `file://${utils.resourcePath('my:model.cellml')}`;
+
+    assert.strictEqual(document.serialise(utils.resourcePath()), cvodeExpectedSerialisation('./my:model.cellml'));
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation(fileUrl));
+
+    // Load the SED-ML file back using a relative model source and a "file" URL model source.
+
+    for (const source of ['./my:model.cellml', fileUrl]) {
+      const sedmlFile = new loc.File(utils.resourcePath('my_model.sedml'));
+
+      sedmlFile.setContents(new TextEncoder().encode(cvodeExpectedSerialisation(source)));
+
+      const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+      assert.strictEqual(sedmlDocument.hasIssues, false);
+      assert.strictEqual(sedmlDocument.models.length, 1);
+      assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+      loc.FileManager.instance().unmanage(sedmlFile);
+    }
+  });
+
   test('Local CellML file with non-UTF-8 character', () => {
     // A model source is an XML attribute, so the bytes in the file name of a local model that are not valid UTF-8 must
     // be percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the
@@ -325,6 +357,37 @@ test.describe('Sed serialise tests', () => {
 
       const sedmlDocument = new loc.SedDocument(sedmlFile);
 
+      assert.strictEqual(sedmlDocument.models.length, 1);
+      assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+      loc.FileManager.instance().unmanage(sedmlFile);
+    }
+  });
+
+  test('Remote CellML file with colon', () => {
+    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
+    // mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const file = new loc.File('https://example.com/my:model.cellml');
+
+    file.setContents(cellmlContents);
+
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.serialise('https://example.com/'), cvodeExpectedSerialisation('./my:model.cellml'));
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation('https://example.com/my:model.cellml'));
+
+    // Load the SED-ML file back using a relative model source and an absolute model source.
+
+    for (const source of ['./my:model.cellml', 'https://example.com/my:model.cellml']) {
+      const sedmlFile = new loc.File('https://example.com/my_model.sedml');
+
+      sedmlFile.setContents(new TextEncoder().encode(cvodeExpectedSerialisation(source)));
+
+      const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+      assert.strictEqual(sedmlDocument.hasIssues, false);
       assert.strictEqual(sedmlDocument.models.length, 1);
       assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
 
