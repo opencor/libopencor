@@ -35,6 +35,12 @@ limitations under the License.
 // Note #3: we build our JavaScript bindings with shared memory support (see CMakeLists.txt), meaning that HEAPU8 is
 //          backed by a SharedArrayBuffer, which TextDecoder.decode() doesn't accept in a browser. So, we must copy the
 //          bytes of a std::string (using slice() rather than subarray()) before decoding them.
+// Note #4: a string that is rejected (e.g., because it has a lone surrogate) results in a JavaScript exception, which
+//          we throw using emscripten::val::throw_() rather than from within an EM_ASM() block since the latter is
+//          declared as not throwing. Also, a JavaScript exception that leaves WebAssembly doesn't restore the
+//          WebAssembly stack pointer, meaning that some of the WebAssembly stack would be leaked every time a binding
+//          throws. So, every binding that may throw (i.e. that uses fromJsString() or throwRangeError()) must be listed
+//          in restoreStackOnThrow() (see main.cpp).
 
 EMSCRIPTEN_DECLARE_VAL_TYPE(JsString);
 
@@ -111,7 +117,7 @@ inline std::string fromJsString(const JsString &pString)
         let str = Emval.toValue($0);
 
         if (typeof str !== 'string') {
-            throw new TypeError('Cannot pass non-string to std::string');
+            return Emval.toHandle(new TypeError('Cannot pass non-string to std::string'));
         }
 
         let encoder = new TextEncoder();
@@ -142,7 +148,7 @@ inline std::string fromJsString(const JsString &pString)
                 continue;
             }
 
-            throw new TypeError('Cannot pass a string with a lone surrogate (other than U+DC80 to U+DCFF) to std::string');
+            return Emval.toHandle(new TypeError('Cannot pass a string with a lone surrogate (other than U+DC80 to U+DCFF) to std::string'));
         }
 
         if (start == 0) {
@@ -162,6 +168,13 @@ inline std::string fromJsString(const JsString &pString)
 
         return Emval.toHandle(res);
     }, pString.as_handle())))};
+
+    // Note: the above EM_ASM() block returns rather than throws a TypeError if the string is rejected (see Note #4).
+
+    if (bytes.instanceof(emscripten::val::global("TypeError"))) {
+        bytes.throw_();
+    }
+
     auto size {bytes["length"].as<size_t>()};
     std::string res(size, '\0');
 
@@ -177,17 +190,9 @@ inline std::string fromJsString(const JsString &pString)
 
 [[noreturn]] inline void throwRangeError(std::string_view pMessage)
 {
-    // Throw a JavaScript RangeError with the given message, e.g., when a value is rejected by libOpenCOR.
-    // Note: the error is thrown from JavaScript, so no C++ object that is alive at that point gets destroyed. Our
-    //       caller must therefore make sure that it doesn't own any resource when calling us.
+    // Throw a JavaScript RangeError with the given message (see Note #4), e.g., when a value is rejected by libOpenCOR.
 
-    // clang-format off
-    EM_ASM({
-        throw new RangeError(UTF8ToString($0, $1));
-    }, pMessage.data(), pMessage.size());
-    // clang-format on
-
-    __builtin_unreachable();
+    emscripten::val::global("RangeError").new_(std::string(pMessage)).throw_();
 }
 
 // Wrappers for a method or a function that returns a std::string (e.g., libOpenCOR::Issue::description()) and for a

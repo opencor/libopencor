@@ -26,6 +26,85 @@ void sedApi();
 void solverApi();
 void versionApi();
 
+// Make sure that addOnPostCtor(), stackSave(), and stackRestore() are available to our EM_ASM() blocks (see below).
+
+EM_JS_DEPS(libOpenCOR, "$addOnPostCtor,$stackSave,$stackRestore");
+
+namespace {
+
+void restoreStackOnThrow()
+{
+    // Make sure that the WebAssembly stack pointer gets restored when a binding throws a JavaScript exception (see Note
+    // #4 in stringconverter.h), i.e. a binding that takes a string (see fromJsString()) or that may reject a value (see
+    // throwRangeError()), as Embind itself does for a binding that allocates its arguments on the WebAssembly stack.
+    // Note #1: a binding is listed as "<class name>:<member name>|<member name>|...", where a member name is that of a
+    //          method, a property (in which case its setter is wrapped), or "constructor" (in which case the class is
+    //          wrapped using a Proxy, so that it otherwise behaves as before, e.g., for instanceof).
+    // Note #2: this must be done once all the static constructors have been run, i.e. once all the types (including
+    //          Embind's builtin ones, e.g., void and bool) have been registered. Indeed, Embind only installs a method
+    //          once all its types have been registered, so it would otherwise replace a method that we have wrapped.
+
+    // clang-format off
+    EM_ASM({
+        let restoringStack = (call) => {
+            let sp = stackSave();
+
+            try {
+                return call();
+            } finally {
+                stackRestore(sp);
+            }
+        };
+        let bindings = 'File:constructor|childFileFromFileName FileManager:fileFromFileNameOrUrl SedBase:id SedChangeAttribute:constructor|componentName|variableName|newValue SedDocument:serialise Strings:push_back|resize|set'.split(' ');
+
+        addOnPostCtor(() => bindings.forEach((binding) => {
+            let parts = binding.split(':');
+            let className = parts[0];
+            let classObject = Module[className];
+
+            if (!classObject) {
+                return;
+            }
+
+            let prototype = classObject.prototype;
+
+            parts[1].split('|').forEach((memberName) => {
+                if (memberName === 'constructor') {
+                    Module[className] = new Proxy(classObject, {
+                        construct: (target, args, newTarget) => restoringStack(() => Reflect.construct(target, args, newTarget))
+                    });
+
+                    return;
+                }
+
+                let descriptor = Object.getOwnPropertyDescriptor(prototype, memberName);
+
+                if (descriptor.set) {
+                    let setter = descriptor.set;
+
+                    descriptor.set = function(value) {
+                        restoringStack(() => setter.call(this, value));
+                    };
+                } else {
+                    let method = descriptor.value;
+
+                    // Note: an overloaded method (e.g., SedDocument.serialise()) is dispatched using its overloadTable
+                    //       property, which Embind retrieves from the prototype, so our wrapper must have it too.
+
+                    descriptor.value = Object.assign(function(...args) {
+                        return restoringStack(() => method.apply(this, args));
+                    }, method);
+                }
+
+                Object.defineProperty(prototype, memberName, descriptor);
+            });
+        }));
+    });
+    // clang-format on
+}
+
+} // namespace
+
 EMSCRIPTEN_BINDINGS(libOpenCOR)
 {
     // JavaScript string.
@@ -90,6 +169,10 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     sedApi();
     solverApi();
     versionApi();
+
+    // Make sure that the WebAssembly stack pointer gets restored when a binding throws a JavaScript exception.
+
+    restoreStackOnThrow();
 
     // Make all registered vectors behave like native JavaScript arrays: expose a .length property and [Symbol.iterator]
     // so that for-of loops, spread syntax, and destructuring work without requiring callers to use .size()/.get().

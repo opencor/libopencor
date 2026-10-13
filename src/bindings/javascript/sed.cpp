@@ -52,8 +52,7 @@ void sedApi()
     emscripten::class_<libOpenCOR::SedChangeAttribute, emscripten::base<libOpenCOR::SedChange>>("SedChangeAttribute")
         // clang-format off
         .smart_ptr_constructor("SedChangeAttribute", emscripten::optional_override([](const JsString &pComponentName, const JsString &pVariableName, const JsString &pNewValue) {
-            // Note: a constructor cannot return nullptr, so we throw a RangeError if the object couldn't be created (in
-            //       which case res doesn't own anything, see throwRangeError()).
+            // Note: a constructor cannot return nullptr, so we throw a RangeError if the object couldn't be created.
 
             auto res {libOpenCOR::SedChangeAttribute::create(fromJsString(pComponentName), fromJsString(pVariableName), fromJsString(pNewValue))};
 
