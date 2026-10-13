@@ -118,8 +118,8 @@ std::string toString(int pNumber);
 
 std::string toString(size_t pNumber);
 
-bool isDouble(const std::string &pString);
-double toDouble(const std::string &pString);
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isDouble(const std::string &pString);
+double LIBOPENCOR_UNIT_TESTING_EXPORT toDouble(const std::string &pString);
 
 std::string toString(double pNumber);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedChars &pBytes);

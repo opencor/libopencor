@@ -447,7 +447,13 @@ def test_sed_change_attribute():
 
     change_attribute.component_name = "new_component"
     change_attribute.variable_name = "new_variable"
-    change_attribute.new_value = "4.56"
+
+    # A new value can be any decimal number, which value must be finite once rounded to the nearest double value.
+
+    for new_value in ["1.", ".5", "+1.5e-3", "-1E+3", "1e-400", "4.56"]:
+        change_attribute.new_value = new_value
+
+        assert change_attribute.new_value == new_value
 
     # A component name, variable name, or new value that is not valid is rejected, leaving it unchanged.
     # Note: a property setter cannot return whether the value was set, so a ValueError is raised instead.
@@ -459,7 +465,19 @@ def test_sed_change_attribute():
         with pytest.raises(ValueError):
             change_attribute.variable_name = name
 
-    for new_value in ["", "abc", "1.23abc", "1.23\x01", "\udcff"]:
+    for new_value in [
+        "",
+        "abc",
+        "1.23abc",
+        "1.23\x01",
+        "\udcff",
+        ".",
+        "1e400",
+        "inf",
+        "nan",
+        "0x1",
+        " 1",
+    ]:
         with pytest.raises(ValueError):
             change_attribute.new_value = new_value
 

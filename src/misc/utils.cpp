@@ -29,8 +29,14 @@ limitations under the License.
 #    include <unistd.h>
 #endif
 
+#ifdef BUILDING_ON_MACOS
+#    include <xlocale.h>
+#endif
+
 #include <algorithm>
+#include <clocale>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <format>
 #include <fstream>
@@ -1200,25 +1206,54 @@ std::string toString(size_t pNumber)
     return std::format("{}", pNumber);
 }
 
+namespace {
+
+std::optional<double> parseDouble(const std::string &pString)
+{
+    // Parse the given string as a double value, i.e. as a decimal number with an optional sign, an optional fractional
+    // part, and an optional exponent (e.g., "1", "-1.", ".5", or "+1.5e-3"), which value must be finite once rounded to
+    // the nearest double value (e.g., "1e400" is not a valid double value while "1e-400" is, i.e. 0).
+    // Note #1: we use our own regular expression since strtod() also accepts some leading whitespace, a hexadecimal
+    //          number, an infinity, and a NaN, none of which we want to accept.
+    // Note #2: strtod() uses the decimal point of the current C locale (e.g., a comma in a French locale, in which case
+    //          "1.5" would be parsed as 1), so we use the C locale instead. We don't use std::from_chars() since it is
+    //          not available for floating-point numbers before macOS 26 nor an input string stream since its handling
+    //          of a value that underflows depends on the C++ standard library (e.g., libc++ considers that "1e-400"
+    //          is not a valid double value while libstdc++ considers that it is).
+
+    static const auto DOUBLE_REGEX {std::regex("^[+-]?([0-9]+\\.?[0-9]*|\\.[0-9]+)([eE][+-]?[0-9]+)?$")};
+
+    if (!std::regex_match(pString, DOUBLE_REGEX)) {
+        return {};
+    }
+
+#ifdef BUILDING_USING_MSVC
+    static auto * const C_LOCALE {_create_locale(LC_NUMERIC, "C")};
+
+    auto res {_strtod_l(pString.c_str(), nullptr, C_LOCALE)};
+#else
+    static auto * const C_LOCALE {newlocale(LC_NUMERIC_MASK, "C", nullptr)};
+
+    auto res {strtod_l(pString.c_str(), nullptr, C_LOCALE)};
+#endif
+
+    if (!std::isfinite(res)) {
+        return {};
+    }
+
+    return res;
+}
+
+} // namespace
+
 bool isDouble(const std::string &pString)
 {
-    static const auto DOUBLE_REGEX {std::regex("^[+-]?[0-9]*\\.?[0-9]+([eE][+-]?[0-9]+)?$")};
-
-    return std::regex_match(pString, DOUBLE_REGEX);
+    return parseDouble(pString).has_value();
 }
 
 double toDouble(const std::string &pString)
 {
-    if (!isDouble(pString)) {
-        return NAN;
-    }
-
-    std::istringstream iss(pString);
-    double res {NAN};
-
-    iss >> res;
-
-    return iss.fail() ? NAN : res;
+    return parseDouble(pString).value_or(NAN);
 }
 
 std::string toString(double pNumber)

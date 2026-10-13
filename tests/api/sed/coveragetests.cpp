@@ -393,7 +393,13 @@ TEST(CoverageSedTest, sedChangeAttribute)
 
     EXPECT_TRUE(changeAttribute->setComponentName("new_component"));
     EXPECT_TRUE(changeAttribute->setVariableName("new_variable"));
-    EXPECT_TRUE(changeAttribute->setNewValue("4.56"));
+
+    // A new value can be any decimal number, which value must be finite once rounded to the nearest double value.
+
+    for (const auto &newValue : std::vector<std::string> {"1.", ".5", "+1.5e-3", "-1E+3", "1e-400", "4.56"}) {
+        EXPECT_TRUE(changeAttribute->setNewValue(newValue));
+        EXPECT_EQ(changeAttribute->newValue(), newValue);
+    }
 
     // A component name, variable name, or new value that is not valid is rejected, leaving it unchanged.
 
@@ -402,7 +408,7 @@ TEST(CoverageSedTest, sedChangeAttribute)
         EXPECT_FALSE(changeAttribute->setVariableName(name));
     }
 
-    for (const auto &newValue : std::vector<std::string> {"", "abc", "1.23abc", "1.23\x01", "\xFF"}) {
+    for (const auto &newValue : std::vector<std::string> {"", "abc", "1.23abc", "1.23\x01", "\xFF", ".", "1e400", "inf", "nan", "0x1", " 1"}) {
         EXPECT_FALSE(changeAttribute->setNewValue(newValue));
     }
 

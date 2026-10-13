@@ -441,7 +441,14 @@ test.describe('Sed coverage tests', () => {
 
     changeAttribute.componentName = 'new_component';
     changeAttribute.variableName = 'new_variable';
-    changeAttribute.newValue = '4.56';
+
+    // A new value can be any decimal number, which value must be finite once rounded to the nearest double value.
+
+    for (const newValue of ['1.', '.5', '+1.5e-3', '-1E+3', '1e-400', '4.56']) {
+      changeAttribute.newValue = newValue;
+
+      assert.strictEqual(changeAttribute.newValue, newValue);
+    }
 
     // A component name, variable name, or new value that is not valid is rejected, leaving it unchanged.
     // Note: a property setter cannot return whether the value was set, so a RangeError is thrown instead.
@@ -455,7 +462,7 @@ test.describe('Sed coverage tests', () => {
       }, RangeError);
     }
 
-    for (const newValue of ['', 'abc', '1.23abc', '1.23\x01', '\udcff']) {
+    for (const newValue of ['', 'abc', '1.23abc', '1.23\x01', '\udcff', '.', '1e400', 'inf', 'nan', '0x1', ' 1']) {
       assert.throws(() => {
         changeAttribute.newValue = newValue;
       }, RangeError);

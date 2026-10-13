@@ -18,6 +18,10 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include <clocale>
+#include <cmath>
+#include <limits>
+
 TEST(UtilsTest, percentEncodeNonXmlCharacters)
 {
     // Valid UTF-8 is kept as is.
@@ -358,6 +362,78 @@ TEST(UtilsTest, isCellmlIdentifier)
     EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("variable" + std::string(1, '\0')));
     EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("\xC3\xA9t\xC3\xA9"));
     EXPECT_FALSE(libOpenCOR::isCellmlIdentifier("\xFF"));
+}
+
+TEST(UtilsTest, isDoubleAndToDouble)
+{
+    // A double value is a decimal number with an optional sign, an optional fractional part, and an optional exponent,
+    // which value must be finite once rounded to the nearest double value (so, a value that underflows is 0).
+
+    static const std::vector<std::pair<std::string, double>> DOUBLES {
+        {"1", 1.0},
+        {"-1", -1.0},
+        {"+1", 1.0},
+        {"1.", 1.0},
+        {".5", 0.5},
+        {"-.5", -0.5},
+        {"1.5e3", 1500.0},
+        {"1.5E-3", 0.0015},
+        {"1e+3", 1000.0},
+        {"1.7976931348623157e308", std::numeric_limits<double>::max()},
+        {"1e-310", 1e-310},
+        {"1e-400", 0.0},
+    };
+
+    for (const auto &[string, value] : DOUBLES) {
+        EXPECT_TRUE(libOpenCOR::isDouble(string)) << string;
+        EXPECT_EQ(libOpenCOR::toDouble(string), value) << string;
+    }
+
+    // Anything else is not a double value, including a value that overflows, an infinity, a NaN, a hexadecimal number,
+    // and a number with some whitespace.
+
+    static const std::vector<std::string> NON_DOUBLES {
+        "",
+        ".",
+        "+",
+        "-",
+        "e3",
+        "1e",
+        "1e+",
+        "1.5.3",
+        "1,5",
+        "1.23abc",
+        " 1",
+        "1 ",
+        "0x1",
+        "inf",
+        "-inf",
+        "nan",
+        "1e400",
+        "-1e400",
+        "1.7976931348623159e308",
+    };
+
+    for (const auto &string : NON_DOUBLES) {
+        EXPECT_FALSE(libOpenCOR::isDouble(string)) << string;
+        EXPECT_TRUE(std::isnan(libOpenCOR::toDouble(string))) << string;
+    }
+
+    // A double value doesn't depend on the current C locale, e.g., a French locale which decimal point is a comma.
+    // Note: we check this only if such a locale is available.
+
+    const std::string previousLocale {std::setlocale(LC_NUMERIC, nullptr)};
+
+    for (const auto *locale : {"fr_FR.UTF-8", "fr_FR", "fr-FR"}) {
+        if (std::setlocale(LC_NUMERIC, locale) != nullptr) {
+            EXPECT_EQ(libOpenCOR::toDouble("1.5"), 1.5);
+            EXPECT_FALSE(libOpenCOR::isDouble("1,5"));
+
+            break;
+        }
+    }
+
+    EXPECT_NE(std::setlocale(LC_NUMERIC, previousLocale.c_str()), nullptr);
 }
 
 TEST(UtilsTest, isInfOrNan)
