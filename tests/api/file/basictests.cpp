@@ -134,6 +134,24 @@ TEST(BasicFileTest, tooLongLocalFileName)
     EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
 }
 
+TEST(BasicFileTest, localFileWithNullCharacter)
+{
+    // A file name with a null character cannot exist and must never be truncated at that null character (e.g.,
+    // "/some/path/file.txt\0.cellml" must not be considered to be "/some/path/file.txt").
+
+    auto filePath {libOpenCOR::resourcePath("cellml_2.cellml")};
+    auto fileName {filePath + std::string(1, '\0') + ".txt"};
+    auto file {libOpenCOR::File::create(fileName)};
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_EQ(file->fileName(), fileName);
+    EXPECT_EQ(file->url(), "");
+    EXPECT_EQ(file->path(), fileName);
+    EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
+    EXPECT_NE(libOpenCOR::File::create(filePath), file);
+}
+
 TEST(BasicFileTest, localDirectory)
 {
     // A directory is not a file, but it must not result in an exception being thrown.

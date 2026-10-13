@@ -93,6 +93,25 @@ test.describe('File basic tests', () => {
     assertIssues(loc, file, expectedNoIssues);
   });
 
+  test('Local file with null character', () => {
+    // A file name with a null character cannot exist and must never be truncated at that null character (e.g.,
+    // "/some/path/file.txt\0.cellml" must not be considered to be "/some/path/file.txt").
+    // Note: the file is of unknown type and has no issues since our JavaScript bindings never retrieve the contents of
+    //       a file.
+
+    const filePath = utils.resourcePath('cellml_2.cellml');
+    const fileName = `${filePath}\0.txt`;
+    const file = new loc.File(fileName);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.fileName, fileName);
+    assert.strictEqual(file.url, '');
+    assert.strictEqual(file.path, fileName);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
+    assert.strictEqual(new loc.File(filePath).isAliasOf(file), false);
+  });
+
   test('Local directory', () => {
     // A directory is not a file, but it must not result in an exception being thrown.
 

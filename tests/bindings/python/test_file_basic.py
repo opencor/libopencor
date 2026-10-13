@@ -119,6 +119,23 @@ def test_too_long_local_file_name():
     assert_issues(file, expected_non_existing_file_issues)
 
 
+def test_local_file_with_null_character():
+    # A file name with a null character cannot exist and must never be truncated at that null character (e.g.,
+    # "/some/path/file.txt\0.cellml" must not be considered to be "/some/path/file.txt").
+
+    file_path = utils.resource_path("cellml_2.cellml")
+    file_name = file_path + "\0.txt"
+    file = loc.File(file_name)
+
+    assert file.type == loc.File.Type.IrretrievableFile
+    assert file.file_name == file_name
+    assert file.url == ""
+    assert file.path == file_name
+    assert file.contents == []
+    assert_issues(file, expected_non_existing_file_issues)
+    assert loc.File(file_path) != file
+
+
 def test_local_directory():
     # A directory is not a file, but it must not result in an exception being thrown.
 

@@ -330,6 +330,9 @@ std::string canonicalFileName(const std::string &pFileName)
     // Note #3: when building using Emscripten, the file system is virtual and std::filesystem::weakly_canonical()
     //          doesn't work as expected (e.g., it throws an exception rather than return "/" for "/some/path/../.."),
     //          so we only ever normalise the file name lexically.
+    // Note #4: a file name with a null character (e.g., "/some/path/file.txt\0.cellml") cannot exist, so we only ever
+    //          normalise it lexically (the std::filesystem functions would otherwise only consider the file name up to
+    //          that null character, i.e. "/some/path/file.txt").
 
     // An empty file name stays empty (std::filesystem::canonical() would otherwise return the current working
     // directory).
@@ -341,11 +344,14 @@ std::string canonicalFileName(const std::string &pFileName)
     auto filePath {stringToPath(pFileName)};
 
 #ifndef __EMSCRIPTEN__
-    std::error_code errorCode;
+    if (pFileName.find('\0') != std::string::npos) {
+        return pathToString(filePath.lexically_normal());
+    }
 
     // If the file exists then use std::filesystem::canonical() since it resolves symbolic links, etc.
     // Note: this fails if the file doesn't exist.
 
+    std::error_code errorCode;
     auto res {std::filesystem::canonical(filePath, errorCode)};
 
     if (!errorCode) {
@@ -774,6 +780,13 @@ UnsignedChars fileContents(const std::filesystem::path &pFilePath)
     static const UnsignedChars NO_UNSIGNED_CHARS;
 
     // Retrieve and return the contents of the given file.
+    // Note: a file path with a null character (e.g., "/some/path/file.txt\0.cellml") cannot exist, so we don't try to
+    //       open it (std::ifstream would otherwise only consider the file path up to that null character, i.e.
+    //       "/some/path/file.txt").
+
+    if (pFilePath.native().find(std::filesystem::path::value_type {}) != std::filesystem::path::string_type::npos) {
+        return NO_UNSIGNED_CHARS;
+    }
 
     std::ifstream file(pFilePath, std::ios_base::binary);
 
