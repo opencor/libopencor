@@ -46,7 +46,7 @@ def do_test_dataset(number, specific_child_file_names):
     )
 
 
-def test_type_no_child_files():
+def test_no_child_files():
     file_path = utils.resource_path("unknown_file.txt")
     file = File(file_path)
 
@@ -58,11 +58,11 @@ def test_type_no_child_files():
     assert file.child_file(file_path) is None
 
 
-def test_type_dataset_135():
+def test_dataset_135():
     do_test_dataset(135, ["HumanSAN_Fabbri_Fantini_Wilders_Severi_2017.cellml"])
 
 
-def test_type_dataset_157():
+def test_dataset_157():
     do_test_dataset(
         157,
         [
@@ -72,7 +72,7 @@ def test_type_dataset_157():
     )
 
 
-def test_type_remote_virtual_combine_archives():
+def test_remote_virtual_combine_archives():
     # Two remote COMBINE archives that are not downloaded must not share their child files.
 
     file_135 = File(utils.RemoteBasePath + "/api/file/dataset_135.omex", False)
@@ -93,6 +93,7 @@ def test_type_remote_virtual_combine_archives():
 
     assert simulation_file_135 is not None
     assert simulation_file_157 is not None
+    assert simulation_file_135 != simulation_file_157
     assert utils.to_string(simulation_file_135.contents) == utils.text_file_contents(
         utils.resource_path("api/file/dataset_135.json")
     )
@@ -101,10 +102,12 @@ def test_type_remote_virtual_combine_archives():
     )
 
 
-def test_type_remote_combine_archive():
+def test_remote_combine_archive():
     # The child files of a remote COMBINE archive must be retrievable using their file name, even if the local copy of
     # the COMBINE archive is in a directory that is accessed through a symbolic link (e.g., on macOS, the temporary
     # directory is "/var/...", which is a symbolic link to "/private/var/...").
+    # Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
+    #       remote file is never downloaded.
 
     file = File(utils.RemoteBasePath + "/api/file/dataset_135.omex")
     simulation_file = file.child_file("simulation.json")
@@ -116,7 +119,7 @@ def test_type_remote_combine_archive():
     )
 
 
-def test_type_combine_archive_replaced_with_other_contents():
+def test_combine_archive_replaced_with_other_contents():
     # Replacing the contents of a COMBINE archive with some other contents must release its child files.
 
     file = File(utils.resource_path("cellml_2.omex"))
@@ -133,7 +136,7 @@ def test_type_combine_archive_replaced_with_other_contents():
     assert file_manager.file_count == 1
 
 
-def test_type_combine_archive_with_files_outside_of_it():
+def test_combine_archive_with_files_outside_of_it():
     # A COMBINE archive may reference files that are located outside of it (e.g., "../sibling.cellml" or even the
     # COMBINE archive itself), in which case they must be ignored rather than replace the contents of another managed
     # file (or result in an infinite recursion).
@@ -168,7 +171,7 @@ def test_type_combine_archive_with_files_outside_of_it():
     assert FileManager.instance().file_count == 3
 
 
-def test_type_combine_archive_with_percent_encoded_locations():
+def test_combine_archive_with_percent_encoded_locations():
     # A location is a URI reference, so it may be percent-encoded (e.g., "./my%20file.txt"), in which case the name of
     # its ZIP entry should be its decoded location (e.g., "my file.txt"), although some tools use the location itself
     # (e.g., "other%20file.txt"). Either way, a child file must have the contents of its ZIP entry and be retrievable
@@ -197,7 +200,7 @@ def test_type_combine_archive_with_percent_encoded_locations():
         assert child_file.contents == utils.text_to_list(file_name)
 
 
-def test_type_combine_archive_with_duplicate_locations():
+def test_combine_archive_with_duplicate_locations():
     # Different locations may refer to the same file (e.g., "./my%20file.txt" and "./my file.txt", or "./file.txt" and
     # "file.txt"), in which case only the first one is kept and the other ones are ignored. The ignored locations can,
     # however, still be used to retrieve the child file since they refer to the same file.

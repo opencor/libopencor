@@ -87,6 +87,8 @@ def test_sedml_file_with_absolute_cellml_file():
 
 
 def test_sedml_file_with_relative_cellml_file():
+    # A relative model source is relative to the SED-ML file and its leading ".." components must be kept.
+
     file = loc.File(utils.resource_path("api/sed/relative_cellml_file.sedml"), False)
 
     file.contents = utils.text_to_list(sedml_contents("../../cellml_2.cellml"))
@@ -420,6 +422,9 @@ def test_combine_archive_with_unknown_indirect_cellml_file():
 
     file = loc.File(utils.resource_path("api/sed/unknown_indirect_cellml_file.omex"))
     document = loc.SedDocument(file)
+
+    assert not document.has_issues
+
     instance = document.instantiate()
 
     instance.run()

@@ -72,7 +72,7 @@ test.describe('Sed serialise tests', () => {
     return `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="nla.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="api/sed/nla.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <steadyState id="simulation1">
@@ -217,7 +217,7 @@ test.describe('Sed serialise tests', () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="dae.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="api/sed/dae.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000">
@@ -258,7 +258,7 @@ test.describe('Sed serialise tests', () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(document.serialise(utils.resourcePath('api/sed')), expectedSerialisation);
+    assert.strictEqual(document.serialise(utils.resourcePath()), expectedSerialisation);
   });
 
   test('NLA model', () => {
@@ -268,14 +268,14 @@ test.describe('Sed serialise tests', () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(document.serialise(utils.resourcePath('api/sed')), kinsolExpectedSerialisation());
+    assert.strictEqual(document.serialise(utils.resourcePath()), kinsolExpectedSerialisation());
   });
 
   test('Algebraic model', () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="algebraic.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="api/sed/algebraic.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <steadyState id="simulation1"/>
@@ -292,14 +292,14 @@ test.describe('Sed serialise tests', () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(document.serialise(utils.resourcePath('api/sed')), expectedSerialisation);
+    assert.strictEqual(document.serialise(utils.resourcePath()), expectedSerialisation);
   });
 
   function sedChangeExpectedSerialisation(component, variable, newValue) {
     return `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.sedml">
+    <model id="model1" language="urn:sedml:language:cellml" source="file://${utils.resourcePath('file.txt')}">
       <listOfChanges>
         <changeAttribute target="/cellml:model/cellml:component[@name='${component}']/cellml:variable[@name='${variable}']" newValue="${newValue}"/>
       </listOfChanges>
@@ -321,16 +321,13 @@ test.describe('Sed serialise tests', () => {
     assert.strictEqual(changeAttribute.newValue, '123.456789');
 
     const document = new loc.SedDocument();
-    const file = new loc.File(utils.resourcePath('cellml_2.sedml'));
+    const file = new loc.File(utils.resourcePath('file.txt'));
     const model = new loc.SedModel(document, file);
 
     assert.strictEqual(model.addChange(changeAttribute), true);
     assert.strictEqual(document.addModel(model), true);
 
-    assert.strictEqual(
-      document.serialise(utils.resourcePath()),
-      sedChangeExpectedSerialisation('component', 'variable', '123.456789')
-    );
+    assert.strictEqual(document.serialise(), sedChangeExpectedSerialisation('component', 'variable', '123.456789'));
 
     changeAttribute.componentName = 'new_component';
     changeAttribute.variableName = 'new_variable';
@@ -345,7 +342,7 @@ test.describe('Sed serialise tests', () => {
     assert.strictEqual(changeAttribute.newValue, '987.654321');
 
     assert.strictEqual(
-      document.serialise(utils.resourcePath()),
+      document.serialise(),
       sedChangeExpectedSerialisation('new_component', 'new_variable', '987.654321')
     );
   });
@@ -564,7 +561,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
 
     assert.strictEqual(
-      document.serialise(utils.resourcePath('api/sed')),
+      document.serialise(utils.resourcePath()),
       kinsolExpectedSerialisation({ 'KISAO:0000477': 'Banded' })
     );
   });
@@ -581,7 +578,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverKinsol.LinearSolver.GMRES;
 
     assert.strictEqual(
-      document.serialise(utils.resourcePath('api/sed')),
+      document.serialise(utils.resourcePath()),
       kinsolExpectedSerialisation({ 'KISAO:0000477': 'GMRES' })
     );
   });
@@ -598,7 +595,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BICGSTAB;
 
     assert.strictEqual(
-      document.serialise(utils.resourcePath('api/sed')),
+      document.serialise(utils.resourcePath()),
       kinsolExpectedSerialisation({ 'KISAO:0000477': 'BiCGStab' })
     );
   });
@@ -615,7 +612,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverKinsol.LinearSolver.TFQMR;
 
     assert.strictEqual(
-      document.serialise(utils.resourcePath('api/sed')),
+      document.serialise(utils.resourcePath()),
       kinsolExpectedSerialisation({ 'KISAO:0000477': 'TFQMR' })
     );
   });
@@ -1103,6 +1100,6 @@ test.describe('Sed serialise tests', () => {
         "SED-ML file | KINSOL: the linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead."
       ]
     ]);
-    assert.strictEqual(document.serialise(utils.resourcePath('api/sed')), expectedSerialisation);
+    assert.strictEqual(document.serialise(utils.resourcePath()), expectedSerialisation);
   });
 });

@@ -39,7 +39,11 @@ test.describe('Sed basic tests', () => {
   });
 
   test('No file', () => {
-    const document = new loc.SedDocument();
+    let document = new loc.SedDocument();
+
+    assert.strictEqual(document.hasIssues, false);
+
+    document = new loc.SedDocument(null);
 
     assert.strictEqual(document.hasIssues, false);
   });
@@ -99,6 +103,8 @@ test.describe('Sed basic tests', () => {
   });
 
   test('SED-ML file with relative CellML file', () => {
+    // A relative model source is relative to the SED-ML file and its leading ".." components must be kept.
+
     const file = new loc.File(utils.resourcePath('api/sed/relative_cellml_file.sedml'));
 
     file.setContents(sedmlContents('../../cellml_2.cellml'));
@@ -423,6 +429,9 @@ test.describe('Sed basic tests', () => {
     file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+
     const instance = document.instantiate();
 
     instance.run();
@@ -442,6 +451,18 @@ test.describe('Sed basic tests', () => {
         loc.Issue.Type.ERROR,
         'A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).'
       ]
+    ]);
+  });
+
+  test('Irretrievable file', () => {
+    // Note: the file is an unknown file rather than an irretrievable file since our JavaScript bindings never retrieve
+    //       the contents of a file.
+
+    const file = new loc.File(utils.resourcePath('irretrievable_file.txt'));
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [loc.Issue.Type.ERROR, 'A simulation experiment description cannot be created using an unknown file.']
     ]);
   });
 });

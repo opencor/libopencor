@@ -61,8 +61,10 @@ TEST(BasicFileTest, localFile)
     EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
 }
 
-TEST(BasicSedTest, existingRelativeLocalFile)
+TEST(BasicFileTest, existingRelativeLocalFile)
 {
+    // Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file.
+
     auto origDir {std::filesystem::current_path()};
 
     std::filesystem::current_path(libOpenCOR::resourcePath());
@@ -287,6 +289,8 @@ TEST(BasicFileTest, remoteFile)
 TEST(BasicFileTest, remoteFileLocalCopy)
 {
     // The local copy of a remote file must exist for as long as the remote file exists, and be deleted with it.
+    // Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
+    //       remote file is never downloaded.
 
     std::string fileName;
 
@@ -305,6 +309,8 @@ TEST(BasicFileTest, localFileMatchingLocalCopyOfRemoteFile)
 {
     // A local file must never be confused with the local copy of a remote file, and deleting it must not delete that
     // local copy (since it is not a file that we downloaded).
+    // Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
+    //       remote file is never downloaded.
 
     auto remoteFile {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE)};
     const auto &fileName {remoteFile->fileName()};
@@ -436,6 +442,8 @@ TEST(BasicFileTest, concurrentFileDownloads)
 {
     // Remote files that are downloaded at the same time must each have their own local copy, so that deleting the local
     // copy of one of them doesn't delete the local copy of another one.
+    // Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
+    //       remote file is never downloaded.
 
     static constexpr size_t THREAD_COUNT {8};
 

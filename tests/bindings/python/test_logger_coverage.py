@@ -43,11 +43,23 @@ def test_issue():
 
 
 def test_issue_str():
+    # Note: this has no C++ equivalent since an issue cannot be converted to a string in C++.
+
     file = loc.File(utils.resource_path("error.cellml"))
     issue = file.issue(0)
 
     assert issue is not None
     assert str(issue) == issue.description
+
+
+def test_issue_repr():
+    # Note: this has no C++ or JavaScript equivalent since an issue has no representation in C++ or JavaScript.
+
+    file = loc.File(utils.resource_path("error.cellml"))
+    issue = file.issue(0)
+
+    assert issue is not None
+    assert repr(issue) == 'Issue(Error: "' + issue.description + '")'
 
 
 def test_has_errors():

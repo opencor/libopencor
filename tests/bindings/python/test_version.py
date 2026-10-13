@@ -16,18 +16,17 @@
 import libopencor as loc
 import pathlib
 
-with open(pathlib.Path(__file__).parent.parent.parent / "VERSION.txt") as file:
-    version_str = file.read().strip()
 
-major_version, date_str, patch_version = version_str.split(".")
-major_version = int(major_version)
-patch_version = int(patch_version)
-year = int(date_str[:4])
-month = int(date_str[4:6])
-day = int(date_str[6:8])
+def test_libopencor():
+    with open(pathlib.Path(__file__).parent.parent.parent / "VERSION.txt") as file:
+        version_string = file.read().strip()
 
-
-def test_version():
+    major_version, date_string, patch_version = version_string.split(".")
+    major_version = int(major_version)
+    year = int(date_string[:4])
+    month = int(date_string[4:6])
+    day = int(date_string[6:8])
+    patch_version = int(patch_version)
     version = 0
     number = (
         10000000000 * major_version
@@ -41,74 +40,84 @@ def test_version():
         number //= 10
         i += 4
 
-    assert isinstance(loc.version(), int)
     assert loc.version() == version
+    assert loc.version_string() == version_string
 
+    # The version is an integer and the version string is a string.
+    # Note: this has no C++ equivalent since C++ is statically typed.
 
-def test_version_string():
-    version = f"{major_version}.{year}{month:02}{day:02}.{patch_version}"
-
-    assert loc.__version__ == version
-
+    assert isinstance(loc.version(), int)
     assert isinstance(loc.version_string(), str)
-    assert loc.version_string() == version
+
+    # The version string is also available as the version of our Python module.
+    # Note: this has no C++ or JavaScript equivalent since __version__ is a Python convention.
+
+    assert loc.__version__ == version_string
 
 
-def test_libcellml_version():
-    assert isinstance(loc.libcellml_version(), int)
+def test_libcellml():
     assert loc.libcellml_version() == 0x000701
-
-
-def test_libcellml_version_string():
-    assert isinstance(loc.libcellml_version_string(), str)
     assert loc.libcellml_version_string() == "0.7.1"
 
+    # The version is an integer and the version string is a string.
+    # Note: this has no C++ equivalent since C++ is statically typed.
 
-def test_libcombine_version():
-    assert isinstance(loc.libcombine_version(), int)
+    assert isinstance(loc.libcellml_version(), int)
+    assert isinstance(loc.libcellml_version_string(), str)
+
+
+def test_libcombine():
     assert loc.libcombine_version() == 220
-
-
-def test_libcombine_version_string():
-    assert isinstance(loc.libcombine_version_string(), str)
     assert loc.libcombine_version_string() == "0.2.20"
 
+    # The version is an integer and the version string is a string.
+    # Note: this has no C++ equivalent since C++ is statically typed.
 
-def test_libcurl_version():
-    assert isinstance(loc.libcurl_version(), int)
+    assert isinstance(loc.libcombine_version(), int)
+    assert isinstance(loc.libcombine_version_string(), str)
+
+
+def test_libcurl():
+    # Note: this has no JavaScript equivalent since our JavaScript bindings are built without libcurl.
+
     assert loc.libcurl_version() == 0x081500
-
-
-def test_libcurl_version_string():
-    assert isinstance(loc.libcurl_version_string(), str)
     assert loc.libcurl_version_string() == "8.21.0-DEV"
 
+    # The version is an integer and the version string is a string.
+    # Note: this has no C++ equivalent since C++ is statically typed.
 
-def test_libsedml_version():
-    assert isinstance(loc.libsedml_version(), int)
+    assert isinstance(loc.libcurl_version(), int)
+    assert isinstance(loc.libcurl_version_string(), str)
+
+
+def test_libsedml():
     assert loc.libsedml_version() == 20033
-
-
-def test_libsedml_version_string():
-    assert isinstance(loc.libsedml_version_string(), str)
     assert loc.libsedml_version_string() == "2.0.33"
 
+    # The version is an integer and the version string is a string.
+    # Note: this has no C++ equivalent since C++ is statically typed.
 
-def test_llvm_version():
-    assert isinstance(loc.llvm_version(), int)
+    assert isinstance(loc.libsedml_version(), int)
+    assert isinstance(loc.libsedml_version_string(), str)
+
+
+def test_llvm():
     assert loc.llvm_version() == 0x220108
-
-
-def test_llvm_version_string():
-    assert isinstance(loc.llvm_version_string(), str)
     assert loc.llvm_version_string() == "22.1.8"
 
+    # The version is an integer and the version string is a string.
+    # Note: this has no C++ equivalent since C++ is statically typed.
 
-def test_sundials_version():
-    assert isinstance(loc.sundials_version(), int)
+    assert isinstance(loc.llvm_version(), int)
+    assert isinstance(loc.llvm_version_string(), str)
+
+
+def test_sundials():
     assert loc.sundials_version() == 0x070700
-
-
-def test_sundials_version_string():
-    assert isinstance(loc.sundials_version_string(), str)
     assert loc.sundials_version_string() == "7.7.0"
+
+    # The version is an integer and the version string is a string.
+    # Note: this has no C++ equivalent since C++ is statically typed.
+
+    assert isinstance(loc.sundials_version(), int)
+    assert isinstance(loc.sundials_version_string(), str)

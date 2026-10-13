@@ -22,15 +22,15 @@ import * as utils from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe('File type tests', () => {
+test.describe('File child tests', () => {
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
   });
 
   function doTestDataset(number, specificChildFileNames) {
-    const file = new loc.File(utils.resourcePath('cellml_2.omex'));
+    const file = new loc.File(utils.resourcePath(`api/file/dataset_${number}.omex`));
 
-    file.setContents(utils.fileContents(utils.resourcePath(`api/file/dataset_${number}.omex`)));
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.hasChildFiles, true);
     assert.strictEqual(file.childFileCount, specificChildFileNames.length + 1);
@@ -97,6 +97,7 @@ test.describe('File type tests', () => {
 
     assert.notStrictEqual(simulationFile135, null);
     assert.notStrictEqual(simulationFile157, null);
+    assert.strictEqual(simulationFile135.isAliasOf(simulationFile157), false);
     assert.deepStrictEqual(
       simulationFile135.contents(),
       utils.fileContents(utils.resourcePath('api/file/dataset_135.json'))
@@ -144,7 +145,7 @@ test.describe('File type tests', () => {
       ]
     ];
     const sibling = new loc.File(utils.resourcePath('api/file/sibling.cellml'));
-    const someContents = Uint8Array.from([1, 2, 3]);
+    const someContents = new TextEncoder().encode('Some contents.');
 
     sibling.setContents(someContents);
 

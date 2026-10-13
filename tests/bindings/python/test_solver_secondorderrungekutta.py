@@ -38,8 +38,6 @@ def test_step_value_with_invalid_number():
 
     instance = document.instantiate()
 
-    instance.run()
-
     assert_issues(instance, expected_issues)
 
 

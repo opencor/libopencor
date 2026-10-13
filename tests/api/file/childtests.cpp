@@ -101,6 +101,8 @@ TEST(ChildFileTest, remoteCombineArchive)
     // The child files of a remote COMBINE archive must be retrievable using their file name, even if the local copy of
     // the COMBINE archive is in a directory that is accessed through a symbolic link (e.g., on macOS, the temporary
     // directory is "/var/...", which is a symbolic link to "/private/var/...").
+    // Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
+    //       remote file is never downloaded.
 
     auto file {libOpenCOR::File::create(std::string(libOpenCOR::REMOTE_BASE_PATH) + "/api/file/dataset_135.omex")};
     auto simulationFile {file->childFile("simulation.json")};

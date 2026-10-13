@@ -40,6 +40,10 @@ TEST(BasicSedTest, noFile)
     auto document {libOpenCOR::SedDocument::create()};
 
     EXPECT_FALSE(document->hasIssues());
+
+    document = libOpenCOR::SedDocument::create(nullptr);
+
+    EXPECT_FALSE(document->hasIssues());
 }
 
 TEST(BasicSedTest, unknownFile)

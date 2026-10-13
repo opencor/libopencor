@@ -382,7 +382,7 @@ TEST(SerialiseSedTest, fixedStepOdeSolver)
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
 }
 
-TEST(SerialiseSedTest, cvodeSolverWithAdamsMoultonInterationMethod)
+TEST(SerialiseSedTest, cvodeSolverWithAdamsMoultonIntegrationMethod)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -490,7 +490,7 @@ TEST(SerialiseSedTest, cvodeSolverWithNoInterpolateSolution)
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000481", "false"}}));
 }
 
-TEST(SerialiseSedTest, kinsolWithBandedLinearSolver)
+TEST(SerialiseSedTest, kinsolSolverWithBandedLinearSolver)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -502,7 +502,7 @@ TEST(SerialiseSedTest, kinsolWithBandedLinearSolver)
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), kinsolExpectedSerialisation({{"KISAO:0000477", "Banded"}}));
 }
 
-TEST(SerialiseSedTest, kinsolWithGmresLinearSolver)
+TEST(SerialiseSedTest, kinsolSolverWithGmresLinearSolver)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -514,7 +514,7 @@ TEST(SerialiseSedTest, kinsolWithGmresLinearSolver)
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), kinsolExpectedSerialisation({{"KISAO:0000477", "GMRES"}}));
 }
 
-TEST(SerialiseSedTest, kinsolWithBicgstabLinearSolver)
+TEST(SerialiseSedTest, kinsolSolverWithBicgstabLinearSolver)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -526,7 +526,7 @@ TEST(SerialiseSedTest, kinsolWithBicgstabLinearSolver)
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), kinsolExpectedSerialisation({{"KISAO:0000477", "BiCGStab"}}));
 }
 
-TEST(SerialiseSedTest, kinsolWithTfmqrLinearSolver)
+TEST(SerialiseSedTest, kinsolSolverWithTfqmrLinearSolver)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};

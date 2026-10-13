@@ -326,11 +326,11 @@ def test_algebraic_model():
     assert document.serialise(utils.ResourceLocation) == expected_serialisation
 
 
-def sed_change_expected_serialisation(file_path, component, variable, new_value):
+def sed_change_expected_serialisation(component, variable, new_value):
     if platform.system() == "Windows":
-        source = "file:///" + utils.forward_slash_path(file_path)
+        source = "file:///" + utils.forward_slash_path(utils.resource_path("file.txt"))
     else:
-        source = f"file://{file_path}"
+        source = "file://" + utils.resource_path("file.txt")
 
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
@@ -345,7 +345,7 @@ def sed_change_expected_serialisation(file_path, component, variable, new_value)
 """
 
 
-def test_changes():
+def test_model_with_changes():
     change_attribute = loc.SedChangeAttribute("component", "variable", "123.456789")
 
     assert (
@@ -364,7 +364,7 @@ def test_changes():
     assert document.add_model(model)
 
     assert document.serialise() == sed_change_expected_serialisation(
-        file.path, "component", "variable", "123.456789"
+        "component", "variable", "123.456789"
     )
 
     change_attribute.component_name = "new_component"
@@ -380,7 +380,7 @@ def test_changes():
     assert change_attribute.new_value == "987.654321"
 
     assert document.serialise() == sed_change_expected_serialisation(
-        file.path, "new_component", "new_variable", "987.654321"
+        "new_component", "new_variable", "987.654321"
     )
 
 
@@ -414,7 +414,7 @@ def test_fixed_step_ode_solver():
     assert document.serialise(utils.ResourceLocation) == expected_serialisation
 
 
-def test_cvode_solver_with_adams_moulton_interation_method():
+def test_cvode_solver_with_adams_moulton_integration_method():
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
@@ -646,8 +646,6 @@ def test_sedml_file():
   </listOfTasks>
 </sedML>
 """
-
-    loc.FileManager.instance().reset()
 
     file = loc.File(utils.resource_path("cellml_2.sedml"))
     document = loc.SedDocument(file)

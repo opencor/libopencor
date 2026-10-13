@@ -24,6 +24,9 @@ limitations under the License.
 
 TEST(ConcurrentSedTest, parallelIndependentInstances)
 {
+    // Note: this has no JavaScript equivalent since JavaScript code cannot call libOpenCOR from several threads at
+    //       once.
+
     static const auto INSTANCE_COUNT {3U};
     static const auto SIMULATION_PROPERTY {10000};
 
@@ -67,6 +70,9 @@ TEST(ConcurrentSedTest, parallelIndependentInstances)
 
 TEST(ConcurrentSedTest, parallelSharedDocument)
 {
+    // Note: this has no JavaScript equivalent since JavaScript code cannot call libOpenCOR from several threads at
+    //       once.
+
     static const auto SIMULATION_PROPERTY {10000};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};

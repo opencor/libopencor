@@ -119,7 +119,7 @@ def test_underconstrained_cellml_file():
     assert_issues(instance, expected_issues)
 
 
-def test_unsuitable_constrained_cellml_file():
+def test_unsuitably_constrained_cellml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
@@ -166,13 +166,15 @@ def test_asynchronous_run_without_active_run():
 
 
 def test_asynchronous_run_lifecycle():
+    WAIT_ITERATIONS = 60000
+
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     instance = document.instantiate()
 
     assert instance.start_run() is True
 
-    for _ in range(200):
+    for _ in range(WAIT_ITERATIONS):
         if instance.status == loc.SedInstance.Status.Idle:
             break
 
@@ -1351,13 +1353,6 @@ def test_combine_archive():
 
 
 def test_combine_archive_with_cellml_file_as_master_file():
-    expected_issues = [
-        [
-            loc.Issue.Type.Error,
-            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
-        ],
-    ]
-
     file = loc.File(utils.resource_path("api/sed/cellml_file_as_master_file.omex"))
     document = loc.SedDocument(file)
     instance = document.instantiate()

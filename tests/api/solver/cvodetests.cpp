@@ -18,7 +18,7 @@ limitations under the License.
 
 TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
 {
-    static const auto RELATIVE_TOLERANCE {-1.234};
+    static const auto MAXIMUM_STEP {-1.234};
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "Task instance | CVODE: the maximum step cannot be equal to -1.234. It must be greater or equal to 0."},
     }};
@@ -28,7 +28,7 @@ TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
     const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
     const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
-    solver->setMaximumStep(RELATIVE_TOLERANCE);
+    solver->setMaximumStep(MAXIMUM_STEP);
 
     auto instance {document->instantiate()};
 

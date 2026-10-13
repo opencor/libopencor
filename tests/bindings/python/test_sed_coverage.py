@@ -16,6 +16,7 @@
 import libopencor as loc
 import math
 import numpy
+import platform
 import utils
 from utils import assert_issues, assert_values
 
@@ -95,11 +96,62 @@ def test_models():
     assert not model.remove_change(None)
 
 
+def sed_changes_expected_serialisation(source, changes):
+    if platform.system() == "Windows":
+        source = "/" + utils.forward_slash_path(source)
+
+    model_end = (
+        f""">
+      <listOfChanges>{changes}      </listOfChanges>
+    </model>"""
+        if changes
+        else "/>"
+    )
+
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model" language="urn:sedml:language:cellml" source="file://{source}"{model_end}
+  </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="50" numberOfSteps="50000">
+      <algorithm kisaoID="KISAO:0000019">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000209" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
+          <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+    </uniformTimeCourse>
+  </listOfSimulations>
+  <listOfTasks>
+    <task id="task1" modelReference="model" simulationReference="simulation1"/>
+  </listOfTasks>
+</sedML>
+"""
+
+
 def test_changes():
     file = loc.File(utils.resource_path("api/sed/sed_changes.omex"))
     document = loc.SedDocument(file)
 
     assert not document.has_issues
+    assert document.serialise() == sed_changes_expected_serialisation(
+        file.child_file(1).path,
+        """
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='beta']" newValue="3.0"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='rho']" newValue="13.0"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='sigma']" newValue="9.0"/>
+""",
+    )
 
     expected_issues_1 = [
         [
@@ -136,6 +188,12 @@ def test_changes():
     document = loc.SedDocument(file)
 
     assert_issues(document, expected_issues_1)
+    assert document.serialise() == sed_changes_expected_serialisation(
+        file.child_file(1).path,
+        """
+        <changeAttribute target="/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']" newValue="1.23"/>
+""",
+    )
 
     expected_issues_2 = [
         [
@@ -160,6 +218,9 @@ def test_changes():
     document = loc.SedDocument(file)
 
     assert_issues(document, expected_issues_2)
+    assert document.serialise() == sed_changes_expected_serialisation(
+        file.child_file(1).path, ""
+    )
 
 
 def test_simulations():
@@ -240,7 +301,7 @@ def test_tasks():
     assert len(document.tasks) == 0
     assert not document.add_task(None)
 
-    file = loc.File(utils.resource_path("file.txt"))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     model = loc.SedModel(document, file)
     simulation = loc.SedUniformTimeCourse(document)
     task = loc.SedTask(document, model, simulation)
@@ -330,6 +391,14 @@ def test_nla_solver():
     assert simulation.nla_solver is None
 
 
+def test_sed_base():
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = loc.SedOneStep(document)
+
+    assert simulation.id == "simulation2"
+
+
 def test_sed_one_step():
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
@@ -383,10 +452,15 @@ def test_sed_instance_and_sed_instance_task_differential_model():
 
     assert instance.has_tasks
     assert instance.task_count == 1
-    assert len(instance) == 1
-    assert list(instance)[0] == instance_task
     assert instance.task(0) == instance_task
     assert instance.task(1) is None
+
+    # A SED instance can be sized and iterated over.
+    # Note: this has no C++ or JavaScript equivalent since a SED instance is neither sized nor iterable in C++ or
+    #       JavaScript.
+
+    assert len(instance) == 1
+    assert list(instance)[0] == instance_task
 
     assert len(instance_task.voi) == 0
     assert instance_task.voi_name == "environment/time"
@@ -463,23 +537,17 @@ def test_sed_document():
     # Note: the three following URLs use http rather than https to help with coverage testing.
 
     file = loc.File(
-        utils.resource_path(
-            "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
-        )
+        "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
     )
     loc.SedDocument(file)
 
     file = loc.File(
-        utils.resource_path(
-            "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml"
-        )
+        "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml"
     )
     loc.SedDocument(file)
 
     file = loc.File(
-        utils.resource_path(
-            "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex"
-        )
+        "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex"
     )
     loc.SedDocument(file)
 
@@ -1078,6 +1146,8 @@ def test_sedml_file_with_bare_filename():
 
 
 def test_simulation_results_are_numpy_arrays():
+    # Note: this has no C++ equivalent since the type of our simulation results is known at compile time in C++.
+
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     instance = document.instantiate()

@@ -95,3 +95,14 @@ def test_algebraic_changes():
     assert instance_task.algebraic_variable(2)[0] == pytest.approx(
         33.33333, abs=ABS_TOL
     )
+
+
+def test_repr():
+    # Note: this has no C++ or JavaScript equivalent since a solver has no representation in C++ or JavaScript.
+
+    file = loc.File(utils.resource_path("cellml_2.omex"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    solver = simulation.ode_solver
+
+    assert repr(solver) == 'Solver(name="CVODE")'

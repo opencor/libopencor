@@ -28,6 +28,45 @@ test.describe('Sed coverage tests', () => {
     loc.FileManager.instance().reset();
   });
 
+  function sedChangesExpectedSerialisation(source, changes) {
+    const modelEnd =
+      changes === ''
+        ? '/>'
+        : `>
+      <listOfChanges>${changes}      </listOfChanges>
+    </model>`;
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model" language="urn:sedml:language:cellml" source="file://${source}"${modelEnd}
+  </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="50" numberOfSteps="50000">
+      <algorithm kisaoID="KISAO:0000019">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000209" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
+          <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+    </uniformTimeCourse>
+  </listOfSimulations>
+  <listOfTasks>
+    <task id="task1" modelReference="model" simulationReference="simulation1"/>
+  </listOfTasks>
+</sedML>
+`;
+  }
+
   function sedTaskExpectedSerialisation(withProperties) {
     return `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
@@ -55,7 +94,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.models.length, 0);
     assert.strictEqual(document.addModel(null), false);
 
-    const file = new loc.File(utils.resourcePath('cellml_2.sedml'));
+    const file = new loc.File(utils.resourcePath('file.txt'));
     const model = new loc.SedModel(document, file);
 
     assert.deepStrictEqual(model.file, file);
@@ -113,15 +152,28 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('Changes', () => {
-    const file = new loc.File('file.omex');
+    let file = new loc.File(utils.resourcePath('api/sed/sed_changes.omex'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/sed_changes.omex')));
+    file.setContents(utils.fileContents(file.path));
 
     let document = new loc.SedDocument(file);
 
     assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(
+      document.serialise(),
+      sedChangesExpectedSerialisation(
+        file.childFile(1).path,
+        `
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='beta']" newValue="3.0"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='rho']" newValue="13.0"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='sigma']" newValue="9.0"/>
+`
+      )
+    );
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/invalid_sed_changes.omex')));
+    file = new loc.File(utils.resourcePath('api/sed/invalid_sed_changes.omex'));
+
+    file.setContents(utils.fileContents(file.path));
 
     document = new loc.SedDocument(file);
 
@@ -155,8 +207,19 @@ test.describe('Sed coverage tests', () => {
         "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'."
       ]
     ]);
+    assert.strictEqual(
+      document.serialise(),
+      sedChangesExpectedSerialisation(
+        file.childFile(1).path,
+        `
+        <changeAttribute target="/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']" newValue="1.23"/>
+`
+      )
+    );
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/unsupported_sed_changes.omex')));
+    file = new loc.File(utils.resourcePath('api/sed/unsupported_sed_changes.omex'));
+
+    file.setContents(utils.fileContents(file.path));
 
     document = new loc.SedDocument(file);
 
@@ -178,6 +241,7 @@ test.describe('Sed coverage tests', () => {
         "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored."
       ]
     ]);
+    assert.strictEqual(document.serialise(), sedChangesExpectedSerialisation(file.childFile(1).path, ''));
   });
 
   test('Simulations', () => {
@@ -242,7 +306,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.tasks.length, 0);
     assert.strictEqual(document.addTask(null), false);
 
-    const file = new loc.File(utils.resourcePath('cellml_2.sedml'));
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
     const model = new loc.SedModel(document, file);
     const simulation = new loc.SedUniformTimeCourse(document);
     const task = new loc.SedTask(document, model, simulation);
@@ -324,8 +388,22 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(simulation.nlaSolver, null);
   });
 
+  test('SedBase', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = new loc.SedOneStep(document);
+
+    assert.strictEqual(simulation.id, 'simulation2');
+  });
+
   test('SedOneStep', () => {
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
     const document = new loc.SedDocument(file);
     const simulation = new loc.SedOneStep(document);
 
@@ -338,6 +416,9 @@ test.describe('Sed coverage tests', () => {
 
   test('SedUniformTimeCourse', () => {
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
     const document = new loc.SedDocument(file);
     const simulation = new loc.SedUniformTimeCourse(document);
 
@@ -479,10 +560,8 @@ test.describe('Sed coverage tests', () => {
     file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations[0];
-    let solver = new loc.SolverForwardEuler();
 
-    simulation.odeSolver = solver;
+    document.simulations[0].odeSolver = new loc.SolverForwardEuler();
 
     let instance = document.instantiate();
 
@@ -490,9 +569,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(instance.hasIssues, false);
 
-    solver = new loc.SolverFourthOrderRungeKutta();
-
-    simulation.odeSolver = solver;
+    document.simulations[0].odeSolver = new loc.SolverFourthOrderRungeKutta();
 
     instance = document.instantiate();
 
@@ -500,9 +577,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(instance.hasIssues, false);
 
-    solver = new loc.SolverHeun();
-
-    simulation.odeSolver = solver;
+    document.simulations[0].odeSolver = new loc.SolverHeun();
 
     instance = document.instantiate();
 
@@ -510,9 +585,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(instance.hasIssues, false);
 
-    solver = new loc.SolverSecondOrderRungeKutta();
-
-    simulation.odeSolver = solver;
+    document.simulations[0].odeSolver = new loc.SolverSecondOrderRungeKutta();
 
     instance = document.instantiate();
 
@@ -1006,6 +1079,8 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('Simulation results are of Float64Array type', () => {
+    // Note: this has no C++ equivalent since the type of our simulation results is known at compile time in C++.
+
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
     file.setContents(utils.fileContents(file.path));
