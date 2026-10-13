@@ -123,6 +123,15 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
             continue;
         }
 
+        // Skip a location that refers to the COMBINE archive itself.
+        // Note: libCOMBINE skips the "." location, which is how a COMBINE archive normally refers to itself, but not
+        //       the other locations that refer to it (e.g., "./" or "/"), which would otherwise result in a file for
+        //       the directory in which we extract the COMBINE archive.
+
+        if (fileName == mArchiveLocation) {
+            continue;
+        }
+
         // Make sure that the file is not the same as a file that we have already extracted.
         // Note: different locations may refer to the same file (e.g., "./my%20file.cellml" and "./my file.cellml", or
         //       "./file.cellml" and "file.cellml"). This is an ambiguity in the COMBINE archive itself, so we keep the

@@ -243,3 +243,19 @@ def test_combine_archive_with_duplicate_locations():
         assert child_file.contents == utils.text_to_list(file_name)
 
     assert FileManager.instance().file_count == 4
+
+
+def test_combine_archive_with_self_referencing_locations():
+    # Locations that refer to the COMBINE archive itself (e.g., ".", "./", or "/") are not child files of the COMBINE
+    # archive.
+
+    file = File(utils.resource_path("api/file/self_referencing_locations.omex"))
+
+    assert file.type == File.Type.CombineArchive
+    assert not file.has_issues
+    assert file.child_file_count == 1
+    assert file.child_file_names[0] == "./file.txt"
+    assert utils.to_string(file.child_file(0).contents) == "file.txt"
+    assert file.child_file("./") is None
+    assert file.child_file("/") is None
+    assert FileManager.instance().file_count == 2

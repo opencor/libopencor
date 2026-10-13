@@ -238,4 +238,22 @@ test.describe('File child tests', () => {
 
     assert.strictEqual(loc.FileManager.instance().fileCount, 4);
   });
+
+  test('COMBINE archive with self-referencing locations', () => {
+    // Locations that refer to the COMBINE archive itself (e.g., ".", "./", or "/") are not child files of the COMBINE
+    // archive.
+
+    const file = new loc.File(utils.resourcePath('api/file/self_referencing_locations.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.hasIssues, false);
+    assert.strictEqual(file.childFileCount, 1);
+    assert.strictEqual(file.childFileNames.get(0), './file.txt');
+    assert.deepStrictEqual(file.childFile(0).contents(), new TextEncoder().encode('file.txt'));
+    assert.strictEqual(file.childFileFromFileName('./'), null);
+    assert.strictEqual(file.childFileFromFileName('/'), null);
+    assert.strictEqual(loc.FileManager.instance().fileCount, 2);
+  });
 });

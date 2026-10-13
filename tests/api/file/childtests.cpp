@@ -225,3 +225,20 @@ TEST(ChildFileTest, combineArchiveWithDuplicateLocations)
 
     EXPECT_EQ(libOpenCOR::FileManager::instance().fileCount(), 4U);
 }
+
+TEST(ChildFileTest, combineArchiveWithSelfReferencingLocations)
+{
+    // Locations that refer to the COMBINE archive itself (e.g., ".", "./", or "/") are not child files of the COMBINE
+    // archive.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/self_referencing_locations.omex"))};
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_FALSE(file->hasIssues());
+    EXPECT_EQ(file->childFileCount(), 1U);
+    EXPECT_EQ(file->childFileNames()[0], "./file.txt");
+    EXPECT_EQ(libOpenCOR::toString(file->childFile(0)->contents()), "file.txt");
+    EXPECT_EQ(file->childFile("./"), nullptr);
+    EXPECT_EQ(file->childFile("/"), nullptr);
+    EXPECT_EQ(libOpenCOR::FileManager::instance().fileCount(), 2U);
+}
