@@ -156,6 +156,26 @@ TEST(BasicSedTest, sedmlFileWithUnsupportedSchemeCellmlFile)
     EXPECT_TRUE(document->models().empty());
 }
 
+TEST(BasicSedTest, sedmlFileWithEmptySourceCellmlFile)
+{
+    // An empty model source refers to the SED-ML file itself (see
+    // https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2), but libSEDML considers it to be an error, so the file is
+    // not considered to be a SED-ML file (and its model source never gets resolved).
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an unknown file."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/empty_source_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+    EXPECT_TRUE(document->models().empty());
+}
+
 TEST(BasicSedTest, remoteSedmlFileWithRelativeCellmlFile)
 {
     // A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or
@@ -284,6 +304,26 @@ TEST(BasicSedTest, remoteSedmlFileWithUnsupportedSchemeCellmlFile)
     auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml", false)};
 
     file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("urn:miriam:biomodels.db:BIOMD0000000012").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+    EXPECT_TRUE(document->models().empty());
+}
+
+TEST(BasicSedTest, remoteSedmlFileWithEmptySourceCellmlFile)
+{
+    // An empty model source refers to the remote SED-ML file itself (see
+    // https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2), but libSEDML considers it to be an error, so the file is
+    // not considered to be a SED-ML file (and its model source never gets resolved).
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an unknown file."},
+    }};
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("").c_str()));
 
     auto document {libOpenCOR::SedDocument::create(file)};
 

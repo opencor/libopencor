@@ -154,6 +154,30 @@ def test_sedml_file_with_unsupported_scheme_cellml_file():
     assert len(document.models) == 0
 
 
+def test_sedml_file_with_empty_source_cellml_file():
+    # An empty model source refers to the SED-ML file itself (see https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2),
+    # but libSEDML considers it to be an error, so the file is not considered to be a SED-ML file (and its model source
+    # never gets resolved).
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "A simulation experiment description cannot be created using an unknown file.",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path("api/sed/empty_source_cellml_file.sedml"), False
+    )
+
+    file.contents = utils.text_to_list(sedml_contents(""))
+
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+    assert len(document.models) == 0
+
+
 def test_remote_sedml_file_with_relative_cellml_file():
     # A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or
     # fragment of the SED-ML file's URL contain some forward slashes.
@@ -287,6 +311,28 @@ def test_remote_sedml_file_with_unsupported_scheme_cellml_file():
     file.contents = utils.text_to_list(
         sedml_contents("urn:miriam:biomodels.db:BIOMD0000000012")
     )
+
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+    assert len(document.models) == 0
+
+
+def test_remote_sedml_file_with_empty_source_cellml_file():
+    # An empty model source refers to the remote SED-ML file itself (see
+    # https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2), but libSEDML considers it to be an error, so the file is
+    # not considered to be a SED-ML file (and its model source never gets resolved).
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "A simulation experiment description cannot be created using an unknown file.",
+        ],
+    ]
+
+    file = loc.File("https://example.com/simulations/simulation.sedml", False)
+
+    file.contents = utils.text_to_list(sedml_contents(""))
 
     document = loc.SedDocument(file)
 

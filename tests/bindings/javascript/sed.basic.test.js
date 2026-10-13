@@ -162,6 +162,23 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(document.models.length, 0);
   });
 
+  test('SED-ML file with empty source CellML file', () => {
+    // An empty model source refers to the SED-ML file itself (see
+    // https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2), but libSEDML considers it to be an error, so the file is
+    // not considered to be a SED-ML file (and its model source never gets resolved).
+
+    const file = new loc.File(utils.resourcePath('api/sed/empty_source_cellml_file.sedml'));
+
+    file.setContents(sedmlContents(''));
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [loc.Issue.Type.ERROR, 'A simulation experiment description cannot be created using an unknown file.']
+    ]);
+    assert.strictEqual(document.models.length, 0);
+  });
+
   test('Remote SED-ML file with relative CellML file', () => {
     // A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or
     // fragment of the SED-ML file's URL contain some forward slashes.
@@ -286,6 +303,23 @@ test.describe('Sed basic tests', () => {
         loc.Issue.Type.WARNING,
         "SED-ML file: the model 'urn:miriam:biomodels.db:BIOMD0000000012' has an unsupported scheme. It has been ignored."
       ]
+    ]);
+    assert.strictEqual(document.models.length, 0);
+  });
+
+  test('Remote SED-ML file with empty source CellML file', () => {
+    // An empty model source refers to the remote SED-ML file itself (see
+    // https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2), but libSEDML considers it to be an error, so the file is
+    // not considered to be a SED-ML file (and its model source never gets resolved).
+
+    const file = new loc.File('https://example.com/simulations/simulation.sedml');
+
+    file.setContents(sedmlContents(''));
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [loc.Issue.Type.ERROR, 'A simulation experiment description cannot be created using an unknown file.']
     ]);
     assert.strictEqual(document.models.length, 0);
   });
