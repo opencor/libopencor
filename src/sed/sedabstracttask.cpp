@@ -22,7 +22,7 @@ namespace libOpenCOR {
 static constexpr auto ID_PREFIX {"task"};
 
 SedAbstractTask::Impl::Impl(const SedDocumentPtr &pDocument)
-    : SedBase::Impl(pDocument->pimpl()->uniqueId(ID_PREFIX))
+    : SedBase::Impl(pDocument, ID_PREFIX)
 {
 }
 

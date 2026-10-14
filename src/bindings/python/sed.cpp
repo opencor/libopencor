@@ -33,12 +33,17 @@ void sedApi(nb::module_ &m)
     auto setId = [](libOpenCOR::SedBase &pThis, const std::string &pId) {
         // Note: a property setter cannot return whether the value was set, so we raise a ValueError if it wasn't.
 
-        if (!pThis.setId(pId)) {
+        if (!libOpenCOR::SedBase::isValidId(pId)) {
             throw nb::value_error("The id is not a valid SED-ML identifier.");
+        }
+
+        if (!pThis.setId(pId)) {
+            throw nb::value_error("The id is already used.");
         }
     };
 
-    sedBase.def_prop_rw("id", &libOpenCOR::SedBase::id, setId, "The id.");
+    sedBase.def_static("is_valid_id", &libOpenCOR::SedBase::isValidId, "Return whether the given id is a valid SED-ML identifier.", nb::arg("id"))
+        .def_prop_rw("id", &libOpenCOR::SedBase::id, setId, "The id.");
 
     // SedAbstractTask API.
 

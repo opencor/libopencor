@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "sedbase_p.h"
+#include "seddocument_p.h"
 
 #include "utils.h"
 
@@ -25,14 +26,45 @@ SedBase::Impl::Impl(const std::string &pId)
 {
 }
 
+SedBase::Impl::Impl(const SedDocumentPtr &pDocument, const std::string &pIdPrefix)
+    : mId(pDocument->pimpl()->uniqueId(pIdPrefix))
+    , mDocument(pDocument)
+    , mHasReservedId(true)
+{
+}
+
 const std::string &SedBase::Impl::id() const
 {
     return mId;
 }
 
-void SedBase::Impl::setId(const std::string &pId)
+bool SedBase::Impl::setId(const std::string &pId)
 {
+    // Make sure that the id is not already used by another object of our document, if we still have one, and if our
+    // current id is reserved in our document (i.e. we have not been removed from it) then reserve the new id instead.
+
+    if (pId == mId) {
+        return true;
+    }
+
+    auto document {mDocument.lock()};
+
+    if (document != nullptr) {
+        auto &ids {document->pimpl()->mIds};
+
+        if (ids.contains(pId)) {
+            return false;
+        }
+
+        if (mHasReservedId) {
+            ids.erase(mId);
+            ids.insert(pId);
+        }
+    }
+
     mId = pId;
+
+    return true;
 }
 
 void SedBase::Impl::serialise(xmlNodePtr pNode) const
@@ -60,15 +92,18 @@ const std::string &SedBase::id() const
     return pimpl()->id();
 }
 
+bool SedBase::isValidId(const std::string &pId)
+{
+    return isSedmlId(pId);
+}
+
 bool SedBase::setId(const std::string &pId)
 {
-    if (!isSedmlId(pId)) {
+    if (!isValidId(pId)) {
         return false;
     }
 
-    pimpl()->setId(pId);
-
-    return true;
+    return pimpl()->setId(pId);
 }
 
 } // namespace libOpenCOR

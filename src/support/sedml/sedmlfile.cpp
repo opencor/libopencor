@@ -741,9 +741,11 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 
 void SedmlFile::Impl::setId(const SedBasePtr &pSedBase, const std::string &pId, const char *pType)
 {
-    // Set the id of the given SED-ML object, unless it is not a valid SED-ML identifier (e.g., "my model"), in which
-    // case the object keeps the id that it was given when it was created (e.g., "model1").
-    // Note: libSEDML doesn't reject an id that is not a valid SED-ML identifier when it loads a SED-ML file.
+    // Set the id of the given SED-ML object, unless it is not a valid SED-ML identifier (e.g., "my model") or it is
+    // already used by another SED-ML object (e.g., two models with the same id), in which case the object keeps the id
+    // that it was given when it was created (e.g., "model1").
+    // Note: libSEDML doesn't reject an id that is not a valid SED-ML identifier or that is already used when it loads a
+    //       SED-ML file.
 
     if (!pSedBase->setId(pId)) {
         std::string warning;
@@ -754,7 +756,8 @@ void SedmlFile::Impl::setId(const SedBasePtr &pSedBase, const std::string &pId, 
         warning += pId;
         warning += "' of the ";
         warning += pType;
-        warning += " is not a valid SED-ML identifier. The id '";
+        warning += isSedmlId(pId) ? " is already used" : " is not a valid SED-ML identifier";
+        warning += ". The id '";
         warning += pSedBase->id();
         warning += "' has been used instead.";
 

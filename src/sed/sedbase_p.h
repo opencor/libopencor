@@ -30,11 +30,14 @@ public:
     std::string mId;
     std::string mName;
     std::string mMetaId;
+    std::weak_ptr<SedDocument> mDocument;
+    bool mHasReservedId {false};
 
     explicit Impl(const std::string &pId = {});
+    explicit Impl(const SedDocumentPtr &pDocument, const std::string &pIdPrefix);
 
     const std::string &id() const;
-    void setId(const std::string &pId);
+    bool setId(const std::string &pId);
 
     virtual void serialise(xmlNodePtr pNode) const;
 };

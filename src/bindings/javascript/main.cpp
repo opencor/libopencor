@@ -38,8 +38,8 @@ void restoreStackOnThrow()
     // #4 in stringconverter.h), i.e. a binding that takes a string (see fromJsString()) or that may reject a value (see
     // throwRangeError()), as Embind itself does for a binding that allocates its arguments on the WebAssembly stack.
     // Note #1: a binding is listed as "<class name>:<member name>|<member name>|...", where a member name is that of a
-    //          method, a property (in which case its setter is wrapped), or "constructor" (in which case the class is
-    //          wrapped using a Proxy, so that it otherwise behaves as before, e.g., for instanceof).
+    //          method, a static method, a property (in which case its setter is wrapped), or "constructor" (in which
+    //          case the class is wrapped using a Proxy, so that it otherwise behaves as before, e.g., for instanceof).
     // Note #2: this must be done once all the static constructors have been run, i.e. once all the types (including
     //          Embind's builtin ones, e.g., void and bool) have been registered. Indeed, Embind only installs a method
     //          once all its types have been registered, so it would otherwise replace a method that we have wrapped.
@@ -55,7 +55,7 @@ void restoreStackOnThrow()
                 stackRestore(sp);
             }
         };
-        let bindings = 'File:constructor|childFileFromFileName FileManager:fileFromFileNameOrUrl SedBase:id SedChangeAttribute:constructor|componentName|variableName|newValue SedDocument:serialise Strings:push_back|resize|set'.split(' ');
+        let bindings = 'File:constructor|childFileFromFileName FileManager:fileFromFileNameOrUrl SedBase:id|isValidId SedChangeAttribute:constructor|componentName|variableName|newValue SedDocument:serialise Strings:push_back|resize|set'.split(' ');
 
         addOnPostCtor(() => bindings.forEach((binding) => {
             let parts = binding.split(':');
@@ -77,7 +77,10 @@ void restoreStackOnThrow()
                     return;
                 }
 
-                let descriptor = Object.getOwnPropertyDescriptor(prototype, memberName);
+                // Note: a static method is a member of the class itself rather than of its prototype.
+
+                let owner = Object.getOwnPropertyDescriptor(prototype, memberName) ? prototype : classObject;
+                let descriptor = Object.getOwnPropertyDescriptor(owner, memberName);
 
                 if (descriptor.set) {
                     let setter = descriptor.set;
@@ -96,7 +99,7 @@ void restoreStackOnThrow()
                     }, method);
                 }
 
-                Object.defineProperty(prototype, memberName, descriptor);
+                Object.defineProperty(owner, memberName, descriptor);
             });
         }));
     });

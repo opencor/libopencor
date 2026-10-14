@@ -29,7 +29,7 @@ namespace libOpenCOR {
 static constexpr auto ID_PREFIX {"model"};
 
 SedModel::Impl::Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile)
-    : SedBase::Impl(pDocument->pimpl()->uniqueId(ID_PREFIX))
+    : SedBase::Impl(pDocument, ID_PREFIX)
     , mFile(pFile)
 {
 }

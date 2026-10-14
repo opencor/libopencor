@@ -32,16 +32,50 @@ namespace libOpenCOR {
 
 std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 {
+    // Return an id that is neither used by an object of this document nor the id of a model or simulation of the SED-ML
+    // file that is being imported, if any (see initialiseFromSedmlFile()).
+
     size_t counter {0};
     auto res {pPrefix + std::format("{}", ++counter)};
 
-    while (mIds.contains(res)) {
+    while (mIds.contains(res) || mImportedIds.contains(res)) {
         res = pPrefix + std::format("{}", ++counter);
     }
 
     mIds.insert(res);
 
     return res;
+}
+
+bool SedDocument::Impl::reserveId(SedBase::Impl *pSedBase)
+{
+    // Make sure that the given object was created for this document and that its id is reserved, which may not be the
+    // case if the object was removed from this document, in which case another object may have been given its id since.
+
+    auto document {pSedBase->mDocument.lock()};
+
+    if ((document == nullptr) || (document->pimpl() != this)) {
+        return false;
+    }
+
+    if (!pSedBase->mHasReservedId) {
+        if (mIds.contains(pSedBase->mId)) {
+            return false;
+        }
+
+        mIds.insert(pSedBase->mId);
+
+        pSedBase->mHasReservedId = true;
+    }
+
+    return true;
+}
+
+void SedDocument::Impl::releaseId(SedBase::Impl *pSedBase)
+{
+    mIds.erase(pSedBase->mId);
+
+    pSedBase->mHasReservedId = false;
 }
 
 void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &pFile)
@@ -83,14 +117,18 @@ void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, co
 {
     auto sedmlFile {pFile->pimpl()->mSedmlFile};
 
-    // Reserve the ids of the models and simulations of the SED-ML file, so that a model or simulation which id is not a
-    // valid SED-ML identifier doesn't get given the id of another model or simulation (e.g., "model1").
+    // Keep track of the ids of the models and simulations of the SED-ML file, so that a model or simulation which id is
+    // not a valid SED-ML identifier (or is already used) doesn't get given the id of another model or simulation (e.g.,
+    // "model1"). Those ids can, however, still be given to the models and simulations of the SED-ML file (see
+    // SedBase::Impl::setId()).
 
     for (const auto &id : sedmlFile->ids()) {
-        mIds.insert(id);
+        mImportedIds.insert(id);
     }
 
     sedmlFile->populateDocument(pOwner);
+
+    mImportedIds.clear();
 
     addIssues(sedmlFile, "SED-ML file");
 }
@@ -285,7 +323,7 @@ bool SedDocument::Impl::addModel(const SedModelPtr &pModel)
         return m == pModel;
     })};
 
-    if (model != mModels.end()) {
+    if ((model != mModels.end()) || !reserveId(pModel->pimpl())) {
         return false;
     }
 
@@ -301,7 +339,7 @@ bool SedDocument::Impl::removeModel(const SedModelPtr &pModel)
     })};
 
     if (model != mModels.end()) {
-        mIds.erase((*model)->pimpl()->mId);
+        releaseId((*model)->pimpl());
         mModels.erase(model);
 
         return true;
@@ -359,7 +397,7 @@ bool SedDocument::Impl::addSimulation(const SedSimulationPtr &pSimulation)
         return s == pSimulation;
     })};
 
-    if (simulation != mSimulations.end()) {
+    if ((simulation != mSimulations.end()) || !reserveId(pSimulation->pimpl())) {
         return false;
     }
 
@@ -375,7 +413,7 @@ bool SedDocument::Impl::removeSimulation(const SedSimulationPtr &pSimulation)
     })};
 
     if (simulation != mSimulations.end()) {
-        mIds.erase((*simulation)->pimpl()->mId);
+        releaseId((*simulation)->pimpl());
         mSimulations.erase(simulation);
 
         return true;
@@ -433,7 +471,7 @@ bool SedDocument::Impl::addTask(const SedAbstractTaskPtr &pTask)
         return t == pTask;
     })};
 
-    if (task != mTasks.end()) {
+    if ((task != mTasks.end()) || !reserveId(pTask->pimpl())) {
         return false;
     }
 
@@ -449,7 +487,7 @@ bool SedDocument::Impl::removeTask(const SedAbstractTaskPtr &pTask)
     })};
 
     if (task != mTasks.end()) {
-        mIds.erase((*task)->pimpl()->mId);
+        releaseId((*task)->pimpl());
         mTasks.erase(task);
 
         return true;

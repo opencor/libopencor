@@ -30,6 +30,7 @@ class LIBOPENCOR_EXPORT SedDocument: public Logger
     , public std::enable_shared_from_this<SedDocument>
 {
     friend class SedAbstractTask;
+    friend class SedBase;
     friend class SedInstanceTask;
     friend class SedModel;
     friend class SedSimulation;
@@ -135,7 +136,9 @@ public:
     /**
      * @brief Add the given model.
      *
-     * Add the given model.
+     * Add the given model, if it was created for this simulation experiment description and if its id is not already
+     * used by another object of this simulation experiment description (e.g., because the model was removed and another
+     * object was then given its id).
      *
      * @param pModel The @ref SedModel object to be added.
      *
@@ -210,7 +213,9 @@ public:
     /**
      * @brief Add the given simulation.
      *
-     * Add the given simulation.
+     * Add the given simulation, if it was created for this simulation experiment description and if its id is not
+     * already used by another object of this simulation experiment description (e.g., because the simulation was
+     * removed and another object was then given its id).
      *
      * @param pSimulation The @ref SedSimulation object to be added.
      *
@@ -285,7 +290,9 @@ public:
     /**
      * @brief Add the given task.
      *
-     * Add the given task.
+     * Add the given task, if it was created for this simulation experiment description and if its id is not already
+     * used by another object of this simulation experiment description (e.g., because the task was removed and another
+     * object was then given its id).
      *
      * @param pTask The @ref SedAbstractTask object to be added.
      *

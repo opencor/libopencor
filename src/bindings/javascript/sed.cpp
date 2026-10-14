@@ -20,11 +20,34 @@ limitations under the License.
 
 namespace {
 
-constexpr std::string_view ID_ERROR {"The id is not a valid SED-ML identifier."};
+constexpr std::string_view INVALID_ID_ERROR {"The id is not a valid SED-ML identifier."};
+constexpr std::string_view ALREADY_USED_ID_ERROR {"The id is already used."};
 constexpr std::string_view COMPONENT_NAME_ERROR {"The component name is not a valid CellML identifier."};
 constexpr std::string_view VARIABLE_NAME_ERROR {"The variable name is not a valid CellML identifier."};
 constexpr std::string_view NEW_VALUE_ERROR {"The new value is not a valid double value."};
 constexpr std::string_view CHANGE_ATTRIBUTE_ERROR {"The component and variable names must be valid CellML identifiers and the new value must be a valid double value."};
+
+void setId(libOpenCOR::SedBase &pThis, const JsString &pId)
+{
+    // Note: a property setter cannot return whether the id was set, so we throw a RangeError if it wasn't, making sure
+    //       that the std::string returned by fromJsString() is destroyed before we do so (see stringconverter.h).
+
+    std::string_view error;
+
+    {
+        auto id {fromJsString(pId)};
+
+        if (!libOpenCOR::SedBase::isValidId(id)) {
+            error = INVALID_ID_ERROR;
+        } else if (!pThis.setId(id)) {
+            error = ALREADY_USED_ID_ERROR;
+        }
+    }
+
+    if (!error.empty()) {
+        throwRangeError(error);
+    }
+}
 
 } // namespace
 
@@ -34,7 +57,11 @@ void sedApi()
 
     emscripten::class_<libOpenCOR::SedBase, emscripten::base<libOpenCOR::Logger>>("SedBase")
         .smart_ptr<libOpenCOR::SedBasePtr>("SedBase")
-        .property("id", &JsStringResult<&libOpenCOR::SedBase::id>::call, &JsStringArgument<&libOpenCOR::SedBase::setId, ID_ERROR>::call);
+        // clang-format off
+        .class_function("isValidId", emscripten::optional_override([](const JsString &pId) {
+            return libOpenCOR::SedBase::isValidId(fromJsString(pId));
+        })) // clang-format on
+        .property("id", &JsStringResult<&libOpenCOR::SedBase::id>::call, &setId);
 
     // SedAbstractTask API.
 

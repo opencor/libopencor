@@ -397,6 +397,7 @@ test.describe('Sed coverage tests', () => {
     const simulation = new loc.SedOneStep(document);
 
     assert.strictEqual(simulation.id, 'simulation2');
+    assert.strictEqual(loc.SedBase.isValidId('my_simulation'), true);
 
     simulation.id = 'my_simulation';
 
@@ -406,9 +407,13 @@ test.describe('Sed coverage tests', () => {
     // Note: a property setter cannot return whether the id was set, so a RangeError is thrown instead.
 
     for (const id of ['', 'my simulation', '1simulation', 'simulation-1', 'simulation\x01', '\udcff']) {
-      assert.throws(() => {
-        simulation.id = id;
-      }, RangeError);
+      assert.strictEqual(loc.SedBase.isValidId(id), false);
+      assert.throws(
+        () => {
+          simulation.id = id;
+        },
+        { name: 'RangeError', message: 'The id is not a valid SED-ML identifier.' }
+      );
       assert.strictEqual(simulation.id, 'my_simulation');
     }
 
@@ -417,9 +422,100 @@ test.describe('Sed coverage tests', () => {
     // Note: this has no C++ equivalent since a std::string cannot contain a lone surrogate.
 
     assert.throws(() => {
+      loc.SedBase.isValidId('\ud800');
+    }, TypeError);
+    assert.throws(() => {
       simulation.id = '\ud800';
     }, TypeError);
     assert.strictEqual(simulation.id, 'my_simulation');
+  });
+
+  test('SED ids', () => {
+    // An id must be unique within the simulation experiment description for which an object was created.
+    // Note: a property setter cannot return whether the id was set, so a RangeError is thrown instead.
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const model = document.models[0];
+    const simulation = document.simulations[0];
+    const task = document.tasks[0];
+
+    assert.strictEqual(model.id, 'model1');
+    assert.strictEqual(simulation.id, 'simulation1');
+    assert.strictEqual(task.id, 'task1');
+
+    // A new object is not given the id of an existing object, but it can be given an id that is not used anymore.
+
+    model.id = 'model2';
+
+    const otherModel = new loc.SedModel(document, file);
+
+    assert.strictEqual(otherModel.id, 'model1');
+
+    // An id that is already used by another object, whatever its type, is rejected, leaving the id unchanged, even
+    // though it is a valid SED-ML identifier. An object can, however, be given its own id.
+
+    for (const id of ['model2', 'simulation1', 'task1']) {
+      assert.strictEqual(loc.SedBase.isValidId(id), true);
+      assert.throws(
+        () => {
+          otherModel.id = id;
+        },
+        { name: 'RangeError', message: 'The id is already used.' }
+      );
+      assert.strictEqual(otherModel.id, 'model1');
+    }
+
+    otherModel.id = 'model1';
+
+    // A removed object releases its id, which can then be given to another object, in which case the removed object can
+    // only be added back once it has been given another id.
+
+    assert.strictEqual(document.removeModel(model), true);
+
+    otherModel.id = 'model2';
+
+    assert.strictEqual(document.addModel(model), false);
+
+    model.id = 'my_model';
+
+    assert.strictEqual(document.addModel(model), true);
+    assert.throws(
+      () => {
+        otherModel.id = 'my_model';
+      },
+      { name: 'RangeError', message: 'The id is already used.' }
+    );
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].isAliasOf(model), true);
+
+    // An object can only be added to the simulation experiment description for which it was created.
+
+    const otherDocument = new loc.SedDocument();
+
+    assert.strictEqual(otherDocument.addModel(otherModel), false);
+    assert.strictEqual(otherDocument.addSimulation(simulation), false);
+    assert.strictEqual(otherDocument.addTask(task), false);
+    assert.strictEqual(otherDocument.hasModels, false);
+    assert.strictEqual(otherDocument.hasSimulations, false);
+    assert.strictEqual(otherDocument.hasTasks, false);
+
+    // An object which simulation experiment description doesn't exist anymore can be given any valid id, but it cannot
+    // be added to another simulation experiment description.
+
+    const orphanSimulation = new loc.SedOneStep(otherDocument);
+
+    otherDocument.delete();
+
+    assert.strictEqual(orphanSimulation.id, 'simulation1');
+
+    orphanSimulation.id = 'my_simulation';
+
+    assert.strictEqual(orphanSimulation.id, 'my_simulation');
+    assert.strictEqual(document.addSimulation(orphanSimulation), false);
   });
 
   test('SedChangeAttribute', () => {
@@ -1259,6 +1355,55 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.simulations.length, 2);
     assert.strictEqual(document.simulations[0].id, 'simulation2');
     assert.strictEqual(document.simulations[1].id, 'simulation1');
+  });
+
+  test('SED-ML file with duplicate ids', () => {
+    // An id that is already used is replaced with the one generated by libOpenCOR. This includes a model and a
+    // simulation with the same id since all the ids of a SED-ML file share the same namespace.
+
+    const cellmlFile = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
+
+    const file = new loc.File(utils.resourcePath('my_model.sedml'));
+
+    file.setContents(
+      new TextEncoder().encode(`<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="my_id" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+    <model id="my_id" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <oneStep id="my_id" step="1"/>
+    <oneStep id="my_simulation" step="1"/>
+  </listOfSimulations>
+</sedML>
+`)
+    );
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the id 'my_id' of the model is already used. The id 'model1' has been used instead."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the id 'my_id' of the simulation is already used. The id 'simulation1' has been used instead."
+      ]
+    ]);
+    assert.strictEqual(document.models.length, 2);
+    assert.strictEqual(document.models[0].id, 'my_id');
+    assert.strictEqual(document.models[1].id, 'model1');
+    assert.strictEqual(document.simulations.length, 2);
+    assert.strictEqual(document.simulations[0].id, 'simulation1');
+    assert.strictEqual(document.simulations[1].id, 'my_simulation');
+
+    // The ids of the SED-ML file are only reserved while it is being imported.
+
+    assert.strictEqual(new loc.SedOneStep(document).id, 'simulation2');
   });
 
   test('Simulation results are of Float64Array type', () => {
