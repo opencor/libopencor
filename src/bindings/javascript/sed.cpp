@@ -60,6 +60,9 @@ void sedApi()
         // clang-format off
         .class_function("isValidId", emscripten::optional_override([](const JsString &pId) {
             return libOpenCOR::SedBase::isValidId(fromJsString(pId));
+        }))
+        .function("isDuplicateId", emscripten::optional_override([](const libOpenCOR::SedBase &pThis, const JsString &pId) {
+            return pThis.isDuplicateId(fromJsString(pId));
         })) // clang-format on
         .property("id", &JsStringResult<&libOpenCOR::SedBase::id>::call, &setId);
 

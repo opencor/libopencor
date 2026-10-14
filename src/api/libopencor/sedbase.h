@@ -69,10 +69,24 @@ public:
     static bool isValidId(const std::string &pId);
 
     /**
+     * @brief Return whether the given id is a duplicate.
+     *
+     * Return whether the given id is already used by another object of the simulation experiment description for which
+     * this object was created. The id of this object is not a duplicate unless this object was removed from its
+     * simulation experiment description and another object was then given its id.
+     *
+     * @param pId The id as a @c std::string.
+     *
+     * @return @c true if the given id is a duplicate, @c false otherwise.
+     */
+
+    bool isDuplicateId(const std::string &pId) const;
+
+    /**
      * @brief Set the id.
      *
-     * Set the id, if it is a valid SED-ML identifier (see @ref isValidId) and if it is not already used by another
-     * object of the simulation experiment description for which this object was created.
+     * Set the id, if it is a valid SED-ML identifier (see @ref isValidId) and if it is not a duplicate (see
+     * @ref isDuplicateId).
      *
      * @param pId The id as a @c std::string.
      *

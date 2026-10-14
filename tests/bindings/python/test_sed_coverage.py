@@ -431,6 +431,9 @@ def test_sed_base():
         loc.SedBase.is_valid_id("\ud800")
 
     with pytest.raises(TypeError):
+        simulation.is_duplicate_id("\ud800")
+
+    with pytest.raises(TypeError):
         simulation.id = "\ud800"
 
     assert simulation.id == "my_simulation"
@@ -458,11 +461,13 @@ def test_sed_ids():
 
     assert other_model.id == "model1"
 
-    # An id that is already used by another object, whatever its type, is rejected, leaving the id unchanged, even
-    # though it is a valid SED-ML identifier. An object can, however, be given its own id.
+    # An id that is already used by another object, whatever its type, is a duplicate and is therefore rejected,
+    # leaving the id unchanged, even though it is a valid SED-ML identifier. The id of an object is, however, not a
+    # duplicate, so an object can be given its own id.
 
     for id in ["model2", "simulation1", "task1"]:
         assert loc.SedBase.is_valid_id(id)
+        assert other_model.is_duplicate_id(id)
 
         with pytest.raises(ValueError) as exception_info:
             other_model.id = id
@@ -470,20 +475,32 @@ def test_sed_ids():
         assert str(exception_info.value) == "The id is already used."
         assert other_model.id == "model1"
 
+    assert not other_model.is_duplicate_id("model1")
+
     other_model.id = "model1"
 
-    # A removed object releases its id, which can then be given to another object, in which case the removed object can
-    # only be added back once it has been given another id.
+    assert not other_model.is_duplicate_id("my_model")
+
+    # A removed object releases its id, which can then be given to another object, in which case the id of the removed
+    # object is a duplicate and the removed object can only be added back once it has been given another id.
 
     assert document.remove_model(model)
+    assert not model.is_duplicate_id("model2")
 
     other_model.id = "model2"
 
+    assert model.is_duplicate_id("model2")
+
+    with pytest.raises(ValueError) as exception_info:
+        model.id = "model2"
+
+    assert str(exception_info.value) == "The id is already used."
     assert not document.add_model(model)
 
     model.id = "my_model"
 
     assert document.add_model(model)
+    assert other_model.is_duplicate_id("my_model")
 
     with pytest.raises(ValueError) as exception_info:
         other_model.id = "my_model"
@@ -504,14 +521,15 @@ def test_sed_ids():
     assert not other_document.has_simulations
     assert not other_document.has_tasks
 
-    # An object which simulation experiment description doesn't exist anymore can be given any valid id, but it cannot
-    # be added to another simulation experiment description.
+    # An object which simulation experiment description doesn't exist anymore has no duplicate id, so it can be given
+    # any valid id, but it cannot be added to another simulation experiment description.
 
     orphan_simulation = loc.SedOneStep(other_document)
 
     del other_document
 
     assert orphan_simulation.id == "simulation1"
+    assert not orphan_simulation.is_duplicate_id("my_simulation")
 
     orphan_simulation.id = "my_simulation"
 

@@ -425,6 +425,9 @@ test.describe('Sed coverage tests', () => {
       loc.SedBase.isValidId('\ud800');
     }, TypeError);
     assert.throws(() => {
+      simulation.isDuplicateId('\ud800');
+    }, TypeError);
+    assert.throws(() => {
       simulation.id = '\ud800';
     }, TypeError);
     assert.strictEqual(simulation.id, 'my_simulation');
@@ -455,11 +458,13 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(otherModel.id, 'model1');
 
-    // An id that is already used by another object, whatever its type, is rejected, leaving the id unchanged, even
-    // though it is a valid SED-ML identifier. An object can, however, be given its own id.
+    // An id that is already used by another object, whatever its type, is a duplicate and is therefore rejected,
+    // leaving the id unchanged, even though it is a valid SED-ML identifier. The id of an object is, however, not a
+    // duplicate, so an object can be given its own id.
 
     for (const id of ['model2', 'simulation1', 'task1']) {
       assert.strictEqual(loc.SedBase.isValidId(id), true);
+      assert.strictEqual(otherModel.isDuplicateId(id), true);
       assert.throws(
         () => {
           otherModel.id = id;
@@ -469,20 +474,33 @@ test.describe('Sed coverage tests', () => {
       assert.strictEqual(otherModel.id, 'model1');
     }
 
+    assert.strictEqual(otherModel.isDuplicateId('model1'), false);
+
     otherModel.id = 'model1';
 
-    // A removed object releases its id, which can then be given to another object, in which case the removed object can
-    // only be added back once it has been given another id.
+    assert.strictEqual(otherModel.isDuplicateId('my_model'), false);
+
+    // A removed object releases its id, which can then be given to another object, in which case the id of the removed
+    // object is a duplicate and the removed object can only be added back once it has been given another id.
 
     assert.strictEqual(document.removeModel(model), true);
+    assert.strictEqual(model.isDuplicateId('model2'), false);
 
     otherModel.id = 'model2';
 
+    assert.strictEqual(model.isDuplicateId('model2'), true);
+    assert.throws(
+      () => {
+        model.id = 'model2';
+      },
+      { name: 'RangeError', message: 'The id is already used.' }
+    );
     assert.strictEqual(document.addModel(model), false);
 
     model.id = 'my_model';
 
     assert.strictEqual(document.addModel(model), true);
+    assert.strictEqual(otherModel.isDuplicateId('my_model'), true);
     assert.throws(
       () => {
         otherModel.id = 'my_model';
@@ -503,14 +521,15 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(otherDocument.hasSimulations, false);
     assert.strictEqual(otherDocument.hasTasks, false);
 
-    // An object which simulation experiment description doesn't exist anymore can be given any valid id, but it cannot
-    // be added to another simulation experiment description.
+    // An object which simulation experiment description doesn't exist anymore has no duplicate id, so it can be given
+    // any valid id, but it cannot be added to another simulation experiment description.
 
     const orphanSimulation = new loc.SedOneStep(otherDocument);
 
     otherDocument.delete();
 
     assert.strictEqual(orphanSimulation.id, 'simulation1');
+    assert.strictEqual(orphanSimulation.isDuplicateId('my_simulation'), false);
 
     orphanSimulation.id = 'my_simulation';
 

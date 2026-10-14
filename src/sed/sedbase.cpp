@@ -33,6 +33,17 @@ SedBase::Impl::Impl(const SedDocumentPtr &pDocument, const std::string &pIdPrefi
 {
 }
 
+bool SedBase::Impl::isDuplicateId(const std::string &pId) const
+{
+    // Check whether the given id is used by another object of our document, if we still have one. Our own id is not a
+    // duplicate unless it is not reserved in our document (i.e. we have been removed from it) and another object has
+    // since been given it.
+
+    auto document {mDocument.lock()};
+
+    return (document != nullptr) && document->pimpl()->mIds.contains(pId) && ((pId != mId) || !mHasReservedId);
+}
+
 const std::string &SedBase::Impl::id() const
 {
     return mId;
@@ -40,23 +51,19 @@ const std::string &SedBase::Impl::id() const
 
 bool SedBase::Impl::setId(const std::string &pId)
 {
-    // Make sure that the id is not already used by another object of our document, if we still have one, and if our
-    // current id is reserved in our document (i.e. we have not been removed from it) then reserve the new id instead.
+    // Make sure that the id is not already used by another object of our document and if our current id is reserved in
+    // our document, if we still have one, then reserve the new id instead.
 
-    if (pId == mId) {
-        return true;
+    if (isDuplicateId(pId)) {
+        return false;
     }
 
-    auto document {mDocument.lock()};
+    if (mHasReservedId) {
+        auto document {mDocument.lock()};
 
-    if (document != nullptr) {
-        auto &ids {document->pimpl()->mIds};
+        if (document != nullptr) {
+            auto &ids {document->pimpl()->mIds};
 
-        if (ids.contains(pId)) {
-            return false;
-        }
-
-        if (mHasReservedId) {
             ids.erase(mId);
             ids.insert(pId);
         }
@@ -87,14 +94,19 @@ const SedBase::Impl *SedBase::pimpl() const
     return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
-const std::string &SedBase::id() const
-{
-    return pimpl()->id();
-}
-
 bool SedBase::isValidId(const std::string &pId)
 {
     return isSedmlId(pId);
+}
+
+bool SedBase::isDuplicateId(const std::string &pId) const
+{
+    return pimpl()->isDuplicateId(pId);
+}
+
+const std::string &SedBase::id() const
+{
+    return pimpl()->id();
 }
 
 bool SedBase::setId(const std::string &pId)

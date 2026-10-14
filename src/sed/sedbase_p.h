@@ -36,6 +36,8 @@ public:
     explicit Impl(const std::string &pId = {});
     explicit Impl(const SedDocumentPtr &pDocument, const std::string &pIdPrefix);
 
+    bool isDuplicateId(const std::string &pId) const;
+
     const std::string &id() const;
     bool setId(const std::string &pId);
 

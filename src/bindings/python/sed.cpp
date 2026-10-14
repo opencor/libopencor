@@ -43,6 +43,7 @@ void sedApi(nb::module_ &m)
     };
 
     sedBase.def_static("is_valid_id", &libOpenCOR::SedBase::isValidId, "Return whether the given id is a valid SED-ML identifier.", nb::arg("id"))
+        .def("is_duplicate_id", &libOpenCOR::SedBase::isDuplicateId, "Return whether the given id is a duplicate.", nb::arg("id"))
         .def_prop_rw("id", &libOpenCOR::SedBase::id, setId, "The id.");
 
     // SedAbstractTask API.

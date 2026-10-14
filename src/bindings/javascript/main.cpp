@@ -55,7 +55,7 @@ void restoreStackOnThrow()
                 stackRestore(sp);
             }
         };
-        let bindings = 'File:constructor|childFileFromFileName FileManager:fileFromFileNameOrUrl SedBase:id|isValidId SedChangeAttribute:constructor|componentName|variableName|newValue SedDocument:serialise Strings:push_back|resize|set'.split(' ');
+        let bindings = 'File:constructor|childFileFromFileName FileManager:fileFromFileNameOrUrl SedBase:id|isDuplicateId|isValidId SedChangeAttribute:constructor|componentName|variableName|newValue SedDocument:serialise Strings:push_back|resize|set'.split(' ');
 
         addOnPostCtor(() => bindings.forEach((binding) => {
             let parts = binding.split(':');

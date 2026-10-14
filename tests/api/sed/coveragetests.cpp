@@ -404,25 +404,33 @@ TEST(CoverageSedTest, sedIds)
 
     EXPECT_EQ(otherModel->id(), "model1");
 
-    // An id that is already used by another object, whatever its type, is rejected, leaving the id unchanged, even
-    // though it is a valid SED-ML identifier. An object can, however, be given its own id.
+    // An id that is already used by another object, whatever its type, is a duplicate and is therefore rejected,
+    // leaving the id unchanged, even though it is a valid SED-ML identifier. The id of an object is, however, not a
+    // duplicate, so an object can be given its own id.
 
     for (const auto &id : std::vector<std::string> {"model2", "simulation1", "task1"}) {
         EXPECT_TRUE(libOpenCOR::SedBase::isValidId(id));
+        EXPECT_TRUE(otherModel->isDuplicateId(id));
         EXPECT_FALSE(otherModel->setId(id));
         EXPECT_EQ(otherModel->id(), "model1");
     }
 
+    EXPECT_FALSE(otherModel->isDuplicateId("model1"));
     EXPECT_TRUE(otherModel->setId("model1"));
+    EXPECT_FALSE(otherModel->isDuplicateId("my_model"));
 
-    // A removed object releases its id, which can then be given to another object, in which case the removed object can
-    // only be added back once it has been given another id.
+    // A removed object releases its id, which can then be given to another object, in which case the id of the removed
+    // object is a duplicate and the removed object can only be added back once it has been given another id.
 
     EXPECT_TRUE(document->removeModel(model));
+    EXPECT_FALSE(model->isDuplicateId("model2"));
     EXPECT_TRUE(otherModel->setId("model2"));
+    EXPECT_TRUE(model->isDuplicateId("model2"));
+    EXPECT_FALSE(model->setId("model2"));
     EXPECT_FALSE(document->addModel(model));
     EXPECT_TRUE(model->setId("my_model"));
     EXPECT_TRUE(document->addModel(model));
+    EXPECT_TRUE(otherModel->isDuplicateId("my_model"));
     EXPECT_FALSE(otherModel->setId("my_model"));
     EXPECT_EQ(document->models().size(), 1U);
     EXPECT_EQ(document->models()[0], model);
@@ -438,14 +446,15 @@ TEST(CoverageSedTest, sedIds)
     EXPECT_FALSE(otherDocument->hasSimulations());
     EXPECT_FALSE(otherDocument->hasTasks());
 
-    // An object which simulation experiment description doesn't exist anymore can be given any valid id, but it cannot
-    // be added to another simulation experiment description.
+    // An object which simulation experiment description doesn't exist anymore has no duplicate id, so it can be given
+    // any valid id, but it cannot be added to another simulation experiment description.
 
     auto orphanSimulation {libOpenCOR::SedOneStep::create(otherDocument)};
 
     otherDocument.reset();
 
     EXPECT_EQ(orphanSimulation->id(), "simulation1");
+    EXPECT_FALSE(orphanSimulation->isDuplicateId("my_simulation"));
     EXPECT_TRUE(orphanSimulation->setId("my_simulation"));
     EXPECT_EQ(orphanSimulation->id(), "my_simulation");
     EXPECT_FALSE(document->addSimulation(orphanSimulation));
