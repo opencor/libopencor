@@ -376,27 +376,6 @@ NlaSolverInfo SedmlFile::Impl::legacyNlaSolver(const libsedml::SedSimulation *se
     return {nlaSolver, warnings};
 }
 
-Strings SedmlFile::Impl::ids() const
-{
-    // Return the ids of the models and simulations that are valid SED-ML identifiers.
-
-    Strings res;
-
-    for (unsigned int i {0}; i < mDocument->getNumModels(); ++i) {
-        if (const auto &id {mDocument->getModel(i)->getId()}; isSedmlId(id)) {
-            res.push_back(id);
-        }
-    }
-
-    for (unsigned int i {0}; i < mDocument->getNumSimulations(); ++i) {
-        if (const auto &id {mDocument->getSimulation(i)->getId()}; isSedmlId(id)) {
-            res.push_back(id);
-        }
-    }
-
-    return res;
-}
-
 void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 {
     // Populate the models.
@@ -741,6 +720,27 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
     }
 }
 
+Strings SedmlFile::Impl::ids() const
+{
+    // Return the ids of the models and simulations that are valid SED-ML identifiers.
+
+    Strings res;
+
+    for (unsigned int i {0}; i < mDocument->getNumModels(); ++i) {
+        if (const auto &id {mDocument->getModel(i)->getId()}; isSedmlId(id)) {
+            res.push_back(id);
+        }
+    }
+
+    for (unsigned int i {0}; i < mDocument->getNumSimulations(); ++i) {
+        if (const auto &id {mDocument->getSimulation(i)->getId()}; isSedmlId(id)) {
+            res.push_back(id);
+        }
+    }
+
+    return res;
+}
+
 void SedmlFile::Impl::setId(const SedBasePtr &pSedBase, const std::string &pId, const char *pType)
 {
     // Set the id of the given SED-ML object, unless it is not a valid SED-ML identifier (e.g., "my model") or it is
@@ -825,14 +825,14 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
     return NO_SEDML_FILE_PTR;
 }
 
-Strings SedmlFile::ids() const
-{
-    return pimpl()->ids();
-}
-
 void SedmlFile::populateDocument(const SedDocumentPtr &pDocument)
 {
     pimpl()->populateDocument(pDocument);
+}
+
+Strings SedmlFile::ids() const
+{
+    return pimpl()->ids();
 }
 
 } // namespace libOpenCOR

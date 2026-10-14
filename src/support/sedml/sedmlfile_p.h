@@ -52,9 +52,9 @@ public:
     NlaSolverInfo nlaSolver(const libsedml::SedSimulation *sedSimulation, bool hasNlaSolver) const;
     NlaSolverInfo legacyNlaSolver(const libsedml::SedSimulation *sedSimulation, bool hasNlaSolver) const;
 
-    Strings ids() const;
-
     void populateDocument(const SedDocumentPtr &pDocument);
+
+    Strings ids() const;
 
     void setId(const SedBasePtr &pSedBase, const std::string &pId, const char *pType);
 };

@@ -43,9 +43,9 @@ public:
 
     static SedmlFilePtr create(const FilePtr &pFile);
 
-    Strings ids() const;
-
     void populateDocument(const SedDocumentPtr &pDocument);
+
+    Strings ids() const;
 
 private:
     class Impl;
