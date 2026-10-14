@@ -729,11 +729,13 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 
     // Populate the tasks.
     //---GRY--- FOR NOW, WE ONLY CREATE A TASK IF WE HAVE ONE MODEL AND ONE SIMULATION.
+    // Note: the model may have been ignored (e.g., because its source has an unsupported scheme), in which case we
+    //       don't create a task since it would have no model.
 
 #ifdef CODE_COVERAGE_ENABLED
-    if (mDocument->getNumModels() == 1) {
+    if ((mDocument->getNumModels() == 1) && pDocument->hasModels()) {
 #else
-    if ((mDocument->getNumModels() == 1) && (mDocument->getNumSimulations() == 1)) {
+    if ((mDocument->getNumModels() == 1) && (mDocument->getNumSimulations() == 1) && pDocument->hasModels()) {
 #endif
         pDocument->addTask(SedTask::create(pDocument, pDocument->model(0), pDocument->simulation(0)));
     }

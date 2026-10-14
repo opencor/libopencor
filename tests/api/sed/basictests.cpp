@@ -23,7 +23,7 @@ limitations under the License.
 
 namespace {
 
-std::string sedmlContents(const std::string &pModelSource)
+std::string sedmlContents(const std::string &pModelSource, bool pWithSimulation = false)
 {
     return R"(<?xml version='1.0' encoding='UTF-8'?>
 <sedML level="1" version="3" xmlns="http://sed-ml.org/sed-ml/level1/version3">
@@ -31,7 +31,14 @@ std::string sedmlContents(const std::string &pModelSource)
         <model id="model" language="urn:sedml:language:cellml" source=")"
            + pModelSource + R"("/>
     </listOfModels>
-</sedML>
+)" + (pWithSimulation ? R"(    <listOfSimulations>
+        <uniformTimeCourse id="simulation" initialTime="0" outputStartTime="0" outputEndTime="50" numberOfSteps="50">
+            <algorithm kisaoID="KISAO:0000019"/>
+        </uniformTimeCourse>
+    </listOfSimulations>
+)" :
+                        "")
+           + R"(</sedML>
 )";
 }
 
@@ -142,7 +149,8 @@ TEST(BasicSedTest, sedmlFileWithRelativeCellmlFileInWorkingDirectory)
 TEST(BasicSedTest, sedmlFileWithUnsupportedSchemeCellmlFile)
 {
     // A model source with a scheme other than "http", "https", or "file" is an absolute URI that we cannot retrieve, so
-    // its model is ignored rather than considered to be relative to the SED-ML file.
+    // its model is ignored rather than considered to be relative to the SED-ML file. No task is then created for the
+    // simulation since it would have no model.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the model 'urn:miriam:biomodels.db:BIOMD0000000012' has an unsupported scheme. It has been ignored."},
@@ -150,12 +158,14 @@ TEST(BasicSedTest, sedmlFileWithUnsupportedSchemeCellmlFile)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsupported_scheme_cellml_file.sedml"), false)};
 
-    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("urn:miriam:biomodels.db:BIOMD0000000012").c_str()));
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("urn:miriam:biomodels.db:BIOMD0000000012", true).c_str()));
 
     auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
     EXPECT_TRUE(document->models().empty());
+    EXPECT_EQ(document->simulations().size(), 1U);
+    EXPECT_TRUE(document->tasks().empty());
 }
 
 TEST(BasicSedTest, sedmlFileWithEmptySourceCellmlFile)

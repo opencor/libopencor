@@ -23,13 +23,22 @@ import { assertIssues } from './utils.js';
 
 const loc = await libOpenCOR();
 
-function sedmlContents(modelSource) {
+function sedmlContents(modelSource, withSimulation = false) {
+  const simulations = withSimulation
+    ? `    <listOfSimulations>
+        <uniformTimeCourse id="simulation" initialTime="0" outputStartTime="0" outputEndTime="50" numberOfSteps="50">
+            <algorithm kisaoID="KISAO:0000019"/>
+        </uniformTimeCourse>
+    </listOfSimulations>
+`
+    : '';
+
   return new TextEncoder().encode(`<?xml version='1.0' encoding='UTF-8'?>
 <sedML level="1" version="3" xmlns="http://sed-ml.org/sed-ml/level1/version3">
     <listOfModels>
         <model id="model" language="urn:sedml:language:cellml" source="${modelSource}"/>
     </listOfModels>
-</sedML>
+${simulations}</sedML>
 `);
 }
 
@@ -145,11 +154,12 @@ test.describe('Sed basic tests', () => {
 
   test('SED-ML file with unsupported scheme CellML file', () => {
     // A model source with a scheme other than "http", "https", or "file" is an absolute URI that we cannot retrieve, so
-    // its model is ignored rather than considered to be relative to the SED-ML file.
+    // its model is ignored rather than considered to be relative to the SED-ML file. No task is then created for the
+    // simulation since it would have no model.
 
     const file = new loc.File(utils.resourcePath('api/sed/unsupported_scheme_cellml_file.sedml'));
 
-    file.setContents(sedmlContents('urn:miriam:biomodels.db:BIOMD0000000012'));
+    file.setContents(sedmlContents('urn:miriam:biomodels.db:BIOMD0000000012', true));
 
     const document = new loc.SedDocument(file);
 
@@ -160,6 +170,8 @@ test.describe('Sed basic tests', () => {
       ]
     ]);
     assert.strictEqual(document.models.length, 0);
+    assert.strictEqual(document.simulations.length, 1);
+    assert.strictEqual(document.tasks.length, 0);
   });
 
   test('SED-ML file with empty source CellML file', () => {

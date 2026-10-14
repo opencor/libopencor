@@ -20,13 +20,24 @@ import utils
 from utils import assert_issues
 
 
-def sedml_contents(model_source):
+def sedml_contents(model_source, with_simulation=False):
+    simulations = (
+        """    <listOfSimulations>
+        <uniformTimeCourse id="simulation" initialTime="0" outputStartTime="0" outputEndTime="50" numberOfSteps="50">
+            <algorithm kisaoID="KISAO:0000019"/>
+        </uniformTimeCourse>
+    </listOfSimulations>
+"""
+        if with_simulation
+        else ""
+    )
+
     return f"""<?xml version='1.0' encoding='UTF-8'?>
 <sedML level="1" version="3" xmlns="http://sed-ml.org/sed-ml/level1/version3">
     <listOfModels>
         <model id="model" language="urn:sedml:language:cellml" source="{model_source}"/>
     </listOfModels>
-</sedML>
+{simulations}</sedML>
 """
 
 
@@ -132,7 +143,8 @@ def test_sedml_file_with_relative_cellml_file_in_working_directory():
 
 def test_sedml_file_with_unsupported_scheme_cellml_file():
     # A model source with a scheme other than "http", "https", or "file" is an absolute URI that we cannot retrieve, so
-    # its model is ignored rather than considered to be relative to the SED-ML file.
+    # its model is ignored rather than considered to be relative to the SED-ML file. No task is then created for the
+    # simulation since it would have no model.
 
     expected_issues = [
         [
@@ -146,13 +158,15 @@ def test_sedml_file_with_unsupported_scheme_cellml_file():
     )
 
     file.contents = utils.text_to_list(
-        sedml_contents("urn:miriam:biomodels.db:BIOMD0000000012")
+        sedml_contents("urn:miriam:biomodels.db:BIOMD0000000012", True)
     )
 
     document = loc.SedDocument(file)
 
     assert_issues(document, expected_issues)
     assert len(document.models) == 0
+    assert len(document.simulations) == 1
+    assert len(document.tasks) == 0
 
 
 def test_sedml_file_with_empty_source_cellml_file():
