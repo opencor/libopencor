@@ -514,6 +514,27 @@ def test_combine_archive_with_no_master_file_and_one_unknown_cellml_file():
     assert_issues(document, expected_issues)
 
 
+def test_combine_archive_with_no_master_file_and_one_unknown_https_cellml_file():
+    # The format of an unknown file is used to determine its type, and a format may use the "https" scheme (e.g.,
+    # "https://identifiers.org/combine.specifications/cellml.1.1").
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path(
+            "api/sed/no_master_file_with_one_unknown_https_cellml_file.omex"
+        )
+    )
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+
+
 def test_combine_archive_with_no_master_file_and_several_cellml_files():
     expected_issues = [
         [
@@ -578,6 +599,28 @@ def test_combine_archive_with_no_master_file_and_one_unknown_sedml_file():
 
     file = loc.File(
         utils.resource_path("api/sed/no_master_file_with_one_unknown_sedml_file.omex")
+    )
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_combine_archive_with_no_master_file_and_one_unknown_versioned_sedml_file():
+    # The format of an unknown file is used to determine its type, and a format may be versioned and use the "https"
+    # scheme (e.g., "https://identifiers.org/combine.specifications/sed-ml.level-1.version-3"). So, the unknown SED-ML
+    # file is the master file, rather than the CellML file.
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path(
+            "api/sed/no_master_file_with_one_unknown_versioned_sedml_file.omex"
+        )
     )
     document = loc.SedDocument(file)
 

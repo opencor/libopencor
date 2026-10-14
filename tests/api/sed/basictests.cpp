@@ -489,6 +489,21 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownCellmlFile)
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
+TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownHttpsCellmlFile)
+{
+    // The format of an unknown file is used to determine its type, and a format may use the "https" scheme (e.g.,
+    // "https://identifiers.org/combine.specifications/cellml.1.1").
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported)."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_one_unknown_https_cellml_file.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
 TEST(BasicSedTest, combineArchiveWithNoMasterFileAndSeveralCellmlFiles)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
@@ -541,6 +556,22 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownSedmlFile)
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_one_unknown_sedml_file.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
+TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownVersionedSedmlFile)
+{
+    // The format of an unknown file is used to determine its type, and a format may be versioned and use the "https"
+    // scheme (e.g., "https://identifiers.org/combine.specifications/sed-ml.level-1.version-3"). So, the unknown SED-ML
+    // file is the master file, rather than the CellML file.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported)."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_one_unknown_versioned_sedml_file.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);

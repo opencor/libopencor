@@ -385,41 +385,54 @@ TEST(UtilsTest, isCellmlIdentifier)
 
 TEST(UtilsTest, isCellmlFormatAndIsSedmlFormat)
 {
-    static const std::string CELLML_FORMAT {"http://identifiers.org/combine.specifications/cellml"};
-    static const std::string SEDML_FORMAT {"http://identifiers.org/combine.specifications/sed-ml"};
+    // A CellML or SED-ML format is one of the CellML or SED-ML specifications listed in the COMBINE specifications
+    // registry (see https://github.com/combine-org/combine-specifications/tree/main/specifications), using either the
+    // "http" or the "https" scheme.
 
-    EXPECT_TRUE(libOpenCOR::isCellmlFormat(CELLML_FORMAT));
-    EXPECT_TRUE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".1.0"));
-    EXPECT_TRUE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".2.0"));
-    EXPECT_TRUE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".2"));
-    EXPECT_TRUE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".10.0.1"));
+    static const std::vector<std::string> SCHEMES {"http", "https"};
+    static const std::vector<std::string> CELLML_SPECIFICATIONS {"cellml", "cellml.1", "cellml.1.0", "cellml.1.1", "cellml.2.0"};
+    static const std::vector<std::string> SEDML_SPECIFICATIONS {"sed-ml", "sed-ml.level-1", "sed-ml.level-1.version-1", "sed-ml.level-1.version-2", "sed-ml.level-1.version-3", "sed-ml.level-1.version-4", "sed-ml.level-1.version-5"};
 
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(""));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + "."));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".."));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".1."));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".1..0"));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".x"));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".1.0x"));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + ".1.0 "));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT.substr(0, CELLML_FORMAT.size() - 1)));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + "2.0"));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + "/1.0"));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat("https://identifiers.org/combine.specifications/cellml"));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(SEDML_FORMAT));
+    for (const auto &scheme : SCHEMES) {
+        auto prefix {scheme + "://identifiers.org/combine.specifications/"};
 
-    EXPECT_TRUE(libOpenCOR::isSedmlFormat(SEDML_FORMAT));
+        for (const auto &specification : CELLML_SPECIFICATIONS) {
+            EXPECT_TRUE(libOpenCOR::isCellmlFormat(prefix + specification));
+            EXPECT_FALSE(libOpenCOR::isSedmlFormat(prefix + specification));
+        }
 
-    EXPECT_FALSE(libOpenCOR::isSedmlFormat(""));
-    EXPECT_FALSE(libOpenCOR::isSedmlFormat(SEDML_FORMAT + ".1.0"));
-    EXPECT_FALSE(libOpenCOR::isSedmlFormat(CELLML_FORMAT));
+        for (const auto &specification : SEDML_SPECIFICATIONS) {
+            EXPECT_TRUE(libOpenCOR::isSedmlFormat(prefix + specification));
+            EXPECT_FALSE(libOpenCOR::isCellmlFormat(prefix + specification));
+        }
+
+        // Specifications that are not listed in the COMBINE specifications registry.
+
+        for (const auto &specification : {"cellml.2", "cellml.1.2", "cellml.2.0.1", "cellml.10.0", "cellml.", "cellml.x", "cellml.2.0 ", "cellml2.0", "cellml/2.0", "CellML"}) {
+            EXPECT_FALSE(libOpenCOR::isCellmlFormat(prefix + specification));
+        }
+
+        for (const auto &specification : {"sedml", "sed-ml.level-2", "sed-ml.level-1.version-6", "sed-ml.level-1.version-", "sed-ml.1.0", "sed-ml.", "sed-ml ", "SED-ML"}) {
+            EXPECT_FALSE(libOpenCOR::isSedmlFormat(prefix + specification));
+        }
+    }
+
+    // Formats that don't use identifiers.org's COMBINE specifications.
+
+    for (const auto &format : {"", "cellml", "sed-ml", "ftp://identifiers.org/combine.specifications/cellml", "HTTP://identifiers.org/combine.specifications/cellml", "http://identifiers.org/combine.specifications:cellml", "http://example.com/combine.specifications/cellml", "http://identifiers.org/combine.specifications/"}) {
+        EXPECT_FALSE(libOpenCOR::isCellmlFormat(format));
+    }
+
+    for (const auto &format : {"", "cellml", "sed-ml", "ftp://identifiers.org/combine.specifications/sed-ml", "HTTP://identifiers.org/combine.specifications/sed-ml", "http://identifiers.org/combine.specifications:sed-ml", "http://example.com/combine.specifications/sed-ml", "http://identifiers.org/combine.specifications/"}) {
+        EXPECT_FALSE(libOpenCOR::isSedmlFormat(format));
+    }
 
     // A very long format can also be checked.
 
     static const std::string LONG_STRING(1000000, '0');
 
-    EXPECT_TRUE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + "." + LONG_STRING));
-    EXPECT_FALSE(libOpenCOR::isCellmlFormat(CELLML_FORMAT + LONG_STRING));
+    EXPECT_FALSE(libOpenCOR::isCellmlFormat("http://identifiers.org/combine.specifications/cellml." + LONG_STRING));
+    EXPECT_FALSE(libOpenCOR::isSedmlFormat("http://identifiers.org/combine.specifications/sed-ml." + LONG_STRING));
 }
 
 TEST(UtilsTest, isDoubleAndToDouble)

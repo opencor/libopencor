@@ -486,6 +486,24 @@ test.describe('Sed basic tests', () => {
     ]);
   });
 
+  test('COMBINE archive with no master file and one unknown HTTPS CellML file', () => {
+    // The format of an unknown file is used to determine its type, and a format may use the "https" scheme (e.g.,
+    // "https://identifiers.org/combine.specifications/cellml.1.1").
+
+    const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_one_unknown_https_cellml_file.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.ERROR,
+        'A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).'
+      ]
+    ]);
+  });
+
   test('COMBINE archive with no master file and several CellML files', () => {
     const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_several_cellml_files.omex'));
 
@@ -541,6 +559,25 @@ test.describe('Sed basic tests', () => {
 
   test('COMBINE archive with no master file and one unknown SED-ML file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_one_unknown_sedml_file.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.ERROR,
+        'A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).'
+      ]
+    ]);
+  });
+
+  test('COMBINE archive with no master file and one unknown versioned SED-ML file', () => {
+    // The format of an unknown file is used to determine its type, and a format may be versioned and use the "https"
+    // scheme (e.g., "https://identifiers.org/combine.specifications/sed-ml.level-1.version-3"). So, the unknown SED-ML
+    // file is the master file, rather than the CellML file.
+
+    const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_one_unknown_versioned_sedml_file.omex'));
 
     file.setContents(utils.fileContents(file.path));
 
