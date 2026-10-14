@@ -28,6 +28,45 @@ test.describe('Sed coverage tests', () => {
     loc.FileManager.instance().reset();
   });
 
+  function sedChangesExpectedSerialisation(source, changes) {
+    const modelEnd =
+      changes === ''
+        ? '/>'
+        : `>
+      <listOfChanges>${changes}      </listOfChanges>
+    </model>`;
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model" language="urn:sedml:language:cellml" source="file://${source}"${modelEnd}
+  </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="50" numberOfSteps="50000">
+      <algorithm kisaoID="KISAO:0000019">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000209" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
+          <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+    </uniformTimeCourse>
+  </listOfSimulations>
+  <listOfTasks>
+    <task id="task1" modelReference="model" simulationReference="simulation1"/>
+  </listOfTasks>
+</sedML>
+`;
+  }
+
   function sedTaskExpectedSerialisation(withProperties) {
     return `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
@@ -55,7 +94,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.models.length, 0);
     assert.strictEqual(document.addModel(null), false);
 
-    const file = new loc.File(utils.resourcePath('cellml_2.sedml'));
+    const file = new loc.File(utils.resourcePath('file.txt'));
     const model = new loc.SedModel(document, file);
 
     assert.deepStrictEqual(model.file, file);
@@ -88,7 +127,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(model.addChange(null), false);
     assert.strictEqual(model.removeAllChanges(), false);
 
-    const changeAttribute = new loc.SedChangeAttribute('component', 'variable', 'newValue');
+    const changeAttribute = new loc.SedChangeAttribute('component', 'variable', '1.23');
 
     assert.strictEqual(model.addChange(changeAttribute), true);
 
@@ -113,15 +152,28 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('Changes', () => {
-    const file = new loc.File('file.omex');
+    let file = new loc.File(utils.resourcePath('api/sed/sed_changes.omex'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/sed_changes.omex')));
+    file.setContents(utils.fileContents(file.path));
 
     let document = new loc.SedDocument(file);
 
     assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(
+      document.serialise(),
+      sedChangesExpectedSerialisation(
+        file.childFile(1).path,
+        `
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='beta']" newValue="3.0"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='rho']" newValue="13.0"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='sigma']" newValue="9.0"/>
+`
+      )
+    );
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/invalid_sed_changes.omex')));
+    file = new loc.File(utils.resourcePath('api/sed/invalid_sed_changes.omex'));
+
+    file.setContents(utils.fileContents(file.path));
 
     document = new loc.SedDocument(file);
 
@@ -155,8 +207,19 @@ test.describe('Sed coverage tests', () => {
         "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'."
       ]
     ]);
+    assert.strictEqual(
+      document.serialise(),
+      sedChangesExpectedSerialisation(
+        file.childFile(1).path,
+        `
+        <changeAttribute target="/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']" newValue="1.23"/>
+`
+      )
+    );
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/unsupported_sed_changes.omex')));
+    file = new loc.File(utils.resourcePath('api/sed/unsupported_sed_changes.omex'));
+
+    file.setContents(utils.fileContents(file.path));
 
     document = new loc.SedDocument(file);
 
@@ -178,6 +241,7 @@ test.describe('Sed coverage tests', () => {
         "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored."
       ]
     ]);
+    assert.strictEqual(document.serialise(), sedChangesExpectedSerialisation(file.childFile(1).path, ''));
   });
 
   test('Simulations', () => {
@@ -242,7 +306,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.tasks.length, 0);
     assert.strictEqual(document.addTask(null), false);
 
-    const file = new loc.File(utils.resourcePath('cellml_2.sedml'));
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
     const model = new loc.SedModel(document, file);
     const simulation = new loc.SedUniformTimeCourse(document);
     const task = new loc.SedTask(document, model, simulation);
@@ -324,8 +388,231 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(simulation.nlaSolver, null);
   });
 
+  test('SedBase', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = new loc.SedOneStep(document);
+
+    assert.strictEqual(simulation.id, 'simulation2');
+    assert.strictEqual(loc.SedBase.isValidId('my_simulation'), true);
+
+    simulation.id = 'my_simulation';
+
+    assert.strictEqual(simulation.id, 'my_simulation');
+
+    // An id that is not a valid SED-ML identifier is rejected, leaving the id unchanged.
+    // Note: a property setter cannot return whether the id was set, so a RangeError is thrown instead.
+
+    for (const id of ['', 'my simulation', '1simulation', 'simulation-1', 'simulation\x01', '\udcff']) {
+      assert.strictEqual(loc.SedBase.isValidId(id), false);
+      assert.throws(
+        () => {
+          simulation.id = id;
+        },
+        { name: 'RangeError', message: 'The id is not a valid SED-ML identifier.' }
+      );
+      assert.strictEqual(simulation.id, 'my_simulation');
+    }
+
+    // A string with a lone surrogate that doesn't stand for an invalid byte (i.e. other than U+DC80 to U+DCFF) is
+    // rejected.
+    // Note: this has no C++ equivalent since a std::string cannot contain a lone surrogate.
+
+    assert.throws(() => {
+      loc.SedBase.isValidId('\ud800');
+    }, TypeError);
+    assert.throws(() => {
+      simulation.isDuplicateId('\ud800');
+    }, TypeError);
+    assert.throws(() => {
+      simulation.id = '\ud800';
+    }, TypeError);
+    assert.strictEqual(simulation.id, 'my_simulation');
+  });
+
+  test('SED ids', () => {
+    // An id must be unique within the simulation experiment description for which an object was created.
+    // Note: a property setter cannot return whether the id was set, so a RangeError is thrown instead.
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const model = document.models[0];
+    const simulation = document.simulations[0];
+    const task = document.tasks[0];
+
+    assert.strictEqual(model.id, 'model1');
+    assert.strictEqual(simulation.id, 'simulation1');
+    assert.strictEqual(task.id, 'task1');
+
+    // A new object is not given the id of an existing object, but it can be given an id that is not used anymore.
+
+    model.id = 'model2';
+
+    const otherModel = new loc.SedModel(document, file);
+
+    assert.strictEqual(otherModel.id, 'model1');
+
+    // An id that is already used by another object, whatever its type, is a duplicate and is therefore rejected,
+    // leaving the id unchanged, even though it is a valid SED-ML identifier. The id of an object is, however, not a
+    // duplicate, so an object can be given its own id.
+
+    for (const id of ['model2', 'simulation1', 'task1']) {
+      assert.strictEqual(loc.SedBase.isValidId(id), true);
+      assert.strictEqual(otherModel.isDuplicateId(id), true);
+      assert.throws(
+        () => {
+          otherModel.id = id;
+        },
+        { name: 'RangeError', message: 'The id is already used.' }
+      );
+      assert.strictEqual(otherModel.id, 'model1');
+    }
+
+    assert.strictEqual(otherModel.isDuplicateId('model1'), false);
+
+    otherModel.id = 'model1';
+
+    assert.strictEqual(otherModel.isDuplicateId('my_model'), false);
+
+    // A removed object releases its id, which can then be given to another object, in which case the id of the removed
+    // object is a duplicate and the removed object can only be added back once it has been given another id.
+
+    assert.strictEqual(document.removeModel(model), true);
+    assert.strictEqual(model.isDuplicateId('model2'), false);
+
+    otherModel.id = 'model2';
+
+    assert.strictEqual(model.isDuplicateId('model2'), true);
+    assert.throws(
+      () => {
+        model.id = 'model2';
+      },
+      { name: 'RangeError', message: 'The id is already used.' }
+    );
+    assert.strictEqual(document.addModel(model), false);
+
+    model.id = 'my_model';
+
+    assert.strictEqual(document.addModel(model), true);
+    assert.strictEqual(otherModel.isDuplicateId('my_model'), true);
+    assert.throws(
+      () => {
+        otherModel.id = 'my_model';
+      },
+      { name: 'RangeError', message: 'The id is already used.' }
+    );
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].isAliasOf(model), true);
+
+    // A destroyed object releases its id, even if it was never added to its simulation experiment description, so that
+    // its id can then be given to another object.
+
+    const transientModel = new loc.SedModel(document, file);
+
+    assert.strictEqual(transientModel.id, 'model1');
+    assert.strictEqual(otherModel.isDuplicateId('model1'), true);
+
+    transientModel.delete();
+
+    assert.strictEqual(otherModel.isDuplicateId('model1'), false);
+
+    otherModel.id = 'model1';
+
+    assert.strictEqual(otherModel.id, 'model1');
+
+    // An object can only be added to the simulation experiment description for which it was created.
+
+    const otherDocument = new loc.SedDocument();
+
+    assert.strictEqual(otherDocument.addModel(otherModel), false);
+    assert.strictEqual(otherDocument.addSimulation(simulation), false);
+    assert.strictEqual(otherDocument.addTask(task), false);
+    assert.strictEqual(otherDocument.hasModels, false);
+    assert.strictEqual(otherDocument.hasSimulations, false);
+    assert.strictEqual(otherDocument.hasTasks, false);
+
+    // An object which simulation experiment description doesn't exist anymore has no duplicate id, so it can be given
+    // any valid id, but it cannot be added to another simulation experiment description.
+
+    const orphanSimulation = new loc.SedOneStep(otherDocument);
+
+    otherDocument.delete();
+
+    assert.strictEqual(orphanSimulation.id, 'simulation1');
+    assert.strictEqual(orphanSimulation.isDuplicateId('my_simulation'), false);
+
+    orphanSimulation.id = 'my_simulation';
+
+    assert.strictEqual(orphanSimulation.id, 'my_simulation');
+    assert.strictEqual(document.addSimulation(orphanSimulation), false);
+  });
+
+  test('SedChangeAttribute', () => {
+    // A change attribute can only be created with component and variable names that are valid CellML identifiers and
+    // with a new value that is a valid double value.
+    // Note: a constructor cannot return null, so a RangeError is thrown instead.
+
+    assert.throws(() => {
+      new loc.SedChangeAttribute('my component', 'variable', '1.23');
+    }, RangeError);
+    assert.throws(() => {
+      new loc.SedChangeAttribute('component', '1variable', '1.23');
+    }, RangeError);
+    assert.throws(() => {
+      new loc.SedChangeAttribute('component', 'variable', 'abc');
+    }, RangeError);
+
+    const changeAttribute = new loc.SedChangeAttribute('component', 'variable', '1.23');
+
+    changeAttribute.componentName = 'new_component';
+    changeAttribute.variableName = 'new_variable';
+
+    // A new value can be any decimal number, which value must be finite once rounded to the nearest double value.
+
+    for (const newValue of ['1.', '.5', '+1.5e-3', '-1E+3', '1e-400', '4.56']) {
+      changeAttribute.newValue = newValue;
+
+      assert.strictEqual(changeAttribute.newValue, newValue);
+    }
+
+    // A component name, variable name, or new value that is not valid is rejected, leaving it unchanged.
+    // Note: a property setter cannot return whether the value was set, so a RangeError is thrown instead.
+
+    for (const name of ['', 'my component', '1component', '_1', 'component\x01', '\udcff']) {
+      assert.throws(() => {
+        changeAttribute.componentName = name;
+      }, RangeError);
+      assert.throws(() => {
+        changeAttribute.variableName = name;
+      }, RangeError);
+    }
+
+    for (const newValue of ['', 'abc', '1.23abc', '1.23\x01', '\udcff', '.', '1e400', 'inf', 'nan', '0x1', ' 1']) {
+      assert.throws(() => {
+        changeAttribute.newValue = newValue;
+      }, RangeError);
+    }
+
+    assert.strictEqual(changeAttribute.componentName, 'new_component');
+    assert.strictEqual(changeAttribute.variableName, 'new_variable');
+    assert.strictEqual(changeAttribute.newValue, '4.56');
+    assert.strictEqual(
+      changeAttribute.target,
+      "/cellml:model/cellml:component[@name='new_component']/cellml:variable[@name='new_variable']"
+    );
+  });
+
   test('SedOneStep', () => {
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
     const document = new loc.SedDocument(file);
     const simulation = new loc.SedOneStep(document);
 
@@ -338,6 +625,9 @@ test.describe('Sed coverage tests', () => {
 
   test('SedUniformTimeCourse', () => {
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
     const document = new loc.SedDocument(file);
     const simulation = new loc.SedUniformTimeCourse(document);
 
@@ -479,10 +769,8 @@ test.describe('Sed coverage tests', () => {
     file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations[0];
-    let solver = new loc.SolverForwardEuler();
 
-    simulation.odeSolver = solver;
+    document.simulations[0].odeSolver = new loc.SolverForwardEuler();
 
     let instance = document.instantiate();
 
@@ -490,9 +778,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(instance.hasIssues, false);
 
-    solver = new loc.SolverFourthOrderRungeKutta();
-
-    simulation.odeSolver = solver;
+    document.simulations[0].odeSolver = new loc.SolverFourthOrderRungeKutta();
 
     instance = document.instantiate();
 
@@ -500,9 +786,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(instance.hasIssues, false);
 
-    solver = new loc.SolverHeun();
-
-    simulation.odeSolver = solver;
+    document.simulations[0].odeSolver = new loc.SolverHeun();
 
     instance = document.instantiate();
 
@@ -510,9 +794,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(instance.hasIssues, false);
 
-    solver = new loc.SolverSecondOrderRungeKutta();
-
-    simulation.odeSolver = solver;
+    document.simulations[0].odeSolver = new loc.SolverSecondOrderRungeKutta();
 
     instance = document.instantiate();
 
@@ -1005,7 +1287,163 @@ test.describe('Sed coverage tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('cellml_2.sedml')));
   });
 
+  test('SED-ML file with invalid ids and change names', () => {
+    // libSEDML doesn't reject an id that is not a valid SED-ML identifier nor a change with component and/or variable
+    // names that are not valid CellML identifiers, so such an id is replaced with the one generated by libOpenCOR and
+    // such a change is ignored.
+
+    const cellmlFile = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
+
+    const file = new loc.File(utils.resourcePath('my_model.sedml'));
+
+    file.setContents(
+      new TextEncoder().encode(`<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="my model" language="urn:sedml:language:cellml" source="cellml_2.cellml">
+      <listOfChanges>
+        <changeAttribute target="/cellml:model/cellml:component[@name='my component']/cellml:variable[@name='x']" newValue="1.23"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='1x']" newValue="4.56"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='x']" newValue="7.89"/>
+      </listOfChanges>
+    </model>
+  </listOfModels>
+  <listOfSimulations>
+    <oneStep id="my simulation" step="1"/>
+  </listOfSimulations>
+</sedML>
+`)
+    );
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the id 'my model' of the model is not a valid SED-ML identifier. The id 'model1' has been used instead."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the component name 'my component' for the change of type 'changeAttribute' is not a valid CellML identifier. The change has been ignored."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the variable name '1x' for the change of type 'changeAttribute' is not a valid CellML identifier. The change has been ignored."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the id 'my simulation' of the simulation is not a valid SED-ML identifier. The id 'simulation1' has been used instead."
+      ]
+    ]);
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.isAliasOf(cellmlFile), true);
+    assert.strictEqual(document.models[0].id, 'model1');
+    assert.strictEqual(document.models[0].changeCount, 1);
+    assert.strictEqual(document.simulations.length, 1);
+    assert.strictEqual(document.simulations[0].id, 'simulation1');
+  });
+
+  test('SED-ML file with invalid ids and clashing valid ids', () => {
+    // An id that is not a valid SED-ML identifier is replaced with the one generated by libOpenCOR, which must not be
+    // the id of another model or simulation (e.g., "model1" and "simulation1" below).
+
+    const cellmlFile = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
+
+    const file = new loc.File(utils.resourcePath('my_model.sedml'));
+
+    file.setContents(
+      new TextEncoder().encode(`<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="my model" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <oneStep id="my simulation" step="1"/>
+    <oneStep id="simulation1" step="1"/>
+  </listOfSimulations>
+</sedML>
+`)
+    );
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the id 'my model' of the model is not a valid SED-ML identifier. The id 'model2' has been used instead."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the id 'my simulation' of the simulation is not a valid SED-ML identifier. The id 'simulation2' has been used instead."
+      ]
+    ]);
+    assert.strictEqual(document.models.length, 2);
+    assert.strictEqual(document.models[0].file.isAliasOf(cellmlFile), true);
+    assert.strictEqual(document.models[0].id, 'model2');
+    assert.strictEqual(document.models[1].file.isAliasOf(cellmlFile), true);
+    assert.strictEqual(document.models[1].id, 'model1');
+    assert.strictEqual(document.simulations.length, 2);
+    assert.strictEqual(document.simulations[0].id, 'simulation2');
+    assert.strictEqual(document.simulations[1].id, 'simulation1');
+  });
+
+  test('SED-ML file with duplicate ids', () => {
+    // An id that is already used is replaced with the one generated by libOpenCOR. This includes a model and a
+    // simulation with the same id since all the ids of a SED-ML file share the same namespace.
+
+    const cellmlFile = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
+
+    const file = new loc.File(utils.resourcePath('my_model.sedml'));
+
+    file.setContents(
+      new TextEncoder().encode(`<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="my_id" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+    <model id="my_id" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <oneStep id="my_id" step="1"/>
+    <oneStep id="my_simulation" step="1"/>
+  </listOfSimulations>
+</sedML>
+`)
+    );
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the id 'my_id' of the model is already used. The id 'model1' has been used instead."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the id 'my_id' of the simulation is already used. The id 'simulation1' has been used instead."
+      ]
+    ]);
+    assert.strictEqual(document.models.length, 2);
+    assert.strictEqual(document.models[0].id, 'my_id');
+    assert.strictEqual(document.models[1].id, 'model1');
+    assert.strictEqual(document.simulations.length, 2);
+    assert.strictEqual(document.simulations[0].id, 'simulation1');
+    assert.strictEqual(document.simulations[1].id, 'my_simulation');
+
+    // The ids of the SED-ML file are only reserved while it is being imported.
+
+    assert.strictEqual(new loc.SedOneStep(document).id, 'simulation2');
+  });
+
   test('Simulation results are of Float64Array type', () => {
+    // Note: this has no C++ equivalent since the type of our simulation results is known at compile time in C++.
+
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
     file.setContents(utils.fileContents(file.path));

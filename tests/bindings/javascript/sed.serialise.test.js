@@ -72,7 +72,7 @@ test.describe('Sed serialise tests', () => {
     return `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="nla.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="api/sed/nla.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <steadyState id="simulation1">
@@ -175,6 +175,226 @@ test.describe('Sed serialise tests', () => {
     }
   });
 
+  test('Local CellML file with question marks and number signs', () => {
+    // A model source is a URI reference, so the question marks and number signs in the file name of a local model must
+    // be percent-encoded for the model source to refer to that model when the SED-ML file is loaded back (rather than
+    // to the file which name is the part of that file name that precedes the first question mark or number sign).
+
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const file = new loc.File(utils.resourcePath('my?model#1.cellml'));
+
+    file.setContents(cellmlContents);
+
+    const otherFile = new loc.File(utils.resourcePath('my'));
+
+    otherFile.setContents(cellmlContents);
+
+    const document = new loc.SedDocument(file);
+    const encodedFileUrl = `file://${utils.resourcePath('my%3Fmodel%231.cellml')}`;
+
+    assert.strictEqual(document.serialise(utils.resourcePath()), cvodeExpectedSerialisation('my%3Fmodel%231.cellml'));
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation(encodedFileUrl));
+
+    // Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    // (which we never generate, but which a third-party tool might).
+
+    for (const source of ['my%3Fmodel%231.cellml', encodedFileUrl, utils.resourcePath('my%3Fmodel%231.cellml')]) {
+      const sedmlFile = new loc.File(utils.resourcePath('my_model.sedml'));
+
+      sedmlFile.setContents(new TextEncoder().encode(cvodeExpectedSerialisation(source)));
+
+      const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+      assert.strictEqual(sedmlDocument.models.length, 1);
+      assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+      loc.FileManager.instance().unmanage(sedmlFile);
+    }
+  });
+
+  test('Local CellML file with colon', () => {
+    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
+    // mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const file = new loc.File(utils.resourcePath('my:model.cellml'));
+
+    file.setContents(cellmlContents);
+
+    const document = new loc.SedDocument(file);
+    const fileUrl = `file://${utils.resourcePath('my:model.cellml')}`;
+
+    assert.strictEqual(document.serialise(utils.resourcePath()), cvodeExpectedSerialisation('./my:model.cellml'));
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation(fileUrl));
+
+    // Load the SED-ML file back using a relative model source and a "file" URL model source.
+
+    for (const source of ['./my:model.cellml', fileUrl]) {
+      const sedmlFile = new loc.File(utils.resourcePath('my_model.sedml'));
+
+      sedmlFile.setContents(new TextEncoder().encode(cvodeExpectedSerialisation(source)));
+
+      const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+      assert.strictEqual(sedmlDocument.hasIssues, false);
+      assert.strictEqual(sedmlDocument.models.length, 1);
+      assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+      loc.FileManager.instance().unmanage(sedmlFile);
+    }
+  });
+
+  test('Local CellML file with non-UTF-8 character', () => {
+    // A model source is an XML attribute, so the bytes in the file name of a local model that are not valid UTF-8 must
+    // be percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the
+    // SED-ML file is loaded back.
+
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const file = new loc.File(utils.resourcePath('\udcff.cellml'));
+
+    file.setContents(cellmlContents);
+
+    const document = new loc.SedDocument(file);
+    const encodedFileUrl = `file://${utils.resourcePath('%FF.cellml')}`;
+
+    assert.strictEqual(document.serialise(utils.resourcePath()), cvodeExpectedSerialisation('%FF.cellml'));
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation(encodedFileUrl));
+
+    // Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    // (which we never generate, but which a third-party tool might).
+
+    for (const source of ['%FF.cellml', encodedFileUrl, utils.resourcePath('%FF.cellml')]) {
+      const sedmlFile = new loc.File(utils.resourcePath('my_model.sedml'));
+
+      sedmlFile.setContents(new TextEncoder().encode(cvodeExpectedSerialisation(source)));
+
+      const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+      assert.strictEqual(sedmlDocument.models.length, 1);
+      assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+      loc.FileManager.instance().unmanage(sedmlFile);
+    }
+
+    // A base path that is not valid UTF-8 is also used as is.
+
+    const otherFile = new loc.File(utils.resourcePath('\udcff/model.cellml'));
+
+    otherFile.setContents(cellmlContents);
+
+    assert.strictEqual(
+      new loc.SedDocument(otherFile).serialise(utils.resourcePath('\udcff')),
+      cvodeExpectedSerialisation('model.cellml')
+    );
+  });
+
+  test('Local CellML file with non-XML character', () => {
+    // A model source is an XML attribute, so the characters in the file name of a local model that are not allowed in
+    // an XML document (e.g., U+0001 and U+FFFF) must be percent-encoded for the SED-ML file to be valid and for the
+    // model source to refer to that model when the SED-ML file is loaded back.
+
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const file = new loc.File(utils.resourcePath('\x01￿.cellml'));
+
+    file.setContents(cellmlContents);
+
+    const document = new loc.SedDocument(file);
+    const encodedFileUrl = `file://${utils.resourcePath('%01%EF%BF%BF.cellml')}`;
+
+    assert.strictEqual(document.serialise(utils.resourcePath()), cvodeExpectedSerialisation('%01%EF%BF%BF.cellml'));
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation(encodedFileUrl));
+
+    // Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    // (which we never generate, but which a third-party tool might).
+
+    for (const source of ['%01%EF%BF%BF.cellml', encodedFileUrl, utils.resourcePath('%01%EF%BF%BF.cellml')]) {
+      const sedmlFile = new loc.File(utils.resourcePath('my_model.sedml'));
+
+      sedmlFile.setContents(new TextEncoder().encode(cvodeExpectedSerialisation(source)));
+
+      const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+      assert.strictEqual(sedmlDocument.models.length, 1);
+      assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+      loc.FileManager.instance().unmanage(sedmlFile);
+    }
+
+    // A null character is also percent-encoded, so that the model source doesn't get truncated (and refer to another
+    // file).
+
+    const nullFile = new loc.File(`${utils.resourcePath('model')}\0.cellml`);
+
+    nullFile.setContents(cellmlContents);
+
+    assert.strictEqual(
+      new loc.SedDocument(nullFile).serialise(utils.resourcePath()),
+      cvodeExpectedSerialisation('model%00.cellml')
+    );
+  });
+
+  test('Remote CellML file with non-UTF-8 character', () => {
+    // A model source is an XML attribute, so the bytes in the URL of a remote model that are not valid UTF-8 must be
+    // percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the SED-ML
+    // file is loaded back.
+
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const file = new loc.File('https://example.com/%FF.cellml');
+
+    file.setContents(cellmlContents);
+
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.serialise('https://example.com/'), cvodeExpectedSerialisation('%FF.cellml'));
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation('https://example.com/%FF.cellml'));
+
+    // Load the SED-ML file back using a relative model source and an absolute model source.
+
+    for (const source of ['%FF.cellml', 'https://example.com/%FF.cellml']) {
+      const sedmlFile = new loc.File('https://example.com/my_model.sedml');
+
+      sedmlFile.setContents(new TextEncoder().encode(cvodeExpectedSerialisation(source)));
+
+      const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+      assert.strictEqual(sedmlDocument.models.length, 1);
+      assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+      loc.FileManager.instance().unmanage(sedmlFile);
+    }
+  });
+
+  test('Remote CellML file with colon', () => {
+    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
+    // mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const file = new loc.File('https://example.com/my:model.cellml');
+
+    file.setContents(cellmlContents);
+
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.serialise('https://example.com/'), cvodeExpectedSerialisation('./my:model.cellml'));
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation('https://example.com/my:model.cellml'));
+
+    // Load the SED-ML file back using a relative model source and an absolute model source.
+
+    for (const source of ['./my:model.cellml', 'https://example.com/my:model.cellml']) {
+      const sedmlFile = new loc.File('https://example.com/my_model.sedml');
+
+      sedmlFile.setContents(new TextEncoder().encode(cvodeExpectedSerialisation(source)));
+
+      const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+      assert.strictEqual(sedmlDocument.hasIssues, false);
+      assert.strictEqual(sedmlDocument.models.length, 1);
+      assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+      loc.FileManager.instance().unmanage(sedmlFile);
+    }
+  });
+
   test('Remote CellML file with base path', () => {
     const file = new loc.File(utils.REMOTE_FILE);
 
@@ -217,7 +437,7 @@ test.describe('Sed serialise tests', () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="dae.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="api/sed/dae.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000">
@@ -258,7 +478,7 @@ test.describe('Sed serialise tests', () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(document.serialise(utils.resourcePath('api/sed')), expectedSerialisation);
+    assert.strictEqual(document.serialise(utils.resourcePath()), expectedSerialisation);
   });
 
   test('NLA model', () => {
@@ -268,14 +488,14 @@ test.describe('Sed serialise tests', () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(document.serialise(utils.resourcePath('api/sed')), kinsolExpectedSerialisation());
+    assert.strictEqual(document.serialise(utils.resourcePath()), kinsolExpectedSerialisation());
   });
 
   test('Algebraic model', () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="algebraic.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="api/sed/algebraic.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <steadyState id="simulation1"/>
@@ -292,14 +512,14 @@ test.describe('Sed serialise tests', () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(document.serialise(utils.resourcePath('api/sed')), expectedSerialisation);
+    assert.strictEqual(document.serialise(utils.resourcePath()), expectedSerialisation);
   });
 
   function sedChangeExpectedSerialisation(component, variable, newValue) {
     return `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.sedml">
+    <model id="model1" language="urn:sedml:language:cellml" source="file://${utils.resourcePath('file.txt')}">
       <listOfChanges>
         <changeAttribute target="/cellml:model/cellml:component[@name='${component}']/cellml:variable[@name='${variable}']" newValue="${newValue}"/>
       </listOfChanges>
@@ -321,16 +541,13 @@ test.describe('Sed serialise tests', () => {
     assert.strictEqual(changeAttribute.newValue, '123.456789');
 
     const document = new loc.SedDocument();
-    const file = new loc.File(utils.resourcePath('cellml_2.sedml'));
+    const file = new loc.File(utils.resourcePath('file.txt'));
     const model = new loc.SedModel(document, file);
 
     assert.strictEqual(model.addChange(changeAttribute), true);
     assert.strictEqual(document.addModel(model), true);
 
-    assert.strictEqual(
-      document.serialise(utils.resourcePath()),
-      sedChangeExpectedSerialisation('component', 'variable', '123.456789')
-    );
+    assert.strictEqual(document.serialise(), sedChangeExpectedSerialisation('component', 'variable', '123.456789'));
 
     changeAttribute.componentName = 'new_component';
     changeAttribute.variableName = 'new_variable';
@@ -345,7 +562,7 @@ test.describe('Sed serialise tests', () => {
     assert.strictEqual(changeAttribute.newValue, '987.654321');
 
     assert.strictEqual(
-      document.serialise(utils.resourcePath()),
+      document.serialise(),
       sedChangeExpectedSerialisation('new_component', 'new_variable', '987.654321')
     );
   });
@@ -564,7 +781,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
 
     assert.strictEqual(
-      document.serialise(utils.resourcePath('api/sed')),
+      document.serialise(utils.resourcePath()),
       kinsolExpectedSerialisation({ 'KISAO:0000477': 'Banded' })
     );
   });
@@ -581,7 +798,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverKinsol.LinearSolver.GMRES;
 
     assert.strictEqual(
-      document.serialise(utils.resourcePath('api/sed')),
+      document.serialise(utils.resourcePath()),
       kinsolExpectedSerialisation({ 'KISAO:0000477': 'GMRES' })
     );
   });
@@ -598,7 +815,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BICGSTAB;
 
     assert.strictEqual(
-      document.serialise(utils.resourcePath('api/sed')),
+      document.serialise(utils.resourcePath()),
       kinsolExpectedSerialisation({ 'KISAO:0000477': 'BiCGStab' })
     );
   });
@@ -615,7 +832,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverKinsol.LinearSolver.TFQMR;
 
     assert.strictEqual(
-      document.serialise(utils.resourcePath('api/sed')),
+      document.serialise(utils.resourcePath()),
       kinsolExpectedSerialisation({ 'KISAO:0000477': 'TFQMR' })
     );
   });
@@ -1103,6 +1320,6 @@ test.describe('Sed serialise tests', () => {
         "SED-ML file | KINSOL: the linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead."
       ]
     ]);
-    assert.strictEqual(document.serialise(utils.resourcePath('api/sed')), expectedSerialisation);
+    assert.strictEqual(document.serialise(utils.resourcePath()), expectedSerialisation);
   });
 });

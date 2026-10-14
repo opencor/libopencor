@@ -65,23 +65,34 @@ SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
     const auto &url {pFile->url()};
 
     if (mIsLocalLocation) {
-        mLocation = pathToString(stringToPath(pFile->fileName()).parent_path());
+        mFileName = pFile->fileName();
+        mLocation = pathToString(stringToPath(mFileName).parent_path());
 
         if (!mLocation.empty()) {
             mLocation += "/";
         }
     } else {
-        // Note: the URL may have no path (e.g., "https://example.com?a=b"), in which case its location is its root
-        //       (e.g., "https://example.com/").
+        // Note #1: the URL may have no path (e.g., "https://example.com?a=b"), in which case its location is its root
+        //          (e.g., "https://example.com/").
+        // Note #2: we also keep track of the scheme (e.g., "https:") and origin (e.g., "https://example.com") of the
+        //          URL, as well as of the URL without its query and fragment (e.g.,
+        //          "https://example.com/dir/file.sedml") and without its fragment (e.g.,
+        //          "https://example.com/dir/file.sedml?a=b"), which a network-path, an absolute-path, a query-only, and
+        //          a fragment-only model source, respectively, are relative to (see populateDocument()).
 
         static constexpr std::string_view SCHEME_SEPARATOR {"://"};
 
-        auto urlWithoutQueryAndFragment {url.substr(0, url.find_first_of("?#"))};
-        auto pathPos {urlWithoutQueryAndFragment.find('/', urlWithoutQueryAndFragment.find(SCHEME_SEPARATOR) + SCHEME_SEPARATOR.size())};
+        mUrlWithoutQueryAndFragment = url.substr(0, url.find_first_of("?#"));
+        mUrlWithoutFragment = url.substr(0, url.find('#'));
+
+        auto schemeSeparatorPos {mUrlWithoutQueryAndFragment.find(SCHEME_SEPARATOR)};
+        auto pathPos {mUrlWithoutQueryAndFragment.find('/', schemeSeparatorPos + SCHEME_SEPARATOR.size())};
 
         mLocation = (pathPos == std::string::npos) ?
-                        urlWithoutQueryAndFragment + "/" :
-                        urlWithoutQueryAndFragment.substr(0, urlWithoutQueryAndFragment.rfind('/') + 1);
+                        mUrlWithoutQueryAndFragment + "/" :
+                        mUrlWithoutQueryAndFragment.substr(0, mUrlWithoutQueryAndFragment.rfind('/') + 1);
+        mUrlScheme = mUrlWithoutQueryAndFragment.substr(0, schemeSeparatorPos + 1);
+        mUrlOrigin = mUrlWithoutQueryAndFragment.substr(0, pathPos);
     }
 }
 
@@ -387,15 +398,64 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         //          forward slash (i.e. "%2F") must not make a relative model source absolute. If the SED-ML file is a
         //          remote file then a relative model source is decoded as part of the URL of the model (see
         //          retrieveFileInfo()).
+        // Note #3: if the SED-ML file is a remote file then a model source that is a file name is never a local file
+        //          name, but a reference that is relative to the URL of the SED-ML file, i.e. a network-path reference
+        //          (e.g., "//example.org/models/model.cellml") is relative to its scheme, an absolute-path reference
+        //          (e.g., "/models/model.cellml") to its origin, a query-only reference (e.g., "?model=1") to its URL
+        //          without its query and fragment, a fragment-only reference (e.g., "#model") to its URL without its
+        //          fragment, and a relative-path reference (e.g., "../models/model.cellml") to its location (see
+        //          https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2).
+        // Note #4: a model source with a scheme other than "http", "https", or "file" (e.g.,
+        //          "urn:miriam:biomodels.db:BIOMD0000000012") is an absolute URI (see
+        //          https://www.rfc-editor.org/rfc/rfc3986#section-4.3), not a reference that is relative to the SED-ML
+        //          file. We cannot retrieve such a model, so we ignore it.
+        // Note #5: if the SED-ML file is a local file and the model source is a file name then the query and fragment
+        //          of the model source (e.g., "?a=b" and "#c" in "model.cellml?a=b#c") are not part of its path, so we
+        //          ignore them (see retrieveFileInfo()). A query-only or fragment-only model source (e.g., "?model=1"
+        //          or "#model") therefore refers to the SED-ML file itself (see
+        //          https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2).
 
         auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(source, false)};
         auto isRelativeFileName {isLocalFile && !stringToPath(fileNameOrUrl).has_root_directory()};
+        auto isFileName {isLocalFile && (fileNameOrUrl == source)};
 
-        if (mIsLocalLocation && isLocalFile && (fileNameOrUrl == source)) {
-            fileNameOrUrl = decodeUrl(fileNameOrUrl);
+        if (isFileName && hasScheme(source)) {
+            std::string warning;
+
+            warning.reserve(source.size() + 64); // NOLINT
+
+            warning += "The model '";
+            warning += source;
+            warning += "' has an unsupported scheme. It has been ignored.";
+
+            addWarning(warning);
+
+            continue;
         }
 
-        auto modelSource {isRelativeFileName ? mLocation + fileNameOrUrl : fileNameOrUrl};
+        if (mIsLocalLocation && isFileName) {
+            fileNameOrUrl = decodeUrl(fileNameOrUrl.substr(0, fileNameOrUrl.find_first_of("?#")));
+        }
+
+        std::string modelSource;
+
+        if (!mIsLocalLocation && isFileName) {
+            if (source.starts_with("//")) {
+                modelSource = mUrlScheme + source;
+            } else if (source.starts_with('/')) {
+                modelSource = mUrlOrigin + source;
+            } else if (source.starts_with('?')) {
+                modelSource = mUrlWithoutQueryAndFragment + source;
+            } else if (source.starts_with('#')) {
+                modelSource = mUrlWithoutFragment + source;
+            } else {
+                modelSource = mLocation + source;
+            }
+        } else if (mIsLocalLocation && isFileName && fileNameOrUrl.empty()) {
+            modelSource = mFileName;
+        } else {
+            modelSource = isRelativeFileName ? mLocation + fileNameOrUrl : fileNameOrUrl;
+        }
 #ifdef __EMSCRIPTEN__
         const auto &file {fileManager.fileFromFileNameOrUrl(modelSource)};
 #else
@@ -419,7 +479,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
             model = SedModel::create(pDocument, File::create(modelSource));
         }
 
-        model->setId(mDocument->getModel(i)->getId());
+        setId(model, mDocument->getModel(i)->getId(), "model");
 
         for (unsigned int j {0}; j < mDocument->getModel(i)->getNumChanges(); ++j) {
             auto *change {mDocument->getModel(i)->getChange(j)};
@@ -475,6 +535,31 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
                     error += "'.";
 
                     addError(error);
+                } else {
+                    // Make sure that the component and variable names are valid CellML identifiers, since the change
+                    // couldn't otherwise be applied to a CellML model (and SedChangeAttribute::create() would reject
+                    // them).
+
+                    auto checkName = [this, &canAddChange](const char *pNameType, const std::string &pName) {
+                        if (!isCellmlIdentifier(pName)) {
+                            canAddChange = false;
+
+                            std::string warning;
+
+                            warning.reserve(pName.size() + 120); // NOLINT
+
+                            warning += "The ";
+                            warning += pNameType;
+                            warning += " name '";
+                            warning += pName;
+                            warning += "' for the change of type 'changeAttribute' is not a valid CellML identifier. The change has been ignored.";
+
+                            addWarning(warning);
+                        }
+                    };
+
+                    checkName("component", componentName);
+                    checkName("variable", variableName);
                 }
 
                 if (!isDouble(newValue)) {
@@ -541,7 +626,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
             simulation = SedAnalysis::create(pDocument);
         }
 
-        simulation->setId(sedSimulation->getId());
+        setId(simulation, sedSimulation->getId(), "simulation");
 
         pDocument->addSimulation(simulation);
 
@@ -623,13 +708,62 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 
     // Populate the tasks.
     //---GRY--- FOR NOW, WE ONLY CREATE A TASK IF WE HAVE ONE MODEL AND ONE SIMULATION.
+    // Note: the model may have been ignored (e.g., because its source has an unsupported scheme), in which case we
+    //       don't create a task since it would have no model.
 
 #ifdef CODE_COVERAGE_ENABLED
-    if (mDocument->getNumModels() == 1) {
+    if ((mDocument->getNumModels() == 1) && pDocument->hasModels()) {
 #else
-    if ((mDocument->getNumModels() == 1) && (mDocument->getNumSimulations() == 1)) {
+    if ((mDocument->getNumModels() == 1) && (mDocument->getNumSimulations() == 1) && pDocument->hasModels()) {
 #endif
         pDocument->addTask(SedTask::create(pDocument, pDocument->model(0), pDocument->simulation(0)));
+    }
+}
+
+Strings SedmlFile::Impl::ids() const
+{
+    // Return the ids of the models and simulations that are valid SED-ML identifiers.
+
+    Strings res;
+
+    for (unsigned int i {0}; i < mDocument->getNumModels(); ++i) {
+        if (const auto &id {mDocument->getModel(i)->getId()}; isSedmlId(id)) {
+            res.push_back(id);
+        }
+    }
+
+    for (unsigned int i {0}; i < mDocument->getNumSimulations(); ++i) {
+        if (const auto &id {mDocument->getSimulation(i)->getId()}; isSedmlId(id)) {
+            res.push_back(id);
+        }
+    }
+
+    return res;
+}
+
+void SedmlFile::Impl::setId(const SedBasePtr &pSedBase, const std::string &pId, const char *pType)
+{
+    // Set the id of the given SED-ML object, unless it is not a valid SED-ML identifier (e.g., "my model") or it is
+    // already used by another SED-ML object (e.g., two models with the same id), in which case the object keeps the id
+    // that it was given when it was created (e.g., "model1").
+    // Note: libSEDML doesn't reject an id that is not a valid SED-ML identifier or that is already used when it loads a
+    //       SED-ML file.
+
+    if (!pSedBase->setId(pId)) {
+        std::string warning;
+
+        warning.reserve(pId.size() + pSedBase->id().size() + 100); // NOLINT
+
+        warning += "The id '";
+        warning += pId;
+        warning += "' of the ";
+        warning += pType;
+        warning += isSedmlId(pId) ? " is already used" : " is not a valid SED-ML identifier";
+        warning += ". The id '";
+        warning += pSedBase->id();
+        warning += "' has been used instead.";
+
+        addWarning(warning);
     }
 }
 
@@ -694,6 +828,11 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
 void SedmlFile::populateDocument(const SedDocumentPtr &pDocument)
 {
     pimpl()->populateDocument(pDocument);
+}
+
+Strings SedmlFile::ids() const
+{
+    return pimpl()->ids();
 }
 
 } // namespace libOpenCOR

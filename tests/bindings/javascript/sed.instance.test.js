@@ -367,6 +367,8 @@ test.describe('Sed instance tests', () => {
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
+    // Calling stopRun() when idle is a no-op.
+
     instance.stopRun();
 
     assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
@@ -660,7 +662,7 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Pause run and resume run with natural completion', async () => {
-    const moderateStepCount = 50000;
+    const MODERATE_STEP_COUNT = 50000;
     const WAIT_ITERATIONS = 60000;
 
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
@@ -670,8 +672,8 @@ test.describe('Sed instance tests', () => {
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
 
-    simulation.numberOfSteps = moderateStepCount;
-    simulation.outputEndTime = moderateStepCount;
+    simulation.numberOfSteps = MODERATE_STEP_COUNT;
+    simulation.outputEndTime = MODERATE_STEP_COUNT;
 
     const instance = document.instantiate();
 
@@ -769,9 +771,10 @@ test.describe('Sed instance tests', () => {
     for (let i = 0; i < NUMBER_OF_RUNS; ++i) {
       assert.strictEqual(instance.startRun(), true);
 
-      // Note: the threads of our previous runs can only be cleaned up when we return to the event loop, so we must do
-      //       so or we would eventually run out of memory. We do it here rather than once our run has completed so
-      //       that a new run is still started as soon as our instance is reported as idle.
+      // Note: this has no C++ or Python equivalent since the threads of our previous runs can only be cleaned up when
+      //       we return to the event loop, which we must do or we would eventually run out of memory. We do it here
+      //       rather than once our run has completed so that a new run is still started as soon as our instance is
+      //       reported as idle.
 
       await sleep(0);
 
@@ -1614,7 +1617,8 @@ test.describe('Sed instance tests', () => {
 
     file.setContents(utils.fileContents(file.path));
 
-    const instance = new loc.SedDocument(file).instantiate();
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
 
     assert.strictEqual(instance.hasIssues, false);
 
@@ -1648,7 +1652,8 @@ test.describe('Sed instance tests', () => {
 
     file.setContents(utils.fileContents(file.path));
 
-    const instance = new loc.SedDocument(file).instantiate();
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
 
     assert.strictEqual(instance.hasIssues, false);
     assert.strictEqual(instance.run(), 0.0);

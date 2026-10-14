@@ -37,24 +37,38 @@ test.describe('File basic tests', () => {
   });
 
   test('Local file', () => {
-    const fileName = utils.resourcePath('unknown_file.txt');
-    const file = new loc.File(fileName);
+    // Note: the file is of unknown type and has no issues since our JavaScript bindings never retrieve the contents of
+    //       a file.
+
+    const filePath = utils.resourcePath('file.txt');
+    const file = new loc.File(filePath);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-    assert.strictEqual(file.fileName, fileName);
+    assert.strictEqual(file.fileName, filePath);
     assert.strictEqual(file.url, '');
-    assert.strictEqual(file.path, fileName);
+    assert.strictEqual(file.path, filePath);
     assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
     assertIssues(loc, file, expectedNoIssues);
+  });
 
-    file.setContents(utils.fileContents(file.path));
+  test('Non-existing relative local file', () => {
+    // Note: the file is of unknown type and has no issues since our JavaScript bindings never retrieve the contents of
+    //       a file.
+
+    const file = new loc.File('some/relative/../../path/../dir/file.txt');
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-    assert.deepStrictEqual(file.contents(), utils.fileContents(file.path));
-    assertIssues(loc, file, expectedUnknownFileIssues);
+    assert.strictEqual(file.fileName, 'dir/file.txt');
+    assert.strictEqual(file.url, '');
+    assert.strictEqual(file.path, 'dir/file.txt');
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
   });
 
   test('Non-existing relative local file with leading parent directories', () => {
+    // Note: the file is of unknown type and has no issues since our JavaScript bindings never retrieve the contents of
+    //       a file.
+
     const file = new loc.File('../models/./lorenz.cellml');
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
@@ -67,6 +81,8 @@ test.describe('File basic tests', () => {
 
   test('Too long local file name', () => {
     // A file name that is too long for the file system must not result in an exception being thrown.
+    // Note: the file is of unknown type and has no issues since our JavaScript bindings never retrieve the contents of
+    //       a file.
 
     const TOO_LONG_NAME_LENGTH = 5000;
 
@@ -75,6 +91,55 @@ test.describe('File basic tests', () => {
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
     assertIssues(loc, file, expectedNoIssues);
+  });
+
+  test('Local file with null character', () => {
+    // A file name with a null character cannot exist and must never be truncated at that null character (e.g.,
+    // "/some/path/file.txt\0.cellml" must not be considered to be "/some/path/file.txt").
+    // Note: the file is of unknown type and has no issues since our JavaScript bindings never retrieve the contents of
+    //       a file.
+
+    const filePath = utils.resourcePath('cellml_2.cellml');
+    const fileName = `${filePath}\0.txt`;
+    const file = new loc.File(fileName);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.fileName, fileName);
+    assert.strictEqual(file.url, '');
+    assert.strictEqual(file.path, fileName);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
+    assert.strictEqual(new loc.File(filePath).isAliasOf(file), false);
+  });
+
+  test('Local file with non-UTF-8 character', () => {
+    // A file name that is not valid UTF-8 (e.g., "/some/path/\xFF.cellml", which is what "file:///some/path/%FF.cellml"
+    // gets percent-decoded to) must not result in an exception being thrown and must be kept as is.
+    // Note: the file is of unknown type and has no issues since our JavaScript bindings never retrieve the contents of
+    //       a file.
+
+    const fileName = utils.resourcePath('\udcff.cellml');
+    const file = new loc.File(fileName);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.fileName.endsWith('\udcff.cellml'), true);
+    assert.strictEqual(file.fileName, fileName);
+    assert.strictEqual(file.url, '');
+    assert.strictEqual(file.path, fileName);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
+    assert.strictEqual(new loc.File(`file://${utils.resourcePath('%FF.cellml')}`).isAliasOf(file), true);
+
+    // A file name with a character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also kept as is.
+
+    const emojiFileName = utils.resourcePath('\u{1f600}.cellml');
+    const emojiFile = new loc.File(emojiFileName);
+
+    assert.strictEqual(emojiFile.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(emojiFile.fileName.endsWith('\u{1f600}.cellml'), true);
+    assert.strictEqual(emojiFile.fileName, emojiFileName);
+    assertIssues(loc, emojiFile, expectedNoIssues);
+    assert.strictEqual(new loc.File(`file://${utils.resourcePath('%F0%9F%98%80.cellml')}`).isAliasOf(emojiFile), true);
   });
 
   test('Local directory', () => {
@@ -87,8 +152,41 @@ test.describe('File basic tests', () => {
     assertIssues(loc, file, expectedNoIssues);
   });
 
+  test('URL-based local file', () => {
+    // Note: the file is of unknown type and has no issues since our JavaScript bindings never retrieve the contents of
+    //       a file.
+
+    const filePath = utils.resourcePath('file.txt');
+    const file = new loc.File(`file://${filePath}`);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.fileName, filePath);
+    assert.strictEqual(file.url, '');
+    assert.strictEqual(file.path, filePath);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
+
+    // A scheme is case-insensitive.
+
+    assert.strictEqual(new loc.File(`FILE://${filePath}`).isAliasOf(file), true);
+
+    // A "file" URL with the "localhost" host or without an authority also refers to a local file while a "file" URL
+    // with another host refers to a remote file.
+
+    assert.strictEqual(new loc.File(`file://localhost${filePath}`).isAliasOf(file), true);
+    assert.strictEqual(new loc.File(`file:${filePath}`).isAliasOf(file), true);
+
+    const remoteFile = new loc.File(`file://example.com${filePath}`);
+
+    assert.strictEqual(remoteFile.isAliasOf(file), false);
+    assert.strictEqual(remoteFile.fileName, '');
+    assert.strictEqual(remoteFile.url, `file://example.com${filePath}`);
+  });
+
   test('Local files with percent signs', () => {
     // A local file name is never decoded since a percent sign is a valid character in a file name.
+    // Note: the file names are not canonicalised against the local file system since our JavaScript bindings use a
+    //       virtual file system.
 
     const dir = path.join(os.tmpdir(), 'libopencor_local_files_with_percent_signs');
     const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
@@ -170,9 +268,33 @@ test.describe('File basic tests', () => {
     assert.strictEqual(percentFile.url, 'https://example.com/100%25.cellml');
     assert.strictEqual(new loc.File('https://example.com/100%25.cellml').isAliasOf(percentFile), true);
     assert.strictEqual(new loc.File(percentFile.url).isAliasOf(percentFile), true);
+
+    // A percent-encoded character that is not valid UTF-8 is also decoded.
+
+    const nonUtf8File = new loc.File('https://example.com/%FF.cellml');
+
+    assert.strictEqual(nonUtf8File.url, 'https://example.com/\udcff.cellml');
+    assert.strictEqual(new loc.File(nonUtf8File.url).isAliasOf(nonUtf8File), true);
+
+    // A percent-encoded character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also decoded.
+
+    const emojiFile = new loc.File('https://example.com/%F0%9F%98%80.cellml');
+
+    assert.strictEqual(emojiFile.url, 'https://example.com/\u{1f600}.cellml');
+    assert.strictEqual(new loc.File(emojiFile.url).isAliasOf(emojiFile), true);
+
+    // A string with a lone surrogate that doesn't stand for an invalid byte (i.e. other than U+DC80 to U+DCFF) is
+    // rejected.
+    // Note: this has no C++ equivalent since a std::string cannot contain a lone surrogate.
+
+    assert.throws(() => new loc.File('https://example.com/\ud800.cellml'), TypeError);
+    assert.throws(() => new loc.File('https://example.com/\udc41.cellml'), TypeError);
   });
 
   test('Remote file', () => {
+    // Note: the file is of unknown type and has no file name and no contents since our JavaScript bindings never
+    //       retrieve the contents of a file, so a remote file is never downloaded.
+
     const file = new loc.File(utils.REMOTE_FILE);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
@@ -180,18 +302,12 @@ test.describe('File basic tests', () => {
     assert.strictEqual(file.url, utils.REMOTE_FILE);
     assert.strictEqual(file.path, utils.REMOTE_FILE);
     assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
-    assertIssues(loc, file, expectedNoIssues);
-
-    const fileContents = utils.fileContents(utils.resourcePath('unknown_file.txt'));
-
-    file.setContents(fileContents);
-
-    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-    assert.deepStrictEqual(file.contents(), fileContents);
-    assertIssues(loc, file, expectedUnknownFileIssues);
   });
 
   test('Encoded remote file', () => {
+    // Note: the file is of unknown type and has no file name and no contents since our JavaScript bindings never
+    //       retrieve the contents of a file, so a remote file is never downloaded.
+
     const file = new loc.File(
       'https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO%20BG%20example%203.1.cellml'
     );
@@ -207,15 +323,6 @@ test.describe('File basic tests', () => {
       'https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml'
     );
     assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
-    assertIssues(loc, file, expectedNoIssues);
-
-    const fileContents = utils.fileContents(utils.resourcePath('unknown_file.txt'));
-
-    file.setContents(fileContents);
-
-    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-    assert.deepStrictEqual(file.contents(), fileContents);
-    assertIssues(loc, file, expectedUnknownFileIssues);
   });
 
   test('Remote file with dot segments', () => {
@@ -223,6 +330,37 @@ test.describe('File basic tests', () => {
 
     assert.strictEqual(file.url, 'https://example.com/c/model.cellml');
     assert.strictEqual(file.path, 'https://example.com/c/model.cellml');
+  });
+
+  test('Remote file with upper-case scheme', () => {
+    // A scheme is case-insensitive, so it gets normalised to lowercase.
+
+    const file = new loc.File('HTTPS://example.com/model.cellml');
+
+    assert.strictEqual(file.url, 'https://example.com/model.cellml');
+    assert.strictEqual(file.path, 'https://example.com/model.cellml');
+    assert.strictEqual(new loc.File('https://example.com/model.cellml').isAliasOf(file), true);
+    assert.strictEqual(new loc.File('Https://example.com/model.cellml').isAliasOf(file), true);
+    assert.strictEqual(
+      loc.FileManager.instance().fileFromFileNameOrUrl('HTTPS://example.com/model.cellml').isAliasOf(file),
+      true
+    );
+  });
+
+  test('Remote file with upper-case host', () => {
+    // A host is case-insensitive, so it gets normalised to lowercase, unlike a path which is case-sensitive.
+
+    const file = new loc.File('https://EXAMPLE.com/model.cellml');
+
+    assert.strictEqual(file.url, 'https://example.com/model.cellml');
+    assert.strictEqual(file.path, 'https://example.com/model.cellml');
+    assert.strictEqual(new loc.File('https://example.com/model.cellml').isAliasOf(file), true);
+    assert.strictEqual(new loc.File('https://Example.COM/model.cellml').isAliasOf(file), true);
+    assert.strictEqual(
+      loc.FileManager.instance().fileFromFileNameOrUrl('https://EXAMPLE.com/model.cellml').isAliasOf(file),
+      true
+    );
+    assert.strictEqual(new loc.File('https://example.com/MODEL.cellml').isAliasOf(file), false);
   });
 
   test('Remote file matching local file', () => {
@@ -285,6 +423,52 @@ test.describe('File basic tests', () => {
     assert.strictEqual(process.cwd(), origDir);
   });
 
+  test('Local virtual file', () => {
+    const filePath = utils.resourcePath('unknown_file.txt');
+    const file = new loc.File(filePath);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.fileName, filePath);
+    assert.strictEqual(file.url, '');
+    assert.strictEqual(file.path, filePath);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
+
+    const someUnknownContents = utils.fileContents(filePath);
+
+    file.setContents(someUnknownContents);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.deepStrictEqual(file.contents(), someUnknownContents);
+    assertIssues(loc, file, expectedUnknownFileIssues);
+  });
+
+  test('Remote virtual file', () => {
+    const file = new loc.File('https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt');
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.fileName, '');
+    assert.strictEqual(
+      file.url,
+      'https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt'
+    );
+    assert.strictEqual(
+      file.path,
+      'https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt'
+    );
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
+
+    const filePath = utils.resourcePath('unknown_file.txt');
+    const someUnknownContents = utils.fileContents(filePath);
+
+    file.setContents(someUnknownContents);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.deepStrictEqual(file.contents(), someUnknownContents);
+    assertIssues(loc, file, expectedUnknownFileIssues);
+  });
+
   test('Remote virtual file matching local file', () => {
     // A remote file that has no local copy has an empty file name, so it must never be confused with a local file that
     // has an empty file name.
@@ -293,65 +477,65 @@ test.describe('File basic tests', () => {
     const remoteFile = new loc.File(utils.REMOTE_FILE);
     const localFile = new loc.File('');
 
-    assert.strictEqual(fileManager.fileCount, 2);
+    assert.strictEqual(localFile.isAliasOf(remoteFile), false);
     assert.strictEqual(remoteFile.fileName, '');
     assert.strictEqual(localFile.fileName, '');
     assert.strictEqual(localFile.url, '');
-    assert.strictEqual(fileManager.fileFromFileNameOrUrl('').url, '');
-    assert.strictEqual(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE).url, utils.REMOTE_FILE);
+    assert.strictEqual(fileManager.fileFromFileNameOrUrl('').isAliasOf(localFile), true);
+    assert.strictEqual(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE).isAliasOf(remoteFile), true);
   });
 
   test('File manager', () => {
     const fileManager = loc.FileManager.instance();
-    const fileName = utils.resourcePath('file.txt');
+    const filePath = utils.resourcePath('file.txt');
 
     assert.strictEqual(fileManager.hasFiles, false);
     assert.strictEqual(fileManager.fileCount, 0);
     assert.strictEqual(fileManager.files.length, 0);
     assert.strictEqual(fileManager.file(0), null);
-    assert.strictEqual(fileManager.fileFromFileNameOrUrl(fileName), null);
+    assert.strictEqual(fileManager.fileFromFileNameOrUrl(filePath), null);
 
-    const localFile = new loc.File(fileName);
+    const localFile = new loc.File(filePath);
     const sameFileManager = loc.FileManager.instance();
 
     assert.strictEqual(sameFileManager.hasFiles, true);
     assert.strictEqual(sameFileManager.fileCount, 1);
     assert.strictEqual(sameFileManager.files.length, 1);
-    assert.deepStrictEqual(fileManager.file(0), localFile);
-    assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(fileName), localFile);
+    assert.strictEqual(fileManager.file(0).isAliasOf(localFile), true);
+    assert.strictEqual(sameFileManager.fileFromFileNameOrUrl(filePath).isAliasOf(localFile), true);
 
     const remoteFile = new loc.File(utils.REMOTE_FILE);
 
     assert.strictEqual(fileManager.hasFiles, true);
     assert.strictEqual(fileManager.fileCount, 2);
     assert.strictEqual(fileManager.files.length, 2);
-    assert.deepStrictEqual(fileManager.file(1), remoteFile);
-    assert.deepStrictEqual(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE), remoteFile);
+    assert.strictEqual(fileManager.file(1).isAliasOf(remoteFile), true);
+    assert.strictEqual(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE).isAliasOf(remoteFile), true);
 
     sameFileManager.unmanage(localFile);
 
     assert.strictEqual(sameFileManager.hasFiles, true);
     assert.strictEqual(sameFileManager.fileCount, 1);
     assert.strictEqual(sameFileManager.files.length, 1);
-    assert.deepStrictEqual(fileManager.file(1), null);
-    assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(fileName), null);
+    assert.strictEqual(fileManager.file(1), null);
+    assert.strictEqual(sameFileManager.fileFromFileNameOrUrl(filePath), null);
 
     sameFileManager.manage(localFile);
 
     assert.strictEqual(sameFileManager.hasFiles, true);
     assert.strictEqual(sameFileManager.fileCount, 2);
     assert.strictEqual(sameFileManager.files.length, 2);
-    assert.deepStrictEqual(fileManager.file(1), localFile);
-    assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(fileName), localFile);
+    assert.strictEqual(fileManager.file(1).isAliasOf(localFile), true);
+    assert.strictEqual(sameFileManager.fileFromFileNameOrUrl(filePath).isAliasOf(localFile), true);
 
     fileManager.reset();
 
     assert.strictEqual(fileManager.hasFiles, false);
     assert.strictEqual(fileManager.fileCount, 0);
     assert.strictEqual(fileManager.files.length, 0);
-    assert.deepStrictEqual(fileManager.file(0), null);
-    assert.deepStrictEqual(fileManager.file(1), null);
-    assert.deepStrictEqual(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE), null);
-    assert.deepStrictEqual(fileManager.fileFromFileNameOrUrl(utils.resourcePath('unknown_file.txt')), null);
+    assert.strictEqual(fileManager.file(0), null);
+    assert.strictEqual(fileManager.file(1), null);
+    assert.strictEqual(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE), null);
+    assert.strictEqual(fileManager.fileFromFileNameOrUrl(utils.resourcePath('unknown_file.txt')), null);
   });
 });

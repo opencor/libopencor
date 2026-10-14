@@ -190,6 +190,244 @@ TEST(SerialiseSedTest, localCellmlFileWithPercentSigns)
     }
 }
 
+TEST(SerialiseSedTest, localCellmlFileWithQuestionMarksAndNumberSigns)
+{
+    // A model source is a URI reference, so the question marks and number signs in the file name of a local model must
+    // be percent-encoded for the model source to refer to that model when the SED-ML file is loaded back (rather than
+    // to the file which name is the part of that file name that precedes the first question mark or number sign).
+
+    auto cellmlContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.cellml")).c_str())};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("my?model#1.cellml"), false)};
+
+    file->setContents(cellmlContents);
+
+    auto otherFile {libOpenCOR::File::create(libOpenCOR::resourcePath("my"), false)};
+
+    otherFile->setContents(cellmlContents);
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+#ifdef BUILDING_ON_WINDOWS
+    auto encodedFileUrl {std::string("file:///").append(libOpenCOR::forwardSlashPath(libOpenCOR::resourcePath("my%3Fmodel%231.cellml")))};
+#else
+    auto encodedFileUrl {std::string("file://").append(libOpenCOR::resourcePath("my%3Fmodel%231.cellml"))};
+#endif
+
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("my%3Fmodel%231.cellml"));
+    EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation(encodedFileUrl));
+
+    // Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    // (which we never generate, but which a third-party tool might).
+
+    for (const auto &source : std::vector<std::string> {"my%3Fmodel%231.cellml", encodedFileUrl, libOpenCOR::resourcePath("my%3Fmodel%231.cellml")}) {
+        auto sedmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("my_model.sedml"), false)};
+
+        sedmlFile->setContents(libOpenCOR::charArrayToUnsignedChars(cvodeExpectedSerialisation(source).c_str()));
+
+        auto sedmlDocument {libOpenCOR::SedDocument::create(sedmlFile)};
+
+        EXPECT_EQ(sedmlDocument->models().size(), 1U);
+        EXPECT_EQ(sedmlDocument->models()[0]->file(), file);
+
+        libOpenCOR::FileManager::instance().unmanage(sedmlFile);
+    }
+}
+
+#ifndef BUILDING_ON_WINDOWS
+TEST(SerialiseSedTest, localCellmlFileWithColon)
+{
+    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
+    // mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+    // Note: a file name cannot contain a colon on Windows.
+
+    auto cellmlContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.cellml")).c_str())};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("my:model.cellml"), false)};
+
+    file->setContents(cellmlContents);
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto fileUrl {std::string("file://").append(libOpenCOR::resourcePath("my:model.cellml"))};
+
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("./my:model.cellml"));
+    EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation(fileUrl));
+
+    // Load the SED-ML file back using a relative model source and a "file" URL model source.
+
+    for (const auto &source : std::vector<std::string> {"./my:model.cellml", fileUrl}) {
+        auto sedmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("my_model.sedml"), false)};
+
+        sedmlFile->setContents(libOpenCOR::charArrayToUnsignedChars(cvodeExpectedSerialisation(source).c_str()));
+
+        auto sedmlDocument {libOpenCOR::SedDocument::create(sedmlFile)};
+
+        EXPECT_FALSE(sedmlDocument->hasIssues());
+        EXPECT_EQ(sedmlDocument->models().size(), 1U);
+        EXPECT_EQ(sedmlDocument->models()[0]->file(), file);
+
+        libOpenCOR::FileManager::instance().unmanage(sedmlFile);
+    }
+}
+#endif
+
+TEST(SerialiseSedTest, localCellmlFileWithNonUtf8Character)
+{
+    // A model source is an XML attribute, so the bytes in the file name of a local model that are not valid UTF-8 must
+    // be percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the
+    // SED-ML file is loaded back.
+
+    auto cellmlContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.cellml")).c_str())};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("\xFF.cellml"), false)};
+
+    file->setContents(cellmlContents);
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+#ifdef BUILDING_ON_WINDOWS
+    auto encodedFileUrl {std::string("file:///").append(libOpenCOR::forwardSlashPath(libOpenCOR::resourcePath("%FF.cellml")))};
+#else
+    auto encodedFileUrl {std::string("file://").append(libOpenCOR::resourcePath("%FF.cellml"))};
+#endif
+
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("%FF.cellml"));
+    EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation(encodedFileUrl));
+
+    // Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    // (which we never generate, but which a third-party tool might).
+
+    for (const auto &source : std::vector<std::string> {"%FF.cellml", encodedFileUrl, libOpenCOR::resourcePath("%FF.cellml")}) {
+        auto sedmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("my_model.sedml"), false)};
+
+        sedmlFile->setContents(libOpenCOR::charArrayToUnsignedChars(cvodeExpectedSerialisation(source).c_str()));
+
+        auto sedmlDocument {libOpenCOR::SedDocument::create(sedmlFile)};
+
+        EXPECT_EQ(sedmlDocument->models().size(), 1U);
+        EXPECT_EQ(sedmlDocument->models()[0]->file(), file);
+
+        libOpenCOR::FileManager::instance().unmanage(sedmlFile);
+    }
+
+    // A base path that is not valid UTF-8 is also used as is.
+
+    auto otherFile {libOpenCOR::File::create(libOpenCOR::resourcePath("\xFF/model.cellml"), false)};
+
+    otherFile->setContents(cellmlContents);
+
+    EXPECT_EQ(libOpenCOR::SedDocument::create(otherFile)->serialise(libOpenCOR::resourcePath("\xFF")), cvodeExpectedSerialisation("model.cellml"));
+}
+
+TEST(SerialiseSedTest, localCellmlFileWithNonXmlCharacter)
+{
+    // A model source is an XML attribute, so the characters in the file name of a local model that are not allowed in
+    // an XML document (e.g., U+0001 and U+FFFF) must be percent-encoded for the SED-ML file to be valid and for the
+    // model source to refer to that model when the SED-ML file is loaded back.
+
+    auto cellmlContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.cellml")).c_str())};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("\x01\xEF\xBF\xBF.cellml"), false)};
+
+    file->setContents(cellmlContents);
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+#ifdef BUILDING_ON_WINDOWS
+    auto encodedFileUrl {std::string("file:///").append(libOpenCOR::forwardSlashPath(libOpenCOR::resourcePath("%01%EF%BF%BF.cellml")))};
+#else
+    auto encodedFileUrl {std::string("file://").append(libOpenCOR::resourcePath("%01%EF%BF%BF.cellml"))};
+#endif
+
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("%01%EF%BF%BF.cellml"));
+    EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation(encodedFileUrl));
+
+    // Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    // (which we never generate, but which a third-party tool might).
+
+    for (const auto &source : std::vector<std::string> {"%01%EF%BF%BF.cellml", encodedFileUrl, libOpenCOR::resourcePath("%01%EF%BF%BF.cellml")}) {
+        auto sedmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("my_model.sedml"), false)};
+
+        sedmlFile->setContents(libOpenCOR::charArrayToUnsignedChars(cvodeExpectedSerialisation(source).c_str()));
+
+        auto sedmlDocument {libOpenCOR::SedDocument::create(sedmlFile)};
+
+        EXPECT_EQ(sedmlDocument->models().size(), 1U);
+        EXPECT_EQ(sedmlDocument->models()[0]->file(), file);
+
+        libOpenCOR::FileManager::instance().unmanage(sedmlFile);
+    }
+
+    // A null character is also percent-encoded, so that the model source doesn't get truncated (and refer to another
+    // file).
+
+    auto nullFile {libOpenCOR::File::create(libOpenCOR::resourcePath("model") + std::string(1, '\0') + ".cellml", false)};
+
+    nullFile->setContents(cellmlContents);
+
+    EXPECT_EQ(libOpenCOR::SedDocument::create(nullFile)->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("model%00.cellml"));
+}
+
+TEST(SerialiseSedTest, remoteCellmlFileWithNonUtf8Character)
+{
+    // A model source is an XML attribute, so the bytes in the URL of a remote model that are not valid UTF-8 must be
+    // percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the SED-ML
+    // file is loaded back.
+
+    auto cellmlContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.cellml")).c_str())};
+    auto file {libOpenCOR::File::create("https://example.com/%FF.cellml", false)};
+
+    file->setContents(cellmlContents);
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ(document->serialise("https://example.com/"), cvodeExpectedSerialisation("%FF.cellml"));
+    EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation("https://example.com/%FF.cellml"));
+
+    // Load the SED-ML file back using a relative model source and an absolute model source.
+
+    for (const auto &source : std::vector<std::string> {"%FF.cellml", "https://example.com/%FF.cellml"}) {
+        auto sedmlFile {libOpenCOR::File::create("https://example.com/my_model.sedml", false)};
+
+        sedmlFile->setContents(libOpenCOR::charArrayToUnsignedChars(cvodeExpectedSerialisation(source).c_str()));
+
+        auto sedmlDocument {libOpenCOR::SedDocument::create(sedmlFile)};
+
+        EXPECT_EQ(sedmlDocument->models().size(), 1U);
+        EXPECT_EQ(sedmlDocument->models()[0]->file(), file);
+
+        libOpenCOR::FileManager::instance().unmanage(sedmlFile);
+    }
+}
+
+TEST(SerialiseSedTest, remoteCellmlFileWithColon)
+{
+    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
+    // mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+
+    auto cellmlContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.cellml")).c_str())};
+    auto file {libOpenCOR::File::create("https://example.com/my:model.cellml", false)};
+
+    file->setContents(cellmlContents);
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ(document->serialise("https://example.com/"), cvodeExpectedSerialisation("./my:model.cellml"));
+    EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation("https://example.com/my:model.cellml"));
+
+    // Load the SED-ML file back using a relative model source and an absolute model source.
+
+    for (const auto &source : std::vector<std::string> {"./my:model.cellml", "https://example.com/my:model.cellml"}) {
+        auto sedmlFile {libOpenCOR::File::create("https://example.com/my_model.sedml", false)};
+
+        sedmlFile->setContents(libOpenCOR::charArrayToUnsignedChars(cvodeExpectedSerialisation(source).c_str()));
+
+        auto sedmlDocument {libOpenCOR::SedDocument::create(sedmlFile)};
+
+        EXPECT_FALSE(sedmlDocument->hasIssues());
+        EXPECT_EQ(sedmlDocument->models().size(), 1U);
+        EXPECT_EQ(sedmlDocument->models()[0]->file(), file);
+
+        libOpenCOR::FileManager::instance().unmanage(sedmlFile);
+    }
+}
+
 TEST(SerialiseSedTest, remoteCellmlFileWithBasePath)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE)};
@@ -382,7 +620,7 @@ TEST(SerialiseSedTest, fixedStepOdeSolver)
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
 }
 
-TEST(SerialiseSedTest, cvodeSolverWithAdamsMoultonInterationMethod)
+TEST(SerialiseSedTest, cvodeSolverWithAdamsMoultonIntegrationMethod)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -490,7 +728,7 @@ TEST(SerialiseSedTest, cvodeSolverWithNoInterpolateSolution)
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000481", "false"}}));
 }
 
-TEST(SerialiseSedTest, kinsolWithBandedLinearSolver)
+TEST(SerialiseSedTest, kinsolSolverWithBandedLinearSolver)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -502,7 +740,7 @@ TEST(SerialiseSedTest, kinsolWithBandedLinearSolver)
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), kinsolExpectedSerialisation({{"KISAO:0000477", "Banded"}}));
 }
 
-TEST(SerialiseSedTest, kinsolWithGmresLinearSolver)
+TEST(SerialiseSedTest, kinsolSolverWithGmresLinearSolver)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -514,7 +752,7 @@ TEST(SerialiseSedTest, kinsolWithGmresLinearSolver)
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), kinsolExpectedSerialisation({{"KISAO:0000477", "GMRES"}}));
 }
 
-TEST(SerialiseSedTest, kinsolWithBicgstabLinearSolver)
+TEST(SerialiseSedTest, kinsolSolverWithBicgstabLinearSolver)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -526,7 +764,7 @@ TEST(SerialiseSedTest, kinsolWithBicgstabLinearSolver)
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), kinsolExpectedSerialisation({{"KISAO:0000477", "BiCGStab"}}));
 }
 
-TEST(SerialiseSedTest, kinsolWithTfmqrLinearSolver)
+TEST(SerialiseSedTest, kinsolSolverWithTfqmrLinearSolver)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};

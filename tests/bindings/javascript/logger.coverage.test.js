@@ -22,7 +22,7 @@ import * as utils from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe('Issue coverage tests', () => {
+test.describe('Logger coverage tests', () => {
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
   });
@@ -129,6 +129,8 @@ test.describe('Issue coverage tests', () => {
   });
 
   test('toString()', () => {
+    // Note: this has no C++ equivalent since an issue cannot be converted to a string in C++.
+
     const file = new loc.File(utils.resourcePath('error.cellml'));
 
     file.setContents(utils.fileContents(file.path));

@@ -15,6 +15,7 @@
 
 import libopencor as loc
 import platform
+import pytest
 import utils
 from utils import assert_issues
 
@@ -203,6 +204,281 @@ def test_local_cellml_file_with_percent_signs():
         loc.FileManager.instance().unmanage(sedml_file)
 
 
+def test_local_cellml_file_with_question_marks_and_number_signs():
+    # A model source is a URI reference, so the question marks and number signs in the file name of a local model must
+    # be percent-encoded for the model source to refer to that model when the SED-ML file is loaded back (rather than
+    # to the file which name is the part of that file name that precedes the first question mark or number sign).
+
+    cellml_contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+    file = loc.File(utils.resource_path("my?model#1.cellml"), False)
+
+    file.contents = cellml_contents
+
+    other_file = loc.File(utils.resource_path("my"), False)
+
+    other_file.contents = cellml_contents
+
+    document = loc.SedDocument(file)
+
+    if platform.system() == "Windows":
+        encoded_file_url = "file:///" + utils.forward_slash_path(
+            utils.resource_path("my%3Fmodel%231.cellml")
+        )
+    else:
+        encoded_file_url = "file://" + utils.resource_path("my%3Fmodel%231.cellml")
+
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
+        "my%3Fmodel%231.cellml"
+    )
+    assert document.serialise() == cvode_expected_serialisation(encoded_file_url)
+
+    # Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    # (which we never generate, but which a third-party tool might).
+
+    for source in [
+        "my%3Fmodel%231.cellml",
+        encoded_file_url,
+        utils.resource_path("my%3Fmodel%231.cellml"),
+    ]:
+        sedml_file = loc.File(utils.resource_path("my_model.sedml"), False)
+
+        sedml_file.contents = utils.text_to_list(cvode_expected_serialisation(source))
+
+        sedml_document = loc.SedDocument(sedml_file)
+
+        assert len(sedml_document.models) == 1
+        assert sedml_document.models[0].file == file
+
+        loc.FileManager.instance().unmanage(sedml_file)
+
+
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="A file name cannot contain a colon on Windows.",
+)
+def test_local_cellml_file_with_colon():
+    # A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
+    # mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+    # Note: a file name cannot contain a colon on Windows.
+
+    cellml_contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+    file = loc.File(utils.resource_path("my:model.cellml"), False)
+
+    file.contents = cellml_contents
+
+    document = loc.SedDocument(file)
+    file_url = "file://" + utils.resource_path("my:model.cellml")
+
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
+        "./my:model.cellml"
+    )
+    assert document.serialise() == cvode_expected_serialisation(file_url)
+
+    # Load the SED-ML file back using a relative model source and a "file" URL model source.
+
+    for source in ["./my:model.cellml", file_url]:
+        sedml_file = loc.File(utils.resource_path("my_model.sedml"), False)
+
+        sedml_file.contents = utils.text_to_list(cvode_expected_serialisation(source))
+
+        sedml_document = loc.SedDocument(sedml_file)
+
+        assert not sedml_document.has_issues
+        assert len(sedml_document.models) == 1
+        assert sedml_document.models[0].file == file
+
+        loc.FileManager.instance().unmanage(sedml_file)
+
+
+def test_local_cellml_file_with_non_utf8_character():
+    # A model source is an XML attribute, so the bytes in the file name of a local model that are not valid UTF-8 must
+    # be percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the SED-ML
+    # file is loaded back.
+
+    cellml_contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+    file = loc.File(utils.resource_path("\udcff.cellml"), False)
+
+    file.contents = cellml_contents
+
+    document = loc.SedDocument(file)
+
+    if platform.system() == "Windows":
+        encoded_file_url = "file:///" + utils.forward_slash_path(
+            utils.resource_path("%FF.cellml")
+        )
+    else:
+        encoded_file_url = "file://" + utils.resource_path("%FF.cellml")
+
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
+        "%FF.cellml"
+    )
+    assert document.serialise() == cvode_expected_serialisation(encoded_file_url)
+
+    # Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    # (which we never generate, but which a third-party tool might).
+
+    for source in [
+        "%FF.cellml",
+        encoded_file_url,
+        utils.resource_path("%FF.cellml"),
+    ]:
+        sedml_file = loc.File(utils.resource_path("my_model.sedml"), False)
+
+        sedml_file.contents = utils.text_to_list(cvode_expected_serialisation(source))
+
+        sedml_document = loc.SedDocument(sedml_file)
+
+        assert len(sedml_document.models) == 1
+        assert sedml_document.models[0].file == file
+
+        loc.FileManager.instance().unmanage(sedml_file)
+
+    # A base path that is not valid UTF-8 is also used as is.
+
+    other_file = loc.File(utils.resource_path("\udcff/model.cellml"), False)
+
+    other_file.contents = cellml_contents
+
+    assert loc.SedDocument(other_file).serialise(
+        utils.resource_path("\udcff")
+    ) == cvode_expected_serialisation("model.cellml")
+
+
+def test_local_cellml_file_with_non_xml_character():
+    # A model source is an XML attribute, so the characters in the file name of a local model that are not allowed in
+    # an XML document (e.g., U+0001 and U+FFFF) must be percent-encoded for the SED-ML file to be valid and for the
+    # model source to refer to that model when the SED-ML file is loaded back.
+
+    cellml_contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+    file = loc.File(utils.resource_path("\x01￿.cellml"), False)
+
+    file.contents = cellml_contents
+
+    document = loc.SedDocument(file)
+
+    if platform.system() == "Windows":
+        encoded_file_url = "file:///" + utils.forward_slash_path(
+            utils.resource_path("%01%EF%BF%BF.cellml")
+        )
+    else:
+        encoded_file_url = "file://" + utils.resource_path("%01%EF%BF%BF.cellml")
+
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
+        "%01%EF%BF%BF.cellml"
+    )
+    assert document.serialise() == cvode_expected_serialisation(encoded_file_url)
+
+    # Load the SED-ML file back using a relative model source, a "file" URL model source, and an absolute model source
+    # (which we never generate, but which a third-party tool might).
+
+    for source in [
+        "%01%EF%BF%BF.cellml",
+        encoded_file_url,
+        utils.resource_path("%01%EF%BF%BF.cellml"),
+    ]:
+        sedml_file = loc.File(utils.resource_path("my_model.sedml"), False)
+
+        sedml_file.contents = utils.text_to_list(cvode_expected_serialisation(source))
+
+        sedml_document = loc.SedDocument(sedml_file)
+
+        assert len(sedml_document.models) == 1
+        assert sedml_document.models[0].file == file
+
+        loc.FileManager.instance().unmanage(sedml_file)
+
+    # A null character is also percent-encoded, so that the model source doesn't get truncated (and refer to another
+    # file).
+
+    null_file = loc.File(utils.resource_path("model") + "\0.cellml", False)
+
+    null_file.contents = cellml_contents
+
+    assert loc.SedDocument(null_file).serialise(
+        utils.ResourceLocation
+    ) == cvode_expected_serialisation("model%00.cellml")
+
+
+def test_remote_cellml_file_with_non_utf8_character():
+    # A model source is an XML attribute, so the bytes in the URL of a remote model that are not valid UTF-8 must be
+    # percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the SED-ML
+    # file is loaded back.
+
+    cellml_contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+    file = loc.File("https://example.com/%FF.cellml", False)
+
+    file.contents = cellml_contents
+
+    document = loc.SedDocument(file)
+
+    assert document.serialise("https://example.com/") == cvode_expected_serialisation(
+        "%FF.cellml"
+    )
+    assert document.serialise() == cvode_expected_serialisation(
+        "https://example.com/%FF.cellml"
+    )
+
+    # Load the SED-ML file back using a relative model source and an absolute model source.
+
+    for source in ["%FF.cellml", "https://example.com/%FF.cellml"]:
+        sedml_file = loc.File("https://example.com/my_model.sedml", False)
+
+        sedml_file.contents = utils.text_to_list(cvode_expected_serialisation(source))
+
+        sedml_document = loc.SedDocument(sedml_file)
+
+        assert len(sedml_document.models) == 1
+        assert sedml_document.models[0].file == file
+
+        loc.FileManager.instance().unmanage(sedml_file)
+
+
+def test_remote_cellml_file_with_colon():
+    # A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
+    # mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+
+    cellml_contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+    file = loc.File("https://example.com/my:model.cellml", False)
+
+    file.contents = cellml_contents
+
+    document = loc.SedDocument(file)
+
+    assert document.serialise("https://example.com/") == cvode_expected_serialisation(
+        "./my:model.cellml"
+    )
+    assert document.serialise() == cvode_expected_serialisation(
+        "https://example.com/my:model.cellml"
+    )
+
+    # Load the SED-ML file back using a relative model source and an absolute model source.
+
+    for source in ["./my:model.cellml", "https://example.com/my:model.cellml"]:
+        sedml_file = loc.File("https://example.com/my_model.sedml", False)
+
+        sedml_file.contents = utils.text_to_list(cvode_expected_serialisation(source))
+
+        sedml_document = loc.SedDocument(sedml_file)
+
+        assert not sedml_document.has_issues
+        assert len(sedml_document.models) == 1
+        assert sedml_document.models[0].file == file
+
+        loc.FileManager.instance().unmanage(sedml_file)
+
+
 def test_remote_cellml_file_with_base_path():
     file = loc.File(utils.RemoteFile)
     document = loc.SedDocument(file)
@@ -326,11 +602,11 @@ def test_algebraic_model():
     assert document.serialise(utils.ResourceLocation) == expected_serialisation
 
 
-def sed_change_expected_serialisation(file_path, component, variable, new_value):
+def sed_change_expected_serialisation(component, variable, new_value):
     if platform.system() == "Windows":
-        source = "file:///" + utils.forward_slash_path(file_path)
+        source = "file:///" + utils.forward_slash_path(utils.resource_path("file.txt"))
     else:
-        source = f"file://{file_path}"
+        source = "file://" + utils.resource_path("file.txt")
 
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
@@ -345,7 +621,7 @@ def sed_change_expected_serialisation(file_path, component, variable, new_value)
 """
 
 
-def test_changes():
+def test_model_with_changes():
     change_attribute = loc.SedChangeAttribute("component", "variable", "123.456789")
 
     assert (
@@ -364,7 +640,7 @@ def test_changes():
     assert document.add_model(model)
 
     assert document.serialise() == sed_change_expected_serialisation(
-        file.path, "component", "variable", "123.456789"
+        "component", "variable", "123.456789"
     )
 
     change_attribute.component_name = "new_component"
@@ -380,7 +656,7 @@ def test_changes():
     assert change_attribute.new_value == "987.654321"
 
     assert document.serialise() == sed_change_expected_serialisation(
-        file.path, "new_component", "new_variable", "987.654321"
+        "new_component", "new_variable", "987.654321"
     )
 
 
@@ -414,7 +690,7 @@ def test_fixed_step_ode_solver():
     assert document.serialise(utils.ResourceLocation) == expected_serialisation
 
 
-def test_cvode_solver_with_adams_moulton_interation_method():
+def test_cvode_solver_with_adams_moulton_integration_method():
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
@@ -646,8 +922,6 @@ def test_sedml_file():
   </listOfTasks>
 </sedML>
 """
-
-    loc.FileManager.instance().reset()
 
     file = loc.File(utils.resource_path("cellml_2.sedml"))
     document = loc.SedDocument(file)

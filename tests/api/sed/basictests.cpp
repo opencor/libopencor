@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "utils.h"
+
 #include "tests/utils.h"
 
 #include <filesystem>
@@ -21,7 +23,7 @@ limitations under the License.
 
 namespace {
 
-std::string sedmlContents(const std::string &pModelSource)
+std::string sedmlContents(const std::string &pModelSource, bool pWithSimulation = false)
 {
     return R"(<?xml version='1.0' encoding='UTF-8'?>
 <sedML level="1" version="3" xmlns="http://sed-ml.org/sed-ml/level1/version3">
@@ -29,7 +31,14 @@ std::string sedmlContents(const std::string &pModelSource)
         <model id="model" language="urn:sedml:language:cellml" source=")"
            + pModelSource + R"("/>
     </listOfModels>
-</sedML>
+)" + (pWithSimulation ? R"(    <listOfSimulations>
+        <uniformTimeCourse id="simulation" initialTime="0" outputStartTime="0" outputEndTime="50" numberOfSteps="50">
+            <algorithm kisaoID="KISAO:0000019"/>
+        </uniformTimeCourse>
+    </listOfSimulations>
+)" :
+                        "")
+           + R"(</sedML>
 )";
 }
 
@@ -38,6 +47,10 @@ std::string sedmlContents(const std::string &pModelSource)
 TEST(BasicSedTest, noFile)
 {
     auto document {libOpenCOR::SedDocument::create()};
+
+    EXPECT_FALSE(document->hasIssues());
+
+    document = libOpenCOR::SedDocument::create(nullptr);
 
     EXPECT_FALSE(document->hasIssues());
 }
@@ -133,6 +146,143 @@ TEST(BasicSedTest, sedmlFileWithRelativeCellmlFileInWorkingDirectory)
     EXPECT_EQ(document->models()[0]->file()->path(), libOpenCOR::resourcePath("api/sed/cellml_2.cellml"));
 }
 
+TEST(BasicSedTest, sedmlFileWithUnsupportedSchemeCellmlFile)
+{
+    // A model source with a scheme other than "http", "https", or "file" is an absolute URI that we cannot retrieve, so
+    // its model is ignored rather than considered to be relative to the SED-ML file. No task is then created for the
+    // simulation since it would have no model.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the model 'urn:miriam:biomodels.db:BIOMD0000000012' has an unsupported scheme. It has been ignored."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsupported_scheme_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("urn:miriam:biomodels.db:BIOMD0000000012", true).c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+    EXPECT_TRUE(document->models().empty());
+    EXPECT_EQ(document->simulations().size(), 1U);
+    EXPECT_TRUE(document->tasks().empty());
+}
+
+TEST(BasicSedTest, sedmlFileWithEmptySourceCellmlFile)
+{
+    // An empty model source refers to the SED-ML file itself (see
+    // https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2), but libSEDML considers it to be an error, so the file is
+    // not considered to be a SED-ML file (and its model source never gets resolved).
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an unknown file."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/empty_source_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+    EXPECT_TRUE(document->models().empty());
+}
+
+TEST(BasicSedTest, sedmlFileWithFileUrlCellmlFile)
+{
+    // A "file" URL model source refers to a local file if it has no host (e.g., "file:///some/path/model.cellml" or
+    // "file:/some/path/model.cellml") or the "localhost" host (e.g., "file://localhost/some/path/model.cellml"), and to
+    // a remote file otherwise (e.g., "file://example.com/some/path/model.cellml").
+
+#ifdef BUILDING_ON_WINDOWS
+    auto urlPath {"/" + libOpenCOR::forwardSlashPath(libOpenCOR::resourcePath("cellml_2.cellml"))};
+#else
+    auto urlPath {libOpenCOR::resourcePath("cellml_2.cellml")};
+#endif
+    auto neededFile {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+
+    for (const auto &source : {"file://" + urlPath, "file:" + urlPath, "file://localhost" + urlPath}) {
+        auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/file_url_cellml_file.sedml"), false)};
+
+        file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents(source).c_str()));
+
+        auto document {libOpenCOR::SedDocument::create(file)};
+
+        EXPECT_FALSE(document->hasIssues());
+        EXPECT_EQ(document->models().size(), 1U);
+        EXPECT_EQ(document->models()[0]->file(), neededFile);
+    }
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/file_url_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("file://example.com" + urlPath).c_str()));
+
+    auto neededRemoteFile {libOpenCOR::File::create("file://example.com" + urlPath, false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededRemoteFile);
+}
+
+TEST(BasicSedTest, sedmlFileWithQueryAndFragmentCellmlFile)
+{
+    // The query and fragment of a model source are ignored unless they are percent-encoded, in which case they are part
+    // of the file name of the model.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/query_and_fragment_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("../../cellml_2.cellml?a=b#c").c_str()));
+
+    auto neededFile {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+
+    auto encodedFile {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/encoded_query_and_fragment_cellml_file.sedml"), false)};
+
+    encodedFile->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("../../cellml_2.cellml%3Fa=b%23c").c_str()));
+
+    auto encodedNeededFile {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml?a=b#c"), false)};
+    auto encodedDocument {libOpenCOR::SedDocument::create(encodedFile)};
+
+    EXPECT_FALSE(encodedDocument->hasIssues());
+    EXPECT_EQ(encodedDocument->models().size(), 1U);
+    EXPECT_EQ(encodedDocument->models()[0]->file(), encodedNeededFile);
+}
+
+TEST(BasicSedTest, sedmlFileWithQueryOnlyCellmlFile)
+{
+    // A query-only model source refers to the SED-ML file itself since the query of a model source is ignored.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/query_only_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("?model=1").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), file);
+}
+
+TEST(BasicSedTest, sedmlFileWithFragmentOnlyCellmlFile)
+{
+    // A fragment-only model source refers to the SED-ML file itself since the fragment of a model source is ignored.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/fragment_only_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("#model").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), file);
+}
+
 TEST(BasicSedTest, remoteSedmlFileWithRelativeCellmlFile)
 {
     // A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or
@@ -164,6 +314,128 @@ TEST(BasicSedTest, remoteSedmlFileWithoutPathWithRelativeCellmlFile)
     EXPECT_FALSE(document->hasIssues());
     EXPECT_EQ(document->models().size(), 1U);
     EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
+TEST(BasicSedTest, remoteSedmlFileWithAbsoluteCellmlFile)
+{
+    // An absolute model source is relative to the origin of the remote SED-ML file, i.e. never a local file name.
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml?a=b/c#d/e", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("/models/./model.cellml").c_str()));
+
+    auto neededFile {libOpenCOR::File::create("https://example.com/models/model.cellml", false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
+TEST(BasicSedTest, remoteSedmlFileWithNetworkPathCellmlFile)
+{
+    // A network-path model source is relative to the scheme of the remote SED-ML file, i.e. never a local file name.
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("//example.org/models/model.cellml").c_str()));
+
+    auto neededFile {libOpenCOR::File::create("https://example.org/models/model.cellml", false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
+TEST(BasicSedTest, remoteSedmlFileWithQueryOnlyCellmlFile)
+{
+    // A query-only model source is relative to the URL of the remote SED-ML file without its query and fragment, i.e.
+    // never a local file name.
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml?a=b/c#d/e", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("?model=1").c_str()));
+
+    auto neededFile {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml?model=1", false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
+TEST(BasicSedTest, remoteSedmlFileWithFragmentOnlyCellmlFile)
+{
+    // A fragment-only model source is relative to the URL of the remote SED-ML file without its fragment, i.e. never a
+    // local file name.
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml?a=b/c#d/e", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("#model").c_str()));
+
+    auto neededFile {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml?a=b/c#model", false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
+TEST(BasicSedTest, remoteSedmlFileWithRemoteCellmlFile)
+{
+    // A model source that is a URL is used as is (its scheme being normalised), i.e. it is not relative to the remote
+    // SED-ML file.
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("HTTPS://example.org/models/model.cellml").c_str()));
+
+    auto neededFile {libOpenCOR::File::create("https://example.org/models/model.cellml", false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
+TEST(BasicSedTest, remoteSedmlFileWithUnsupportedSchemeCellmlFile)
+{
+    // A model source with a scheme other than "http", "https", or "file" is an absolute URI that we cannot retrieve, so
+    // its model is ignored rather than considered to be relative to the remote SED-ML file.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the model 'urn:miriam:biomodels.db:BIOMD0000000012' has an unsupported scheme. It has been ignored."},
+    }};
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("urn:miriam:biomodels.db:BIOMD0000000012").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+    EXPECT_TRUE(document->models().empty());
+}
+
+TEST(BasicSedTest, remoteSedmlFileWithEmptySourceCellmlFile)
+{
+    // An empty model source refers to the remote SED-ML file itself (see
+    // https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2), but libSEDML considers it to be an error, so the file is
+    // not considered to be a SED-ML file (and its model source never gets resolved).
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an unknown file."},
+    }};
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+    EXPECT_TRUE(document->models().empty());
 }
 
 TEST(BasicSedTest, sedmlFileWithRemoteCellmlFile)
@@ -227,6 +499,21 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownCellmlFile)
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
+TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownHttpsCellmlFile)
+{
+    // The format of an unknown file is used to determine its type, and a format may use the "https" scheme (e.g.,
+    // "https://identifiers.org/combine.specifications/cellml.1.1").
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported)."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_one_unknown_https_cellml_file.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
 TEST(BasicSedTest, combineArchiveWithNoMasterFileAndSeveralCellmlFiles)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
@@ -237,6 +524,24 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndSeveralCellmlFiles)
     auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
+TEST(BasicSedTest, combineArchiveWithMasterFileWithDuplicateLocation)
+{
+    // The master attribute of an entry that is ignored because its location refers to the same file as another entry
+    // still applies to that file.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file 'cellml_2_b.cellml' is the same as the file './cellml_2_b.cellml'. It has been ignored."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/master_file_with_duplicate_location.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(file, EXPECTED_ISSUES);
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), file->childFile("./cellml_2_b.cellml"));
 }
 
 TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneSedmlFile)
@@ -261,6 +566,22 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownSedmlFile)
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_one_unknown_sedml_file.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
+TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownVersionedSedmlFile)
+{
+    // The format of an unknown file is used to determine its type, and a format may be versioned and use the "https"
+    // scheme (e.g., "https://identifiers.org/combine.specifications/sed-ml.level-1.version-3"). So, the unknown SED-ML
+    // file is the master file, rather than the CellML file.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported)."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_one_unknown_versioned_sedml_file.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);

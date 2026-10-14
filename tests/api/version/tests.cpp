@@ -73,6 +73,8 @@ TEST(VersionTest, libCOMBINE)
 
 TEST(VersionTest, libcurl)
 {
+    // Note: this has no JavaScript equivalent since our JavaScript bindings are built without libcurl.
+
     EXPECT_EQ(0x081500U, libOpenCOR::libcurlVersion());
     EXPECT_EQ("8.21.0-DEV", libOpenCOR::libcurlVersionString());
 }

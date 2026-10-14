@@ -28,7 +28,14 @@ test.describe('File coverage tests', () => {
   });
 
   test('Empty file', () => {
-    const file = new loc.File(utils.resourcePath('unknown_file.txt'));
+    const file = new loc.File(utils.resourcePath('file.txt'));
+
+    file.setContents(Uint8Array.from([]));
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+
+    // Null contents are the same as empty contents.
+    // Note: this has no C++ or Python equivalent since contents cannot be null in C++ or Python.
 
     file.setContents(null);
 
@@ -36,7 +43,7 @@ test.describe('File coverage tests', () => {
   });
 
   test('File with null character', () => {
-    const file = new loc.File(utils.resourcePath('unknown_file.txt'));
+    const file = new loc.File(utils.resourcePath('file.txt'));
 
     file.setContents(Uint8Array.from([0]));
 
@@ -49,19 +56,36 @@ test.describe('File coverage tests', () => {
     file.setContents(utils.fileContents(file.path));
   });
 
+  test('Irretrievable virtual file', () => {
+    const file = new loc.File(utils.resourcePath('irretrievable_file.txt'));
+
+    assert.strictEqual(file.hasIssues, false);
+  });
+
+  test('Irretrievable remote file', () => {
+    new loc.File('https://some.domain.com/irretrievable_file.txt');
+  });
+
   test('Same local file', () => {
     const filePath = utils.resourcePath('file.txt');
     const file1 = new loc.File(filePath);
     const file2 = new loc.File(filePath);
 
-    assert.deepStrictEqual(file1, file2);
+    assert.strictEqual(file1.isAliasOf(file2), true);
   });
 
   test('Same remote file', () => {
     const file1 = new loc.File(utils.REMOTE_FILE);
     const file2 = new loc.File(utils.REMOTE_FILE);
 
-    assert.deepStrictEqual(file1, file2);
+    assert.strictEqual(file1.isAliasOf(file2), true);
+  });
+
+  test('Do not retrieve contents', () => {
+    const file = new loc.File(utils.REMOTE_FILE);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
   });
 
   test('Unmanage file with children', () => {
@@ -86,7 +110,7 @@ test.describe('File coverage tests', () => {
     fileManager.manage(file);
 
     assert.strictEqual(fileManager.fileCount, 1);
-    assert.deepStrictEqual(fileManager.file(0), file);
+    assert.strictEqual(fileManager.file(0).isAliasOf(file), true);
 
     fileManager.reset();
   });
@@ -100,7 +124,7 @@ test.describe('File coverage tests', () => {
     fileManager.manage(file);
 
     assert.strictEqual(fileManager.fileCount, 1);
-    assert.deepStrictEqual(fileManager.file(0), file);
+    assert.strictEqual(fileManager.file(0).isAliasOf(file), true);
 
     fileManager.reset();
   });

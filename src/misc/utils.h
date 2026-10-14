@@ -82,6 +82,8 @@ void LIBOPENCOR_UNIT_TESTING_EXPORT printArray(const std::string &pName, const D
 
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
+std::string LIBOPENCOR_UNIT_TESTING_EXPORT percentEncodeNonXmlCharacters(const std::string &pString);
+
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT encodeUrl(const std::string &pUrl);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT decodeUrl(const std::string &pUrl, bool pDecodeReservedCharacters = true);
 
@@ -89,14 +91,15 @@ std::string LIBOPENCOR_UNIT_TESTING_EXPORT decodeUrl(const std::string &pUrl, bo
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT forwardSlashPath(const std::string &pPath);
 #endif
 
-std::filesystem::path stringToPath(const std::string &pString);
-std::string pathToString(const std::filesystem::path &pPath);
+std::filesystem::path LIBOPENCOR_UNIT_TESTING_EXPORT stringToPath(const std::string &pString);
+std::string LIBOPENCOR_UNIT_TESTING_EXPORT pathToString(const std::filesystem::path &pPath);
 
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT canonicalFileName(const std::string &pFileName);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT canonicalUrl(const std::string &pUrl);
 std::tuple<bool, std::string> LIBOPENCOR_UNIT_TESTING_EXPORT retrieveFileInfo(const std::string &pFileNameOrUrl, bool pCanonicalise = true);
 std::string relativePath(const std::string &pPath, const std::string &pBasePath);
 std::string urlPath(const std::string &pPath);
+bool LIBOPENCOR_UNIT_TESTING_EXPORT hasScheme(const std::string &pUriReference);
 
 #ifndef __EMSCRIPTEN__
 std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
@@ -109,19 +112,25 @@ bool LIBOPENCOR_UNIT_TESTING_EXPORT isInfOrNan(double pNumber);
 bool toBool(const std::string &pString);
 std::string toString(bool pBoolean);
 
-bool isInt(const std::string &pString);
-int toInt(const std::string &pString);
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isInt(const std::string &pString);
+int LIBOPENCOR_UNIT_TESTING_EXPORT toInt(const std::string &pString);
 std::string toString(int pNumber);
 
 std::string toString(size_t pNumber);
 
-bool isDouble(const std::string &pString);
-double toDouble(const std::string &pString);
-std::string toString(double pNumber);
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isDouble(const std::string &pString);
+double LIBOPENCOR_UNIT_TESTING_EXPORT toDouble(const std::string &pString);
 
+std::string toString(double pNumber);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedChars &pBytes);
 
 const xmlChar *toConstXmlCharPtr(const std::string &pString);
+
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isSedmlId(const std::string &pString);
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isCellmlIdentifier(const std::string &pString);
+
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isCellmlFormat(const std::string &pFormat);
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isSedmlFormat(const std::string &pFormat);
 
 libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable);
 

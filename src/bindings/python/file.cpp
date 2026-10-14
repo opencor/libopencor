@@ -14,10 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "stringcaster.h"
+
 #include <libopencor>
 
 #include <nanobind/stl/shared_ptr.h>
-#include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
 namespace nb = nanobind;
@@ -52,9 +53,18 @@ void fileApi(nb::module_ &m)
         .def("child_file", nb::overload_cast<size_t>(&libOpenCOR::File::childFile, nb::const_), "Return the child file at the given index.", nb::arg("index"))
         .def("child_file", nb::overload_cast<const std::string &>(&libOpenCOR::File::childFile, nb::const_), "Return the child file with the given file name.", nb::arg("file_name"))
         .def("__repr__", [](const libOpenCOR::File &self) {
-            std::string loc = self.path().empty() ? self.url() : self.path();
+            // Note: the file name or URL may not be valid UTF-8 (see stringcaster.h), in which case we escape its
+            //       invalid bytes (e.g., 0xFF becomes "\xff"), so that the representation can always be printed.
 
-            return "File(\"" + loc + "\")";
+            std::string loc = self.path().empty() ? self.url() : self.path();
+            std::string repr = "File(\"" + loc + "\")";
+            auto *res = PyUnicode_DecodeUTF8(repr.c_str(), static_cast<Py_ssize_t>(repr.size()), "backslashreplace");
+
+            if (res == nullptr) {
+                throw nb::python_error();
+            }
+
+            return nb::steal<nb::str>(res);
         });
 
     // FileManager API.

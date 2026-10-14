@@ -103,6 +103,8 @@ test.describe('Solver coverage tests', () => {
   });
 
   test('toString()', () => {
+    // Note: this has no C++ or Python equivalent since a solver can only be converted to its name in JavaScript.
+
     const file = new loc.File(utils.resourcePath('cellml_2.omex'));
 
     file.setContents(utils.fileContents(file.path));

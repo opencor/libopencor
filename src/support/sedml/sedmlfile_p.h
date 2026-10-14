@@ -36,7 +36,12 @@ struct NlaSolverInfo
 class SedmlFile::Impl: public Logger::Impl
 {
 public:
+    std::string mFileName;
     std::string mLocation;
+    std::string mUrlScheme;
+    std::string mUrlOrigin;
+    std::string mUrlWithoutQueryAndFragment;
+    std::string mUrlWithoutFragment;
     bool mIsLocalLocation;
     libsedml::SedDocument *mDocument;
     std::string mContents;
@@ -48,6 +53,10 @@ public:
     NlaSolverInfo legacyNlaSolver(const libsedml::SedSimulation *sedSimulation, bool hasNlaSolver) const;
 
     void populateDocument(const SedDocumentPtr &pDocument);
+
+    Strings ids() const;
+
+    void setId(const SedBasePtr &pSedBase, const std::string &pId, const char *pType);
 };
 
 } // namespace libOpenCOR

@@ -19,6 +19,8 @@ import utils
 
 
 def test_parallel_independent_instances():
+    # Note: this has no JavaScript equivalent since JavaScript code cannot call libOpenCOR from several threads at once.
+
     INSTANCE_COUNT = 3
     SIMULATION_PROPERTY = 10000
 
@@ -64,6 +66,8 @@ def test_parallel_independent_instances():
 
 
 def test_parallel_shared_document():
+    # Note: this has no JavaScript equivalent since JavaScript code cannot call libOpenCOR from several threads at once.
+
     SIMULATION_PROPERTY = 10000
 
     file = loc.File(utils.resource_path("cellml_2.cellml"))

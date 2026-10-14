@@ -28,6 +28,9 @@ test.describe('Sed concurrent tests', () => {
   });
 
   test('Parallel independent instances', () => {
+    // Note: this has no C++ or Python equivalent since JavaScript code cannot call libOpenCOR from several threads at
+    //       once, so we run our instances using startRun() and waitForRun() instead.
+
     const INSTANCE_COUNT = 3;
     const SIMULATION_PROPERTY = 10000;
 
@@ -62,6 +65,9 @@ test.describe('Sed concurrent tests', () => {
   });
 
   test('Parallel shared document', () => {
+    // Note: this has no C++ or Python equivalent since JavaScript code cannot call libOpenCOR from several threads at
+    //       once, so we run our instances using startRun() and waitForRun() instead.
+
     const SIMULATION_PROPERTY = 10000;
 
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));

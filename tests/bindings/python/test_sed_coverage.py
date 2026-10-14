@@ -16,6 +16,8 @@
 import libopencor as loc
 import math
 import numpy
+import platform
+import pytest
 import utils
 from utils import assert_issues, assert_values
 
@@ -71,7 +73,7 @@ def test_models():
     assert not model.add_change(None)
     assert not model.remove_all_changes()
 
-    change_attribute = loc.SedChangeAttribute("component", "variable", "newValue")
+    change_attribute = loc.SedChangeAttribute("component", "variable", "1.23")
 
     assert model.add_change(change_attribute)
 
@@ -95,11 +97,62 @@ def test_models():
     assert not model.remove_change(None)
 
 
+def sed_changes_expected_serialisation(source, changes):
+    if platform.system() == "Windows":
+        source = "/" + utils.forward_slash_path(source)
+
+    model_end = (
+        f""">
+      <listOfChanges>{changes}      </listOfChanges>
+    </model>"""
+        if changes
+        else "/>"
+    )
+
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model" language="urn:sedml:language:cellml" source="file://{source}"{model_end}
+  </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="50" numberOfSteps="50000">
+      <algorithm kisaoID="KISAO:0000019">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000209" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
+          <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+    </uniformTimeCourse>
+  </listOfSimulations>
+  <listOfTasks>
+    <task id="task1" modelReference="model" simulationReference="simulation1"/>
+  </listOfTasks>
+</sedML>
+"""
+
+
 def test_changes():
     file = loc.File(utils.resource_path("api/sed/sed_changes.omex"))
     document = loc.SedDocument(file)
 
     assert not document.has_issues
+    assert document.serialise() == sed_changes_expected_serialisation(
+        file.child_file(1).path,
+        """
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='beta']" newValue="3.0"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='rho']" newValue="13.0"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='sigma']" newValue="9.0"/>
+""",
+    )
 
     expected_issues_1 = [
         [
@@ -136,6 +189,12 @@ def test_changes():
     document = loc.SedDocument(file)
 
     assert_issues(document, expected_issues_1)
+    assert document.serialise() == sed_changes_expected_serialisation(
+        file.child_file(1).path,
+        """
+        <changeAttribute target="/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']" newValue="1.23"/>
+""",
+    )
 
     expected_issues_2 = [
         [
@@ -160,6 +219,9 @@ def test_changes():
     document = loc.SedDocument(file)
 
     assert_issues(document, expected_issues_2)
+    assert document.serialise() == sed_changes_expected_serialisation(
+        file.child_file(1).path, ""
+    )
 
 
 def test_simulations():
@@ -240,7 +302,7 @@ def test_tasks():
     assert len(document.tasks) == 0
     assert not document.add_task(None)
 
-    file = loc.File(utils.resource_path("file.txt"))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     model = loc.SedModel(document, file)
     simulation = loc.SedUniformTimeCourse(document)
     task = loc.SedTask(document, model, simulation)
@@ -330,6 +392,228 @@ def test_nla_solver():
     assert simulation.nla_solver is None
 
 
+def test_sed_base():
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = loc.SedOneStep(document)
+
+    assert simulation.id == "simulation2"
+    assert loc.SedBase.is_valid_id("my_simulation")
+
+    simulation.id = "my_simulation"
+
+    assert simulation.id == "my_simulation"
+
+    # An id that is not a valid SED-ML identifier is rejected, leaving the id unchanged.
+    # Note: a property setter cannot return whether the id was set, so a ValueError is raised instead.
+
+    for id in [
+        "",
+        "my simulation",
+        "1simulation",
+        "simulation-1",
+        "simulation\x01",
+        "\udcff",
+    ]:
+        assert not loc.SedBase.is_valid_id(id)
+
+        with pytest.raises(ValueError) as exception_info:
+            simulation.id = id
+
+        assert str(exception_info.value) == "The id is not a valid SED-ML identifier."
+        assert simulation.id == "my_simulation"
+
+    # A string with a lone surrogate that doesn't stand for an invalid byte (i.e. other than U+DC80 to U+DCFF) is
+    # rejected.
+    # Note: this has no C++ equivalent since a std::string cannot contain a lone surrogate.
+
+    with pytest.raises(TypeError):
+        loc.SedBase.is_valid_id("\ud800")
+
+    with pytest.raises(TypeError):
+        simulation.is_duplicate_id("\ud800")
+
+    with pytest.raises(TypeError):
+        simulation.id = "\ud800"
+
+    assert simulation.id == "my_simulation"
+
+
+def test_sed_ids():
+    # An id must be unique within the simulation experiment description for which an object was created.
+    # Note: a property setter cannot return whether the id was set, so a ValueError is raised instead.
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    model = document.models[0]
+    simulation = document.simulations[0]
+    task = document.tasks[0]
+
+    assert model.id == "model1"
+    assert simulation.id == "simulation1"
+    assert task.id == "task1"
+
+    # A new object is not given the id of an existing object, but it can be given an id that is not used anymore.
+
+    model.id = "model2"
+
+    other_model = loc.SedModel(document, file)
+
+    assert other_model.id == "model1"
+
+    # An id that is already used by another object, whatever its type, is a duplicate and is therefore rejected,
+    # leaving the id unchanged, even though it is a valid SED-ML identifier. The id of an object is, however, not a
+    # duplicate, so an object can be given its own id.
+
+    for id in ["model2", "simulation1", "task1"]:
+        assert loc.SedBase.is_valid_id(id)
+        assert other_model.is_duplicate_id(id)
+
+        with pytest.raises(ValueError) as exception_info:
+            other_model.id = id
+
+        assert str(exception_info.value) == "The id is already used."
+        assert other_model.id == "model1"
+
+    assert not other_model.is_duplicate_id("model1")
+
+    other_model.id = "model1"
+
+    assert not other_model.is_duplicate_id("my_model")
+
+    # A removed object releases its id, which can then be given to another object, in which case the id of the removed
+    # object is a duplicate and the removed object can only be added back once it has been given another id.
+
+    assert document.remove_model(model)
+    assert not model.is_duplicate_id("model2")
+
+    other_model.id = "model2"
+
+    assert model.is_duplicate_id("model2")
+
+    with pytest.raises(ValueError) as exception_info:
+        model.id = "model2"
+
+    assert str(exception_info.value) == "The id is already used."
+    assert not document.add_model(model)
+
+    model.id = "my_model"
+
+    assert document.add_model(model)
+    assert other_model.is_duplicate_id("my_model")
+
+    with pytest.raises(ValueError) as exception_info:
+        other_model.id = "my_model"
+
+    assert str(exception_info.value) == "The id is already used."
+
+    assert len(document.models) == 1
+    assert document.models[0] == model
+
+    # A destroyed object releases its id, even if it was never added to its simulation experiment description, so that
+    # its id can then be given to another object.
+
+    transient_model = loc.SedModel(document, file)
+
+    assert transient_model.id == "model1"
+    assert other_model.is_duplicate_id("model1")
+
+    del transient_model
+
+    assert not other_model.is_duplicate_id("model1")
+
+    other_model.id = "model1"
+
+    assert other_model.id == "model1"
+
+    # An object can only be added to the simulation experiment description for which it was created.
+
+    other_document = loc.SedDocument()
+
+    assert not other_document.add_model(other_model)
+    assert not other_document.add_simulation(simulation)
+    assert not other_document.add_task(task)
+    assert not other_document.has_models
+    assert not other_document.has_simulations
+    assert not other_document.has_tasks
+
+    # An object which simulation experiment description doesn't exist anymore has no duplicate id, so it can be given
+    # any valid id, but it cannot be added to another simulation experiment description.
+
+    orphan_simulation = loc.SedOneStep(other_document)
+
+    del other_document
+
+    assert orphan_simulation.id == "simulation1"
+    assert not orphan_simulation.is_duplicate_id("my_simulation")
+
+    orphan_simulation.id = "my_simulation"
+
+    assert orphan_simulation.id == "my_simulation"
+    assert not document.add_simulation(orphan_simulation)
+
+
+def test_sed_change_attribute():
+    # A change attribute can only be created with component and variable names that are valid CellML identifiers and
+    # with a new value that is a valid double value.
+    # Note: a constructor cannot return None, so a ValueError is raised instead.
+
+    with pytest.raises(ValueError):
+        loc.SedChangeAttribute("my component", "variable", "1.23")
+
+    with pytest.raises(ValueError):
+        loc.SedChangeAttribute("component", "1variable", "1.23")
+
+    with pytest.raises(ValueError):
+        loc.SedChangeAttribute("component", "variable", "abc")
+
+    change_attribute = loc.SedChangeAttribute("component", "variable", "1.23")
+
+    change_attribute.component_name = "new_component"
+    change_attribute.variable_name = "new_variable"
+
+    # A new value can be any decimal number, which value must be finite once rounded to the nearest double value.
+
+    for new_value in ["1.", ".5", "+1.5e-3", "-1E+3", "1e-400", "4.56"]:
+        change_attribute.new_value = new_value
+
+        assert change_attribute.new_value == new_value
+
+    # A component name, variable name, or new value that is not valid is rejected, leaving it unchanged.
+    # Note: a property setter cannot return whether the value was set, so a ValueError is raised instead.
+
+    for name in ["", "my component", "1component", "_1", "component\x01", "\udcff"]:
+        with pytest.raises(ValueError):
+            change_attribute.component_name = name
+
+        with pytest.raises(ValueError):
+            change_attribute.variable_name = name
+
+    for new_value in [
+        "",
+        "abc",
+        "1.23abc",
+        "1.23\x01",
+        "\udcff",
+        ".",
+        "1e400",
+        "inf",
+        "nan",
+        "0x1",
+        " 1",
+    ]:
+        with pytest.raises(ValueError):
+            change_attribute.new_value = new_value
+
+    assert change_attribute.component_name == "new_component"
+    assert change_attribute.variable_name == "new_variable"
+    assert change_attribute.new_value == "4.56"
+    assert (
+        change_attribute.target
+        == "/cellml:model/cellml:component[@name='new_component']/cellml:variable[@name='new_variable']"
+    )
+
+
 def test_sed_one_step():
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
@@ -383,10 +667,15 @@ def test_sed_instance_and_sed_instance_task_differential_model():
 
     assert instance.has_tasks
     assert instance.task_count == 1
-    assert len(instance) == 1
-    assert list(instance)[0] == instance_task
     assert instance.task(0) == instance_task
     assert instance.task(1) is None
+
+    # A SED instance can be sized and iterated over.
+    # Note: this has no C++ or JavaScript equivalent since a SED instance is neither sized nor iterable in C++ or
+    #       JavaScript.
+
+    assert len(instance) == 1
+    assert list(instance)[0] == instance_task
 
     assert len(instance_task.voi) == 0
     assert instance_task.voi_name == "environment/time"
@@ -463,23 +752,17 @@ def test_sed_document():
     # Note: the three following URLs use http rather than https to help with coverage testing.
 
     file = loc.File(
-        utils.resource_path(
-            "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
-        )
+        "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
     )
     loc.SedDocument(file)
 
     file = loc.File(
-        utils.resource_path(
-            "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml"
-        )
+        "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml"
     )
     loc.SedDocument(file)
 
     file = loc.File(
-        utils.resource_path(
-            "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex"
-        )
+        "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex"
     )
     loc.SedDocument(file)
 
@@ -1077,7 +1360,160 @@ def test_sedml_file_with_bare_filename():
     )
 
 
+def test_sedml_file_with_invalid_ids_and_change_names():
+    # libSEDML doesn't reject an id that is not a valid SED-ML identifier nor a change with component and/or variable
+    # names that are not valid CellML identifiers, so such an id is replaced with the one generated by libOpenCOR and
+    # such a change is ignored.
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the id 'my model' of the model is not a valid SED-ML identifier. The id 'model1' has been used instead.",
+        ],
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the component name 'my component' for the change of type 'changeAttribute' is not a valid CellML identifier. The change has been ignored.",
+        ],
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the variable name '1x' for the change of type 'changeAttribute' is not a valid CellML identifier. The change has been ignored.",
+        ],
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the id 'my simulation' of the simulation is not a valid SED-ML identifier. The id 'simulation1' has been used instead.",
+        ],
+    ]
+
+    cellml_file = loc.File(utils.resource_path("cellml_2.cellml"))
+    file = loc.File(utils.resource_path("my_model.sedml"), False)
+
+    file.contents = utils.text_to_list(
+        """<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="my model" language="urn:sedml:language:cellml" source="cellml_2.cellml">
+      <listOfChanges>
+        <changeAttribute target="/cellml:model/cellml:component[@name='my component']/cellml:variable[@name='x']" newValue="1.23"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='1x']" newValue="4.56"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='x']" newValue="7.89"/>
+      </listOfChanges>
+    </model>
+  </listOfModels>
+  <listOfSimulations>
+    <oneStep id="my simulation" step="1"/>
+  </listOfSimulations>
+</sedML>
+"""
+    )
+
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+    assert len(document.models) == 1
+    assert document.models[0].file == cellml_file
+    assert document.models[0].id == "model1"
+    assert document.models[0].change_count == 1
+    assert len(document.simulations) == 1
+    assert document.simulations[0].id == "simulation1"
+
+
+def test_sedml_file_with_invalid_ids_and_clashing_valid_ids():
+    # An id that is not a valid SED-ML identifier is replaced with the one generated by libOpenCOR, which must not be
+    # the id of another model or simulation (e.g., "model1" and "simulation1" below).
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the id 'my model' of the model is not a valid SED-ML identifier. The id 'model2' has been used instead.",
+        ],
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the id 'my simulation' of the simulation is not a valid SED-ML identifier. The id 'simulation2' has been used instead.",
+        ],
+    ]
+
+    cellml_file = loc.File(utils.resource_path("cellml_2.cellml"))
+    file = loc.File(utils.resource_path("my_model.sedml"), False)
+
+    file.contents = utils.text_to_list(
+        """<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="my model" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <oneStep id="my simulation" step="1"/>
+    <oneStep id="simulation1" step="1"/>
+  </listOfSimulations>
+</sedML>
+"""
+    )
+
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+    assert len(document.models) == 2
+    assert document.models[0].file == cellml_file
+    assert document.models[0].id == "model2"
+    assert document.models[1].file == cellml_file
+    assert document.models[1].id == "model1"
+    assert len(document.simulations) == 2
+    assert document.simulations[0].id == "simulation2"
+    assert document.simulations[1].id == "simulation1"
+
+
+def test_sedml_file_with_duplicate_ids():
+    # An id that is already used is replaced with the one generated by libOpenCOR. This includes a model and a
+    # simulation with the same id since all the ids of a SED-ML file share the same namespace.
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the id 'my_id' of the model is already used. The id 'model1' has been used instead.",
+        ],
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the id 'my_id' of the simulation is already used. The id 'simulation1' has been used instead.",
+        ],
+    ]
+
+    cellml_file = loc.File(utils.resource_path("cellml_2.cellml"))
+    file = loc.File(utils.resource_path("my_model.sedml"), False)
+
+    file.contents = utils.text_to_list(
+        """<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="my_id" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+    <model id="my_id" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <oneStep id="my_id" step="1"/>
+    <oneStep id="my_simulation" step="1"/>
+  </listOfSimulations>
+</sedML>
+"""
+    )
+
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+    assert len(document.models) == 2
+    assert document.models[0].id == "my_id"
+    assert document.models[1].id == "model1"
+    assert len(document.simulations) == 2
+    assert document.simulations[0].id == "simulation1"
+    assert document.simulations[1].id == "my_simulation"
+
+    # The ids of the SED-ML file are only reserved while it is being imported.
+
+    assert loc.SedOneStep(document).id == "simulation2"
+
+
 def test_simulation_results_are_numpy_arrays():
+    # Note: this has no C++ equivalent since the type of our simulation results is known at compile time in C++.
+
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     instance = document.instantiate()

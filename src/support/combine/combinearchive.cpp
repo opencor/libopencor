@@ -24,27 +24,11 @@ limitations under the License.
 
 #include <atomic>
 #include <filesystem>
-#include <regex>
+#include <unordered_map>
 
 namespace libOpenCOR {
 
 namespace {
-
-bool isCellmlFormat(const std::string &pFormat)
-{
-    // Note: we accept versioned formats (e.g., cellml.1.0 or cellml.2.0).
-
-    static const std::regex CELLML_FORMAT_REGEX {R"(^http://identifiers\.org/combine\.specifications/cellml(\..*)?$)"};
-
-    return std::regex_match(pFormat, CELLML_FORMAT_REGEX);
-}
-
-bool isSedmlFormat(const std::string &pFormat)
-{
-    static const std::string SEDML_FORMAT {"http://identifiers.org/combine.specifications/sed-ml"};
-
-    return pFormat == SEDML_FORMAT;
-}
 
 std::string archiveLocation(const FilePtr &pFile)
 {
@@ -88,6 +72,7 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
 
     FilePtr cellmlFile;
     FilePtr sedmlFile;
+    std::unordered_map<std::string, size_t> fileIndexes;
 
     for (int i {0}; i < mArchive->getNumEntries(); ++i) {
         const auto *entry {mArchive->getEntry(i)};
@@ -120,6 +105,48 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
 
             continue;
         }
+
+        // Skip a location that refers to the COMBINE archive itself.
+        // Note: libCOMBINE skips the "." location, which is how a COMBINE archive normally refers to itself, but not
+        //       the other locations that refer to it (e.g., "./" or "/"), which would otherwise result in a file for
+        //       the directory in which we extract the COMBINE archive.
+
+        if (fileName == mArchiveLocation) {
+            continue;
+        }
+
+        // Make sure that the file is not the same as a file that we have already extracted.
+        // Note: different locations may refer to the same file (e.g., "./my%20file.cellml" and "./my file.cellml", or
+        //       "./file.cellml" and "file.cellml"). This is an ambiguity in the COMBINE archive itself, so we keep the
+        //       first file and ignore the other ones (File::create() would otherwise return the same file, which
+        //       contents would get replaced and which would be counted several times). We do, however, honour the
+        //       master attribute of an ignored entry since it still refers to the file that we kept, and we keep track
+        //       of its location so that it can still be used to retrieve that file (see file()).
+
+        if (auto fileIndex {fileIndexes.find(fileName)}; fileIndex != fileIndexes.end()) {
+            const auto &fileLocation {mFileNames[fileIndex->second]};
+            std::string warning;
+
+            warning.reserve(location.size() + fileLocation.size() + 64); // NOLINT
+
+            warning += "The file '";
+            warning += location;
+            warning += "' is the same as the file '";
+            warning += fileLocation;
+            warning += "'. It has been ignored.";
+
+            addWarning(warning);
+
+            mIgnoredFileNameIndexes.emplace(location, fileIndex->second);
+
+            if (entry->getMaster()) {
+                mMasterFile = mFiles[fileIndex->second];
+            }
+
+            continue;
+        }
+
+        fileIndexes.emplace(fileName, mFiles.size());
 
         // Retrieve the contents of the file.
         // Note #1: a location is a URI reference while the name of an entry in the ZIP file is a file name, so the
@@ -251,13 +278,22 @@ const FilePtr &CombineArchive::Impl::file(const std::string &pFileName) const
 {
     static const FilePtr NO_FILE_PTR;
 
-    // Look for the file using its location, as returned by fileNames() (e.g., "./my%20file.cellml"), or its file name
-    // relative to the COMBINE archive (e.g., "my file.cellml").
+    // Look for the file using its location, as returned by fileNames() (e.g., "./my%20file.cellml"), the location of an
+    // entry that was ignored because it refers to the same file (e.g., "my%20file.cellml"), or its file name relative
+    // to the COMBINE archive (e.g., "my file.cellml").
+    // Note: a file name is never decoded (see retrieveFileInfo()), so we must look for the location of an ignored entry
+    //       explicitly since it may be percent-encoded.
 
     for (size_t i {0}; i < mFileNames.size(); ++i) {
         if (mFileNames[i] == pFileName) {
             return mFiles[i];
         }
+    }
+
+    auto ignoredFileNameIndex {mIgnoredFileNameIndexes.find(pFileName)};
+
+    if (ignoredFileNameIndex != mIgnoredFileNameIndexes.end()) {
+        return mFiles[ignoredFileNameIndex->second];
     }
 
     auto [isLocalFile, fileName] {retrieveFileInfo(mArchiveLocation + pFileName)};

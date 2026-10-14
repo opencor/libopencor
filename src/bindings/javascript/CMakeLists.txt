@@ -22,6 +22,7 @@ set(JAVASCRIPT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/stringconverter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
     CACHE INTERNAL "JavaScript source files."
 )

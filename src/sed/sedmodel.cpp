@@ -29,7 +29,7 @@ namespace libOpenCOR {
 static constexpr auto ID_PREFIX {"model"};
 
 SedModel::Impl::Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile)
-    : SedBase::Impl(pDocument->pimpl()->uniqueId(ID_PREFIX))
+    : SedBase::Impl(pDocument, ID_PREFIX)
     , mFile(pFile)
 {
 }
@@ -171,19 +171,55 @@ void SedModel::Impl::serialise(xmlNodePtr pNode) const
                      relativePath(mFile->path(), mBasePath)};
 #endif
 
-    // A model source is a URI reference, which gets decoded when it is for a local file (see retrieveFileInfo() and
-    // SedmlFile::Impl::populateDocument()). So, for a local file, we must percent-encode the percent signs in its file
-    // name (e.g., "my%20model.cellml" must become "my%2520model.cellml"), so that the model source can be decoded back
-    // to the file name of the model.
+    // A model source is a URI reference, which gets decoded when it is for a local file and which query and fragment
+    // are then ignored (see retrieveFileInfo() and SedmlFile::Impl::populateDocument()). So, for a local file, we must
+    // percent-encode the percent signs, question marks, and number signs in its file name (e.g., "my%20model#1.cellml"
+    // must become "my%2520model%231.cellml"), so that the model source can be decoded back to the file name of the
+    // model.
 
     if (mFile->url().empty()) {
-        static constexpr auto PERCENT_SIGN {'%'};
-        static constexpr std::string_view PERCENT_ENCODED_PERCENT_SIGN {"%25"};
+        std::string encodedSource;
 
-        for (auto pos {source.find(PERCENT_SIGN)}; pos != std::string::npos; pos = source.find(PERCENT_SIGN, pos + PERCENT_ENCODED_PERCENT_SIGN.size())) {
-            source.replace(pos, 1, PERCENT_ENCODED_PERCENT_SIGN);
+        encodedSource.reserve(source.size());
+
+        for (const auto sourceChar : source) {
+            if (sourceChar == '%') {
+                encodedSource += "%25";
+            } else if (sourceChar == '?') {
+                encodedSource += "%3F";
+            } else if (sourceChar == '#') {
+                encodedSource += "%23";
+            } else {
+                encodedSource += sourceChar;
+            }
         }
+
+        source = std::move(encodedSource);
     }
+
+    // A relative model source which first segment contains a colon (e.g., "my:model.cellml") would be mistaken for a URI
+    // with a scheme (i.e. "my"), so we prefix it with "./" (i.e. "./my:model.cellml"), as recommended by
+    // https://www.rfc-editor.org/rfc/rfc3986#section-4.2.
+    // Note: a model source is only relative if we were given a base path (see relativePath()), so we don't need to worry
+    //       about the drive letter of a Windows file name (e.g., "C:/some/path/model.cellml").
+
+    if (!mBasePath.empty() && (source.find(':') < source.find('/'))) {
+        source.insert(0, "./");
+    }
+
+    // The file name or URL of the model may not be valid UTF-8 (e.g., "file:///some/path/%FF.cellml" gets
+    // percent-decoded to "/some/path/\xFF.cellml") or may contain characters that are not allowed in an XML document
+    // (e.g., "/some/path/\x01.cellml"), but the model source must be valid since it is an XML attribute. So, we
+    // percent-encode those bytes (e.g., "\xFF.cellml" becomes "%FF.cellml"), which get decoded back when the SED-ML
+    // file is loaded.
+    // Note #1: this must be done after percent-encoding the percent signs of a local file name, so that the percent
+    //          signs that we add here don't get percent-encoded.
+    // Note #2: a null character is also percent-encoded (i.e. "%00"), so that the model source doesn't get truncated
+    //          (and refer to another file). It doesn't, however, get decoded back (see decodeUrl()), so the model
+    //          source won't refer to the model when the SED-ML file is loaded, but such a model cannot exist on disk
+    //          anyway.
+
+    source = percentEncodeNonXmlCharacters(source);
 
     xmlNewProp(node, toConstXmlCharPtr("source"), toConstXmlCharPtr(source));
 

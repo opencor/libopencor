@@ -32,6 +32,7 @@ public:
     size_t mVersion {4};
 
     std::unordered_set<std::string> mIds;
+    std::unordered_set<std::string> mImportedIds;
 
     SedDataDescriptionPtrs mDataDescriptions;
     SedModelPtrs mModels;
@@ -42,6 +43,8 @@ public:
     SedStylePtrs mStyles;
 
     std::string uniqueId(const std::string &pPrefix);
+    bool reserveId(SedBase::Impl *pSedBase);
+    void releaseId(SedBase::Impl *pSedBase);
 
     void initialise(const SedDocumentPtr &pOwner, const FilePtr &pFile);
     static void initialiseFromCellmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile);

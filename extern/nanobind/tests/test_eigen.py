@@ -1,7 +1,6 @@
 import pytest
 import itertools
 import re
-import sys
 
 try:
     import numpy as np
@@ -140,8 +139,15 @@ def test04_matrix():
 @pytest.mark.parametrize("rowStep", (1, 2, -2))
 @pytest.mark.parametrize("colStep", (1, 3, -3))
 @pytest.mark.parametrize("transpose", (False, True))
-def test05_matrix_large_nonsymm(rowStart, colStart, rowStep, colStep, transpose):
-    A = np.uint32(np.vander(np.arange(80)))
+@pytest.mark.parametrize("vector", (False, True))
+def test05_matrix_large_nonsymm(rowStart, colStart, rowStep, colStep, transpose, vector):
+    if vector:
+        if colStart != 0 or colStep != 1:
+            pytest.skip("This test permutation is not sensible.")
+        # Use ndim=2 but with shape=(80, 1) -- suitable for any Ref storage order.
+        A = np.uint32(np.arange(80).reshape((-1, 1)))
+    else:
+        A = np.uint32(np.vander(np.arange(80)))
     if rowStep < 0:
         rowStart = -rowStart - 1
     if colStep < 0:
@@ -339,8 +345,8 @@ def test08b_sparse_noconvert():
 
 
 @needs_numpy_and_eigen
-def test09_sparse_failures():
-    sp = pytest.importorskip("scipy.sparse")
+def test09_sparse_uncompressed():
+    pytest.importorskip("scipy.sparse")
 
     with pytest.raises(
         ValueError,
@@ -350,27 +356,6 @@ def test09_sparse_failures():
     ):
         t.sparse_r_uncompressed()
 
-    csr_matrix = sp.csr_matrix
-    sp.csr_matrix = None
-    with pytest.raises(TypeError, match=re.escape("'NoneType' object is not callable")):
-        t.sparse_r()
-
-    del sp.csr_matrix
-    with pytest.raises(
-        AttributeError,
-        match=re.escape("'scipy.sparse' has no attribute 'csr_matrix'"),
-    ):
-        t.sparse_r()
-
-    sys_path = sys.path
-    sys.path = []
-    del sys.modules["scipy"]
-    with pytest.raises(ModuleNotFoundError, match=re.escape("No module named 'scipy'")):
-        t.sparse_r()
-
-    # undo sabotage of the module
-    sys.path = sys_path
-    sp.csr_matrix = csr_matrix
 
 @needs_numpy_and_eigen
 def test10_eigen_scalar_default():

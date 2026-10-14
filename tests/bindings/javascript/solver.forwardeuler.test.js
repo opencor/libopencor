@@ -80,6 +80,8 @@ test.describe('Solver Forward Euler tests', () => {
   });
 
   test('Solve with several steps per output point', () => {
+    // Note: the output interval is 0.001, hence our step means that we have several steps per output point.
+
     const file = new loc.File(utils.resourcePath('api/solver/ode.cellml'));
 
     file.setContents(utils.fileContents(file.path));
@@ -87,8 +89,6 @@ test.describe('Solver Forward Euler tests', () => {
     const document = new loc.SedDocument(file);
     const simulation = document.simulations[0];
     const solver = new loc.SolverForwardEuler();
-
-    // Note: the output interval is 0.001, hence our step means that we have several steps per output point.
 
     solver.step = 0.00023;
 

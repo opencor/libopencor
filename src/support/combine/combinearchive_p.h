@@ -20,6 +20,8 @@ limitations under the License.
 
 #include "combinearchive.h"
 
+#include <unordered_map>
+
 namespace libOpenCOR {
 
 class CombineArchive::Impl: public Logger::Impl
@@ -31,6 +33,7 @@ public:
     size_t mArchiveLocationSize;
     std::vector<FilePtr> mFiles;
     std::vector<std::string> mFileNames;
+    std::unordered_map<std::string, size_t> mIgnoredFileNameIndexes;
     FilePtr mMasterFile;
     size_t mCellmlFileCount {0};
     size_t mSedmlFileCount {0};

@@ -54,12 +54,15 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
             }
         }
     } else if (pRetrieveContents) {
-        // Note: we use the std::error_code version of std::filesystem::exists() so that nothing gets thrown (e.g., if
-        //       the file name is too long), in which case we consider that the file doesn't exist.
+        // Note #1: we use the std::error_code version of std::filesystem::exists() so that nothing gets thrown (e.g.,
+        //          if the file name is too long), in which case we consider that the file doesn't exist.
+        // Note #2: a file name with a null character (e.g., "/some/path/file.txt\0.cellml") cannot exist, but
+        //          std::filesystem::exists() would only consider the file name up to that null character (i.e.
+        //          "/some/path/file.txt").
 
         std::error_code errorCode;
 
-        if (!std::filesystem::exists(mFilePath, errorCode)) {
+        if ((fileNameOrUrl.find('\0') != std::string::npos) || !std::filesystem::exists(mFilePath, errorCode)) {
             mType = Type::IRRETRIEVABLE_FILE;
 
             addError("The file does not exist.");

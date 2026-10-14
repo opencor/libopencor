@@ -61,8 +61,10 @@ TEST(BasicFileTest, localFile)
     EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
 }
 
-TEST(BasicSedTest, existingRelativeLocalFile)
+TEST(BasicFileTest, existingRelativeLocalFile)
 {
+    // Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file.
+
     auto origDir {std::filesystem::current_path()};
 
     std::filesystem::current_path(libOpenCOR::resourcePath());
@@ -132,6 +134,61 @@ TEST(BasicFileTest, tooLongLocalFileName)
     EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
 }
 
+TEST(BasicFileTest, localFileWithNullCharacter)
+{
+    // A file name with a null character cannot exist and must never be truncated at that null character (e.g.,
+    // "/some/path/file.txt\0.cellml" must not be considered to be "/some/path/file.txt").
+
+    auto filePath {libOpenCOR::resourcePath("cellml_2.cellml")};
+    auto fileName {filePath + std::string(1, '\0') + ".txt"};
+    auto file {libOpenCOR::File::create(fileName)};
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_EQ(file->fileName(), fileName);
+    EXPECT_EQ(file->url(), "");
+    EXPECT_EQ(file->path(), fileName);
+    EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
+    EXPECT_NE(libOpenCOR::File::create(filePath), file);
+}
+
+TEST(BasicFileTest, localFileWithNonUtf8Character)
+{
+    // A file name that is not valid UTF-8 (e.g., "/some/path/\xFF.cellml", which is what "file:///some/path/%FF.cellml"
+    // gets percent-decoded to) must not result in an exception being thrown and must be kept as is.
+
+    auto fileName {libOpenCOR::resourcePath("\xFF.cellml")};
+    auto file {libOpenCOR::File::create(fileName)};
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_TRUE(file->fileName().ends_with("\xFF.cellml"));
+    EXPECT_EQ(file->fileName(), fileName);
+    EXPECT_EQ(file->url(), "");
+    EXPECT_EQ(file->path(), fileName);
+    EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
+#ifdef BUILDING_ON_WINDOWS
+    EXPECT_EQ(libOpenCOR::File::create(std::string("file:///") + libOpenCOR::forwardSlashPath(libOpenCOR::resourcePath("%FF.cellml"))), file);
+#else
+    EXPECT_EQ(libOpenCOR::File::create(std::string("file://") + libOpenCOR::resourcePath("%FF.cellml")), file);
+#endif
+
+    // A file name with a character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also kept as is.
+
+    auto emojiFileName {libOpenCOR::resourcePath("\xF0\x9F\x98\x80.cellml")};
+    auto emojiFile {libOpenCOR::File::create(emojiFileName)};
+
+    EXPECT_EQ(emojiFile->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_TRUE(emojiFile->fileName().ends_with("\xF0\x9F\x98\x80.cellml"));
+    EXPECT_EQ(emojiFile->fileName(), emojiFileName);
+    EXPECT_EQ_ISSUES(emojiFile, expectedNonExistingFileIssues());
+#ifdef BUILDING_ON_WINDOWS
+    EXPECT_EQ(libOpenCOR::File::create(std::string("file:///") + libOpenCOR::forwardSlashPath(libOpenCOR::resourcePath("%F0%9F%98%80.cellml"))), emojiFile);
+#else
+    EXPECT_EQ(libOpenCOR::File::create(std::string("file://") + libOpenCOR::resourcePath("%F0%9F%98%80.cellml")), emojiFile);
+#endif
+}
+
 TEST(BasicFileTest, localDirectory)
 {
     // A directory is not a file, but it must not result in an exception being thrown.
@@ -158,6 +215,32 @@ TEST(BasicFileTest, urlBasedLocalFile)
     EXPECT_EQ(file->path(), filePath);
     EXPECT_TRUE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
+
+    // A scheme is case-insensitive.
+
+#ifdef BUILDING_ON_WINDOWS
+    EXPECT_EQ(libOpenCOR::File::create(std::string("FILE:///") + libOpenCOR::forwardSlashPath(filePath)), file);
+#else
+    EXPECT_EQ(libOpenCOR::File::create(std::string("FILE://") + filePath), file);
+#endif
+
+    // A "file" URL with the "localhost" host or without an authority also refers to a local file while a "file" URL
+    // with another host refers to a remote file.
+
+#ifdef BUILDING_ON_WINDOWS
+    auto urlPath {"/" + libOpenCOR::forwardSlashPath(filePath)};
+#else
+    const auto &urlPath {filePath};
+#endif
+
+    EXPECT_EQ(libOpenCOR::File::create("file://localhost" + urlPath), file);
+    EXPECT_EQ(libOpenCOR::File::create("file:" + urlPath), file);
+
+    auto remoteFile {libOpenCOR::File::create("file://example.com" + urlPath, false)};
+
+    EXPECT_NE(remoteFile, file);
+    EXPECT_EQ(remoteFile->fileName(), "");
+    EXPECT_EQ(remoteFile->url(), "file://example.com" + urlPath);
 }
 
 TEST(BasicFileTest, localFilesWithPercentSigns)
@@ -249,6 +332,20 @@ TEST(BasicFileTest, remoteFilesWithPercentEncodedCharacters)
     EXPECT_EQ(percentFile->url(), "https://example.com/100%25.cellml");
     EXPECT_EQ(libOpenCOR::File::create("https://example.com/100%25.cellml", false), percentFile);
     EXPECT_EQ(libOpenCOR::File::create(percentFile->url(), false), percentFile);
+
+    // A percent-encoded character that is not valid UTF-8 is also decoded.
+
+    auto nonUtf8File {libOpenCOR::File::create("https://example.com/%FF.cellml", false)};
+
+    EXPECT_EQ(nonUtf8File->url(), "https://example.com/\xFF.cellml");
+    EXPECT_EQ(libOpenCOR::File::create(nonUtf8File->url(), false), nonUtf8File);
+
+    // A percent-encoded character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also decoded.
+
+    auto emojiFile {libOpenCOR::File::create("https://example.com/%F0%9F%98%80.cellml", false)};
+
+    EXPECT_EQ(emojiFile->url(), "https://example.com/\xF0\x9F\x98\x80.cellml");
+    EXPECT_EQ(libOpenCOR::File::create(emojiFile->url(), false), emojiFile);
 }
 
 TEST(BasicFileTest, remoteFile)
@@ -265,6 +362,8 @@ TEST(BasicFileTest, remoteFile)
 TEST(BasicFileTest, remoteFileLocalCopy)
 {
     // The local copy of a remote file must exist for as long as the remote file exists, and be deleted with it.
+    // Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
+    //       remote file is never downloaded.
 
     std::string fileName;
 
@@ -283,6 +382,8 @@ TEST(BasicFileTest, localFileMatchingLocalCopyOfRemoteFile)
 {
     // A local file must never be confused with the local copy of a remote file, and deleting it must not delete that
     // local copy (since it is not a file that we downloaded).
+    // Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
+    //       remote file is never downloaded.
 
     auto remoteFile {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE)};
     const auto &fileName {remoteFile->fileName()};
@@ -318,6 +419,33 @@ TEST(BasicFileTest, remoteFileWithDotSegments)
 
     EXPECT_EQ(file->url(), "https://example.com/c/model.cellml");
     EXPECT_EQ(file->path(), "https://example.com/c/model.cellml");
+}
+
+TEST(BasicFileTest, remoteFileWithUpperCaseScheme)
+{
+    // A scheme is case-insensitive, so it gets normalised to lowercase.
+
+    auto file {libOpenCOR::File::create("HTTPS://example.com/model.cellml", false)};
+
+    EXPECT_EQ(file->url(), "https://example.com/model.cellml");
+    EXPECT_EQ(file->path(), "https://example.com/model.cellml");
+    EXPECT_EQ(libOpenCOR::File::create("https://example.com/model.cellml", false), file);
+    EXPECT_EQ(libOpenCOR::File::create("Https://example.com/model.cellml", false), file);
+    EXPECT_EQ(libOpenCOR::FileManager::instance().file("HTTPS://example.com/model.cellml"), file);
+}
+
+TEST(BasicFileTest, remoteFileWithUpperCaseHost)
+{
+    // A host is case-insensitive, so it gets normalised to lowercase, unlike a path which is case-sensitive.
+
+    auto file {libOpenCOR::File::create("https://EXAMPLE.com/model.cellml", false)};
+
+    EXPECT_EQ(file->url(), "https://example.com/model.cellml");
+    EXPECT_EQ(file->path(), "https://example.com/model.cellml");
+    EXPECT_EQ(libOpenCOR::File::create("https://example.com/model.cellml", false), file);
+    EXPECT_EQ(libOpenCOR::File::create("https://Example.COM/model.cellml", false), file);
+    EXPECT_EQ(libOpenCOR::FileManager::instance().file("https://EXAMPLE.com/model.cellml"), file);
+    EXPECT_NE(libOpenCOR::File::create("https://example.com/MODEL.cellml", false), file);
 }
 
 TEST(BasicFileTest, remoteFileMatchingLocalFile)
@@ -387,6 +515,8 @@ TEST(BasicFileTest, concurrentFileDownloads)
 {
     // Remote files that are downloaded at the same time must each have their own local copy, so that deleting the local
     // copy of one of them doesn't delete the local copy of another one.
+    // Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
+    //       remote file is never downloaded.
 
     static constexpr size_t THREAD_COUNT {8};
 

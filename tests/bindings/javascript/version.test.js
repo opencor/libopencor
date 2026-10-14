@@ -48,31 +48,67 @@ test.describe('Version tests', () => {
     }
 
     assert.strictEqual(loc.version(), version);
-    assert.strictEqual(loc.versionString(), `${majorVersion}.${date}.${patchVersion}`);
+    assert.strictEqual(loc.versionString(), versionStr);
+
+    // The version is a big integer and the version string is a string.
+    // Note: this has no C++ equivalent since C++ is statically typed.
+
+    assert.strictEqual(typeof loc.version(), 'bigint');
+    assert.strictEqual(typeof loc.versionString(), 'string');
   });
 
   test('libCellML', () => {
     assert.strictEqual(loc.libcellmlVersion(), 0x000701);
     assert.strictEqual(loc.libcellmlVersionString(), '0.7.1');
+
+    // The version is a number and the version string is a string.
+    // Note: this has no C++ equivalent since C++ is statically typed.
+
+    assert.strictEqual(typeof loc.libcellmlVersion(), 'number');
+    assert.strictEqual(typeof loc.libcellmlVersionString(), 'string');
   });
 
   test('libCOMBINE', () => {
     assert.strictEqual(loc.libcombineVersion(), 220);
     assert.strictEqual(loc.libcombineVersionString(), '0.2.20');
+
+    // The version is a number and the version string is a string.
+    // Note: this has no C++ equivalent since C++ is statically typed.
+
+    assert.strictEqual(typeof loc.libcombineVersion(), 'number');
+    assert.strictEqual(typeof loc.libcombineVersionString(), 'string');
   });
 
   test('libSEDML', () => {
     assert.strictEqual(loc.libsedmlVersion(), 20033);
     assert.strictEqual(loc.libsedmlVersionString(), '2.0.33');
+
+    // The version is a number and the version string is a string.
+    // Note: this has no C++ equivalent since C++ is statically typed.
+
+    assert.strictEqual(typeof loc.libsedmlVersion(), 'number');
+    assert.strictEqual(typeof loc.libsedmlVersionString(), 'string');
   });
 
   test('LLVM', () => {
     assert.strictEqual(loc.llvmVersion(), 0x220108);
     assert.strictEqual(loc.llvmVersionString(), '22.1.8');
+
+    // The version is a number and the version string is a string.
+    // Note: this has no C++ equivalent since C++ is statically typed.
+
+    assert.strictEqual(typeof loc.llvmVersion(), 'number');
+    assert.strictEqual(typeof loc.llvmVersionString(), 'string');
   });
 
   test('SUNDIALS', () => {
     assert.strictEqual(loc.sundialsVersion(), 0x070700);
     assert.strictEqual(loc.sundialsVersionString(), '7.7.0');
+
+    // The version is a number and the version string is a string.
+    // Note: this has no C++ equivalent since C++ is statically typed.
+
+    assert.strictEqual(typeof loc.sundialsVersion(), 'number');
+    assert.strictEqual(typeof loc.sundialsVersionString(), 'string');
   });
 });

@@ -122,6 +122,8 @@ TEST(CoverageSolverTest, kinsolSolveWithChangedSettings)
 {
     // Solve different NLA systems (both in terms of size and settings) using the same solver instance to make sure that
     // the underlying KINSOL objects of each NLA system are created, reused, and recreated as needed.
+    // Note: this has no JavaScript or Python equivalent since SolverNla::solve() takes a C function pointer, a raw
+    //       array, and a void pointer, and is therefore not exposed to JavaScript or Python.
 
     auto solver {libOpenCOR::SolverKinsol::create()};
 

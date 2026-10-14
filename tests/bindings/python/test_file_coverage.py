@@ -34,11 +34,9 @@ def test_file_with_null_character():
 
 
 def test_sedml_file_with_no_parent():
-    file = loc.File("cellml_2.sedml")
+    file = loc.File(utils.resource_path("cellml_2.sedml"))
 
-    file.contents = utils.text_to_list(
-        utils.text_file_contents(utils.resource_path("cellml_2.sedml"))
-    )
+    file.contents = utils.text_to_list(utils.text_file_contents(file.path))
 
 
 def test_irretrievable_virtual_file():
@@ -56,14 +54,14 @@ def test_same_local_file():
     file1 = loc.File(file_path)
     file2 = loc.File(file_path)
 
-    assert file1.__subclasshook__ == file2.__subclasshook__
+    assert file1 == file2
 
 
 def test_same_remote_file():
     file1 = loc.File(utils.RemoteFile)
     file2 = loc.File(utils.RemoteFile)
 
-    assert file1.__subclasshook__ == file2.__subclasshook__
+    assert file1 == file2
 
 
 def test_do_not_retrieve_contents():

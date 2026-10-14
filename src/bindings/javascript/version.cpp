@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "stringconverter.h"
+
 #include <libopencor>
 
 void versionApi()
@@ -21,19 +23,19 @@ void versionApi()
     // Version API.
 
     emscripten::function("version", &libOpenCOR::version);
-    emscripten::function("versionString", &libOpenCOR::versionString);
+    emscripten::function("versionString", &JsStringResult<&libOpenCOR::versionString>::call);
     emscripten::function("libcellmlVersion", &libOpenCOR::libcellmlVersion);
-    emscripten::function("libcellmlVersionString", &libOpenCOR::libcellmlVersionString);
+    emscripten::function("libcellmlVersionString", &JsStringResult<&libOpenCOR::libcellmlVersionString>::call);
     emscripten::function("libcombineVersion", &libOpenCOR::libcombineVersion);
-    emscripten::function("libcombineVersionString", &libOpenCOR::libcombineVersionString);
+    emscripten::function("libcombineVersionString", &JsStringResult<&libOpenCOR::libcombineVersionString>::call);
 #ifndef __EMSCRIPTEN__
     emscripten::function("libcurlVersion", &libOpenCOR::libcurlVersion);
-    emscripten::function("libcurlVersionString", &libOpenCOR::libcurlVersionString);
+    emscripten::function("libcurlVersionString", &JsStringResult<&libOpenCOR::libcurlVersionString>::call);
 #endif
     emscripten::function("libsedmlVersion", &libOpenCOR::libsedmlVersion);
-    emscripten::function("libsedmlVersionString", &libOpenCOR::libsedmlVersionString);
+    emscripten::function("libsedmlVersionString", &JsStringResult<&libOpenCOR::libsedmlVersionString>::call);
     emscripten::function("llvmVersion", &libOpenCOR::llvmVersion);
-    emscripten::function("llvmVersionString", &libOpenCOR::llvmVersionString);
+    emscripten::function("llvmVersionString", &JsStringResult<&libOpenCOR::llvmVersionString>::call);
     emscripten::function("sundialsVersion", &libOpenCOR::sundialsVersion);
-    emscripten::function("sundialsVersionString", &libOpenCOR::sundialsVersionString);
+    emscripten::function("sundialsVersionString", &JsStringResult<&libOpenCOR::sundialsVersionString>::call);
 }

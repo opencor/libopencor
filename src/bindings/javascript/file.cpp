@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "stringconverter.h"
+
 #include <libopencor>
 
 void fileApi()
@@ -27,12 +29,14 @@ void fileApi()
         .value("COMBINE_ARCHIVE", libOpenCOR::File::Type::COMBINE_ARCHIVE);
 
     emscripten::class_<libOpenCOR::File, emscripten::base<libOpenCOR::Logger>>("File")
-        .smart_ptr_constructor("File", &libOpenCOR::File::create)
-        .property("type", &libOpenCOR::File::type)
-        .property("fileName", &libOpenCOR::File::fileName)
-        .property("url", &libOpenCOR::File::url)
-        .property("path", &libOpenCOR::File::path)
         // clang-format off
+        .smart_ptr_constructor("File", emscripten::optional_override([](const JsString &pFileNameOrUrl) {
+            return libOpenCOR::File::create(fromJsString(pFileNameOrUrl));
+        }))
+        .property("type", &libOpenCOR::File::type)
+        .property("fileName", &JsStringResult<&libOpenCOR::File::fileName>::call)
+        .property("url", &JsStringResult<&libOpenCOR::File::url>::call)
+        .property("path", &JsStringResult<&libOpenCOR::File::path>::call)
         .function("contents", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis) {
             const auto &contents {pThis->contents()};
             auto size = contents.size();
@@ -79,7 +83,10 @@ void fileApi()
         .property("childFileNames", &libOpenCOR::File::childFileNames)
         .property("childFiles", &libOpenCOR::File::childFiles)
         .function("childFile", &libOpenCOR::File::childFile)
-        .function("childFileFromFileName", &libOpenCOR::File::childFileFromFileName);
+        // clang-format off
+        .function("childFileFromFileName", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis, const JsString &pFileName) {
+            return pThis->childFileFromFileName(fromJsString(pFileName));
+        })); // clang-format on
 
     // clang-format off
     EM_ASM({
@@ -101,5 +108,8 @@ void fileApi()
         .property("fileCount", &libOpenCOR::FileManager::fileCount)
         .property("files", &libOpenCOR::FileManager::files)
         .function("file", &libOpenCOR::FileManager::file)
-        .function("fileFromFileNameOrUrl", &libOpenCOR::FileManager::fileFromFileNameOrUrl);
+        // clang-format off
+        .function("fileFromFileNameOrUrl", emscripten::optional_override([](const libOpenCOR::FileManager &pThis, const JsString &pFileNameOrUrl) {
+            return pThis.fileFromFileNameOrUrl(fromJsString(pFileNameOrUrl));
+        })); // clang-format on
 }

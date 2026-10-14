@@ -22,15 +22,15 @@ import * as utils from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe('File type tests', () => {
+test.describe('File child tests', () => {
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
   });
 
   function doTestDataset(number, specificChildFileNames) {
-    const file = new loc.File(utils.resourcePath('cellml_2.omex'));
+    const file = new loc.File(utils.resourcePath(`api/file/dataset_${number}.omex`));
 
-    file.setContents(utils.fileContents(utils.resourcePath(`api/file/dataset_${number}.omex`)));
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.hasChildFiles, true);
     assert.strictEqual(file.childFileCount, specificChildFileNames.length + 1);
@@ -97,6 +97,7 @@ test.describe('File type tests', () => {
 
     assert.notStrictEqual(simulationFile135, null);
     assert.notStrictEqual(simulationFile157, null);
+    assert.strictEqual(simulationFile135.isAliasOf(simulationFile157), false);
     assert.deepStrictEqual(
       simulationFile135.contents(),
       utils.fileContents(utils.resourcePath('api/file/dataset_135.json'))
@@ -144,7 +145,7 @@ test.describe('File type tests', () => {
       ]
     ];
     const sibling = new loc.File(utils.resourcePath('api/file/sibling.cellml'));
-    const someContents = Uint8Array.from([1, 2, 3]);
+    const someContents = new TextEncoder().encode('Some contents.');
 
     sibling.setContents(someContents);
 
@@ -190,5 +191,100 @@ test.describe('File type tests', () => {
       assert.strictEqual(file.childFileFromFileName(fileName).isAliasOf(childFile), true);
       assert.deepStrictEqual(childFile.contents(), new TextEncoder().encode(fileName));
     }
+  });
+
+  test('COMBINE archive with non-UTF-8 locations', () => {
+    // A location may get percent-decoded to a file name that is not valid UTF-8 (e.g., "./%FF.txt" gets decoded to
+    // "\xFF.txt") or that has a character outside of the Basic Multilingual Plane (e.g., "./%F0%9F%98%80.txt" gets
+    // decoded to an emoji), which must not result in an exception being thrown. Either way, a child file must have the
+    // contents of its ZIP entry and be retrievable using either its location or its file name.
+    // Note: the contents of a ZIP entry is the location of its child file.
+
+    const locationsAndFileNames = [
+      ['./%FF.txt', '\udcff.txt'],
+      ['./%F0%9F%98%80.txt', '\u{1f600}.txt']
+    ];
+    const file = new loc.File(utils.resourcePath('api/file/non_utf8_locations.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.hasIssues, false);
+    assert.strictEqual(file.childFileCount, locationsAndFileNames.length);
+
+    for (const [i, [location, fileName]] of locationsAndFileNames.entries()) {
+      const childFile = file.childFileFromFileName(location);
+
+      assert.notStrictEqual(childFile, null);
+      assert.strictEqual(file.childFileNames.get(i), location);
+      assert.strictEqual(file.childFile(i).isAliasOf(childFile), true);
+      assert.strictEqual(file.childFileFromFileName(fileName).isAliasOf(childFile), true);
+      assert.strictEqual(childFile.fileName.endsWith(fileName), true);
+      assert.deepStrictEqual(childFile.contents(), new TextEncoder().encode(location));
+    }
+  });
+
+  test('COMBINE archive with duplicate locations', () => {
+    // Different locations may refer to the same file (e.g., "./my%20file.txt" and "./my file.txt", or "./file.txt" and
+    // "file.txt"), in which case only the first one is kept and the other ones are ignored. The ignored locations can,
+    // however, still be used to retrieve the child file since they refer to the same file.
+
+    const expectedIssues = [
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file 'file.txt' is the same as the file './file.txt'. It has been ignored."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file './other%20file.txt' is the same as the file './other file.txt'. It has been ignored."
+      ]
+    ];
+    const locationsFileNamesAndDuplicateLocations = [
+      ['./file.txt', 'file.txt', 'file.txt'],
+      ['./my%20file.txt', 'my file.txt', './my file.txt'],
+      ['./other file.txt', 'other file.txt', './other%20file.txt']
+    ];
+    const file = new loc.File(utils.resourcePath('api/file/duplicate_locations.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    utils.assertIssues(loc, file, expectedIssues);
+    assert.strictEqual(file.childFileCount, locationsFileNamesAndDuplicateLocations.length);
+
+    for (const [i, [location, fileName, duplicateLocation]] of locationsFileNamesAndDuplicateLocations.entries()) {
+      const childFile = file.childFileFromFileName(location);
+
+      assert.notStrictEqual(childFile, null);
+      assert.strictEqual(file.childFileNames.get(i), location);
+      assert.strictEqual(file.childFile(i).isAliasOf(childFile), true);
+      assert.strictEqual(file.childFileFromFileName(fileName).isAliasOf(childFile), true);
+      assert.strictEqual(file.childFileFromFileName(duplicateLocation).isAliasOf(childFile), true);
+      assert.deepStrictEqual(childFile.contents(), new TextEncoder().encode(fileName));
+    }
+
+    assert.strictEqual(loc.FileManager.instance().fileCount, 4);
+  });
+
+  test('COMBINE archive with self-referencing locations', () => {
+    // Locations that refer to the COMBINE archive itself (e.g., ".", "./", or "/") are not child files of the COMBINE
+    // archive.
+
+    const file = new loc.File(utils.resourcePath('api/file/self_referencing_locations.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.hasIssues, false);
+    assert.strictEqual(file.childFileCount, 1);
+    assert.strictEqual(file.childFileNames.get(0), './file.txt');
+    assert.deepStrictEqual(file.childFile(0).contents(), new TextEncoder().encode('file.txt'));
+    assert.strictEqual(file.childFileFromFileName('./'), null);
+    assert.strictEqual(file.childFileFromFileName('/'), null);
+    assert.strictEqual(loc.FileManager.instance().fileCount, 2);
   });
 });

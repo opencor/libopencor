@@ -184,7 +184,7 @@ sequence.
       .def("set", nb::overload_cast<int>(&Pet::set), "Set the pet's age")
       .def("set", nb::overload_cast<const std::string &>(&Pet::set), "Set the pet's name");
 
-Here, :cpp:func:`nb::overload_cast <overload_cast>` only requires the parameter
+Here, ``nb::overload_cast`` only requires the parameter
 types to be specified, and it deduces the return type.
 
 .. note::
@@ -401,6 +401,46 @@ due to the need to store a weak reference list.
 
    nb::class_<Pet>(m, "Pet", nb::is_weak_referenceable());
 
+.. _frozen_types:
+
+Frozen types
+------------
+
+Python code can normally patch a bound type by adding, replacing, or deleting
+its attributes:
+
+.. code-block:: pycon
+
+   >>> my_ext.Pet.speak = lambda self: print("Woof")
+
+Conclude the binding declarations with :cpp:func:`.freeze() <class_::freeze>`
+to prevent this:
+
+.. code-block:: cpp
+
+   nb::class_<Pet>(m, "Pet")
+       .def(nb::init<>())
+       .def_rw("name", &Pet::name)
+       .freeze();
+
+The type then behaves like a builtin type such as ``int`` or ``str``:
+
+.. code-block:: pycon
+
+   >>> my_ext.Pet.speak = lambda self: print("Woof")
+   TypeError: cannot set 'speak' attribute of immutable type 'my_ext.Pet'
+
+Base classes must be frozen before their subclasses, and violations of this
+rule raise a ``TypeError``. Instances of the type remain writable, and Python
+subclasses of it are still possible. Only the type object itself becomes
+read-only.
+
+Freezing is also an optimization. Python's adaptive specializing interpreter
+can generate faster opcodes for immutable types, which reduces the overhead of
+dispatching a constructor call by 7-10%.
+
+The feature is only enabled on Python 3.15+ and ignored on older versions.
+
 .. _inheriting_in_python:
 
 Extending C++ classes in Python
@@ -487,6 +527,49 @@ example, updating the code as follows fixes the problem:
    Max: woof!
    Max: woof!
 
+.. _python_mixins:
+
+Python mixins
+-------------
+
+A Python subclass can combine one nanobind-bound class with any number of
+Python mixins. For example, the ``Dog`` binding above can share helper methods
+and initialization logic with other Python classes:
+
+.. code-block:: python
+
+   class AlarmMixin:
+       def __init__(self, *args, alarm_count=3, **kwargs):
+           self.alarm_count = alarm_count
+           super().__init__(*args, **kwargs)
+
+       def alarm(self):
+           for _ in range(self.alarm_count):
+               print(self.bark())
+
+   class GuardDog(AlarmMixin, my_ext.Dog):
+       pass
+
+   gd = GuardDog("Max", alarm_count=2)
+   gd.alarm()  # Prints "Max: woof!" twice
+
+The usual Python method resolution order (MRO), ``super()``, and ``isinstance()``
+checks apply. The instance can still be passed to C++ functions accepting the
+bound class or its bound C++ base classes. Mixins can also :ref:`override C++
+virtual functions <trampolines>`, with a :ref:`caveat <mixin_override_caveat>`
+for overrides added after class creation.
+
+Mixins may appear before or after the bound class. For cooperative
+initialization, place them before it, as above, and have each mixin forward
+remaining arguments through ``super().__init__()``. The bound constructor ends
+this chain: it does not initialize mixins that follow it in the MRO. Such mixins
+need explicit initialization in the subclass.
+
+Exactly one *direct* base must be a nanobind-bound class or a Python subclass
+of one. Inheriting from two such bases is unsupported, even if they ultimately
+derive from the same bound class. Other bases must have compatible instance
+layouts.
+
 .. _trampolines:
 
 Overriding virtual functions in Python
@@ -561,7 +644,7 @@ to Python.
    #include <nanobind/trampoline.h>
 
    struct PyDog : Dog {
-       NB_TRAMPOLINE(Dog, 1);
+       NB_TRAMPOLINE(Dog);
 
        std::string bark() const override {
            NB_OVERRIDE(bark);
@@ -569,20 +652,8 @@ to Python.
    };
 
 This involves an additional include directive and the line
-:c:macro:`NB_TRAMPOLINE(Dog, 1) <NB_TRAMPOLINE>` to mark the class as a
-trampoline for the ``Dog`` base type. The count (``1``) denotes to the total
-number of virtual method slots that can be overridden within Python.
-
-.. note::
-
-   The number of virtual method slots is used to preallocate memory.
-   Trampoline declarations with an insufficient size may eventually trigger a
-   Python ``RuntimeError`` exception with a descriptive label, e.g.:
-
-   .. code-block:: text
-
-      nanobind::detail::get_trampoline('PyDog::bark()'): the trampoline ran out of
-      slots (you will need to increase the value provided to the NB_TRAMPOLINE() macro)
+:c:macro:`NB_TRAMPOLINE(Dog) <NB_TRAMPOLINE>` to mark the class as a
+trampoline for the ``Dog`` base type.
 
 The macro :c:macro:`NB_OVERRIDE(bark) <NB_OVERRIDE>` intercepts the virtual
 function call, checks if a Python override exists, and forwards the call in
@@ -663,6 +734,31 @@ simply refuses to do it. You will need to change your approach by either using
 :ref:`bindings <bindings>` instead of :ref:`type casters <type_casters>` or
 changing your virtual method interfaces to return by value.
 
+.. _mixin_override_caveat:
+
+A second special case concerns :ref:`Python mixins <python_mixins>`. nanobind
+caches whether a class overrides a virtual function, and it only refreshes this
+cache when a nanobind class is modified. An override that is monkey-patched
+into a mixin after C++ has already called the function goes unnoticed.
+Overrides that are part of the mixin's class body do not have this problem.
+
+.. code-block:: python
+
+   class LoudMixin:
+       pass
+
+   class LoudDog(LoudMixin, my_ext.Dog):
+       pass
+
+   d = LoudDog("Max")
+   my_ext.alarm(d)  # Calls Dog::bark(), caches that LoudDog has no override
+
+   LoudMixin.bark = lambda self: "WOOF!"
+   my_ext.alarm(d)  # Not supported: still calls Dog::bark()
+
+   LoudDog.bark = lambda self: "WOOF!"
+   my_ext.alarm(d)  # OK: assigning to the nanobind subclass refreshes the cache
+
 .. _operator_overloading:
 
 Operator overloading
@@ -736,7 +832,7 @@ invoked with incompatible arguments rather than throwing a type error.
 
 When binding *in-place* operators such as ``operator+=``, and when their
 implementation is guaranteed to end with ``return *this``, it is recommended
-that you set a return value policy of :cpp:enumerator:`rv_policy::none`, i.e.,
+that you set a return value policy of :cpp:member:`rv_policy::none`, i.e.,
 
 .. code-block:: cpp
 
@@ -802,7 +898,7 @@ described trampoline:
 
     class Trampoline : public A {
     public:
-        NB_TRAMPOLINE(A, 1);
+        NB_TRAMPOLINE(A);
         int foo() const override { NB_OVERRIDE(foo); }
     };
 
@@ -1087,7 +1183,7 @@ here creates two magic methods on ``Pet``:
 * A ``__new__`` that uses the given function to produce a new ``Pet``.
   It is converted to a Python object in the same way as the return value
   of any other function you might write bindings for. In particular,
-  you can pass a :cpp:enum:`nb::rv_policy <rv_policy>` as an additional
+  you can pass a :cpp:class:`nb::rv_policy <rv_policy>` as an additional
   argument to :cpp:func:`.def() <class_::def>` to control how this conversion
   occurs.
 
@@ -1180,7 +1276,7 @@ current compilation unit).
 .. warning::
 
    Instance class marked with :cpp:class:`nb::never_destruct <never_destruct>`
-   must be returned using the :cpp:enumerator:`reference
+   must be returned using the :cpp:member:`reference
    <rv_policy::reference>` return value policy. Otherwise, nanobind will assume
    ownership, which includes the requirement of destructing the object at
    a later point.

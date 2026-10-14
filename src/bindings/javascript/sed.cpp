@@ -14,7 +14,42 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "stringconverter.h"
+
 #include <libopencor>
+
+namespace {
+
+constexpr std::string_view INVALID_ID_ERROR {"The id is not a valid SED-ML identifier."};
+constexpr std::string_view ALREADY_USED_ID_ERROR {"The id is already used."};
+constexpr std::string_view COMPONENT_NAME_ERROR {"The component name is not a valid CellML identifier."};
+constexpr std::string_view VARIABLE_NAME_ERROR {"The variable name is not a valid CellML identifier."};
+constexpr std::string_view NEW_VALUE_ERROR {"The new value is not a valid double value."};
+constexpr std::string_view CHANGE_ATTRIBUTE_ERROR {"The component and variable names must be valid CellML identifiers and the new value must be a valid double value."};
+
+void setId(libOpenCOR::SedBase &pThis, const JsString &pId)
+{
+    // Note: a property setter cannot return whether the id was set, so we throw a RangeError if it wasn't, making sure
+    //       that the std::string returned by fromJsString() is destroyed before we do so (see stringconverter.h).
+
+    std::string_view error;
+
+    {
+        auto id {fromJsString(pId)};
+
+        if (!libOpenCOR::SedBase::isValidId(id)) {
+            error = INVALID_ID_ERROR;
+        } else if (!pThis.setId(id)) {
+            error = ALREADY_USED_ID_ERROR;
+        }
+    }
+
+    if (!error.empty()) {
+        throwRangeError(error);
+    }
+}
+
+} // namespace
 
 void sedApi()
 {
@@ -22,7 +57,14 @@ void sedApi()
 
     emscripten::class_<libOpenCOR::SedBase, emscripten::base<libOpenCOR::Logger>>("SedBase")
         .smart_ptr<libOpenCOR::SedBasePtr>("SedBase")
-        .property("id", &libOpenCOR::SedBase::id, &libOpenCOR::SedBase::setId);
+        // clang-format off
+        .class_function("isValidId", emscripten::optional_override([](const JsString &pId) {
+            return libOpenCOR::SedBase::isValidId(fromJsString(pId));
+        }))
+        .function("isDuplicateId", emscripten::optional_override([](const libOpenCOR::SedBase &pThis, const JsString &pId) {
+            return pThis.isDuplicateId(fromJsString(pId));
+        })) // clang-format on
+        .property("id", &JsStringResult<&libOpenCOR::SedBase::id>::call, &setId);
 
     // SedAbstractTask API.
 
@@ -33,15 +75,26 @@ void sedApi()
 
     emscripten::class_<libOpenCOR::SedChange, emscripten::base<libOpenCOR::SedBase>>("SedChange")
         .smart_ptr<libOpenCOR::SedChangePtr>("SedChange")
-        .property("target", &libOpenCOR::SedChange::target);
+        .property("target", &JsStringResult<&libOpenCOR::SedChange::target>::call);
 
     // SedChangeAttribute API.
 
     emscripten::class_<libOpenCOR::SedChangeAttribute, emscripten::base<libOpenCOR::SedChange>>("SedChangeAttribute")
-        .smart_ptr_constructor("SedChangeAttribute", &libOpenCOR::SedChangeAttribute::create)
-        .property("componentName", &libOpenCOR::SedChangeAttribute::componentName, &libOpenCOR::SedChangeAttribute::setComponentName)
-        .property("variableName", &libOpenCOR::SedChangeAttribute::variableName, &libOpenCOR::SedChangeAttribute::setVariableName)
-        .property("newValue", &libOpenCOR::SedChangeAttribute::newValue, &libOpenCOR::SedChangeAttribute::setNewValue);
+        // clang-format off
+        .smart_ptr_constructor("SedChangeAttribute", emscripten::optional_override([](const JsString &pComponentName, const JsString &pVariableName, const JsString &pNewValue) {
+            // Note: a constructor cannot return nullptr, so we throw a RangeError if the object couldn't be created.
+
+            auto res {libOpenCOR::SedChangeAttribute::create(fromJsString(pComponentName), fromJsString(pVariableName), fromJsString(pNewValue))};
+
+            if (res == nullptr) {
+                throwRangeError(CHANGE_ATTRIBUTE_ERROR);
+            }
+
+            return res;
+        })) // clang-format on
+        .property("componentName", &JsStringResult<&libOpenCOR::SedChangeAttribute::componentName>::call, &JsStringArgument<&libOpenCOR::SedChangeAttribute::setComponentName, COMPONENT_NAME_ERROR>::call)
+        .property("variableName", &JsStringResult<&libOpenCOR::SedChangeAttribute::variableName>::call, &JsStringArgument<&libOpenCOR::SedChangeAttribute::setVariableName, VARIABLE_NAME_ERROR>::call)
+        .property("newValue", &JsStringResult<&libOpenCOR::SedChangeAttribute::newValue>::call, &JsStringArgument<&libOpenCOR::SedChangeAttribute::setNewValue, NEW_VALUE_ERROR>::call);
 
     // SedDataDescription API.
 
@@ -59,8 +112,13 @@ void sedApi()
         .smart_ptr<libOpenCOR::SedDocumentPtr>("SedDocument")
         .constructor(&libOpenCOR::SedDocument::create)
         .constructor(&libOpenCOR::SedDocument::defaultCreate)
-        .function("serialise", emscripten::select_overload<std::string() const>(&libOpenCOR::SedDocument::serialise))
-        .function("serialise", emscripten::select_overload<std::string(const std::string &) const>(&libOpenCOR::SedDocument::serialise))
+        // clang-format off
+        .function("serialise", emscripten::optional_override([](const libOpenCOR::SedDocument &pThis) {
+            return toJsString(pThis.serialise());
+        }))
+        .function("serialise", emscripten::optional_override([](const libOpenCOR::SedDocument &pThis, const JsString &pBasePath) {
+            return toJsString(pThis.serialise(fromJsString(pBasePath)));
+        })) // clang-format on
         .property("hasModels", &libOpenCOR::SedDocument::hasModels)
         .property("modelCount", &libOpenCOR::SedDocument::modelCount)
         .property("models", &libOpenCOR::SedDocument::models)
@@ -120,28 +178,28 @@ void sedApi()
         .smart_ptr<libOpenCOR::SedInstanceTaskPtr>("SedInstanceTask")
         .property("progress", &libOpenCOR::SedInstanceTask::progress)
         .property("voi", &libOpenCOR::SedInstanceTask::voi)
-        .property("voiName", &libOpenCOR::SedInstanceTask::voiName)
-        .property("voiUnit", &libOpenCOR::SedInstanceTask::voiUnit)
+        .property("voiName", &JsStringResult<&libOpenCOR::SedInstanceTask::voiName>::call)
+        .property("voiUnit", &JsStringResult<&libOpenCOR::SedInstanceTask::voiUnit>::call)
         .property("stateCount", &libOpenCOR::SedInstanceTask::stateCount)
         .function("state", &libOpenCOR::SedInstanceTask::state)
-        .function("stateName", &libOpenCOR::SedInstanceTask::stateName)
-        .function("stateUnit", &libOpenCOR::SedInstanceTask::stateUnit)
+        .function("stateName", &JsStringResult<&libOpenCOR::SedInstanceTask::stateName>::call)
+        .function("stateUnit", &JsStringResult<&libOpenCOR::SedInstanceTask::stateUnit>::call)
         .property("rateCount", &libOpenCOR::SedInstanceTask::rateCount)
         .function("rate", &libOpenCOR::SedInstanceTask::rate)
-        .function("rateName", &libOpenCOR::SedInstanceTask::rateName)
-        .function("rateUnit", &libOpenCOR::SedInstanceTask::rateUnit)
+        .function("rateName", &JsStringResult<&libOpenCOR::SedInstanceTask::rateName>::call)
+        .function("rateUnit", &JsStringResult<&libOpenCOR::SedInstanceTask::rateUnit>::call)
         .property("constantCount", &libOpenCOR::SedInstanceTask::constantCount)
         .function("constant", &libOpenCOR::SedInstanceTask::constant)
-        .function("constantName", &libOpenCOR::SedInstanceTask::constantName)
-        .function("constantUnit", &libOpenCOR::SedInstanceTask::constantUnit)
+        .function("constantName", &JsStringResult<&libOpenCOR::SedInstanceTask::constantName>::call)
+        .function("constantUnit", &JsStringResult<&libOpenCOR::SedInstanceTask::constantUnit>::call)
         .property("computedConstantCount", &libOpenCOR::SedInstanceTask::computedConstantCount)
         .function("computedConstant", &libOpenCOR::SedInstanceTask::computedConstant)
-        .function("computedConstantName", &libOpenCOR::SedInstanceTask::computedConstantName)
-        .function("computedConstantUnit", &libOpenCOR::SedInstanceTask::computedConstantUnit)
+        .function("computedConstantName", &JsStringResult<&libOpenCOR::SedInstanceTask::computedConstantName>::call)
+        .function("computedConstantUnit", &JsStringResult<&libOpenCOR::SedInstanceTask::computedConstantUnit>::call)
         .property("algebraicVariableCount", &libOpenCOR::SedInstanceTask::algebraicVariableCount)
         .function("algebraicVariable", &libOpenCOR::SedInstanceTask::algebraicVariable)
-        .function("algebraicVariableName", &libOpenCOR::SedInstanceTask::algebraicVariableName)
-        .function("algebraicVariableUnit", &libOpenCOR::SedInstanceTask::algebraicVariableUnit);
+        .function("algebraicVariableName", &JsStringResult<&libOpenCOR::SedInstanceTask::algebraicVariableName>::call)
+        .function("algebraicVariableUnit", &JsStringResult<&libOpenCOR::SedInstanceTask::algebraicVariableUnit>::call);
 
     // SedModel API.
 

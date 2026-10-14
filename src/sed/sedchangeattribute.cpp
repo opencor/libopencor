@@ -218,6 +218,10 @@ const SedChangeAttribute::Impl *SedChangeAttribute::pimpl() const
 SedChangeAttributePtr SedChangeAttribute::create(const std::string &pComponent, const std::string &pVariable,
                                                  const std::string &pNewValue)
 {
+    if (!isCellmlIdentifier(pComponent) || !isCellmlIdentifier(pVariable) || !isDouble(pNewValue)) {
+        return nullptr;
+    }
+
     return SedChangeAttributePtr(new SedChangeAttribute(pComponent, pVariable, pNewValue));
 }
 
@@ -226,9 +230,15 @@ const std::string &SedChangeAttribute::componentName() const
     return pimpl()->componentName();
 }
 
-void SedChangeAttribute::setComponentName(const std::string &pComponentName)
+bool SedChangeAttribute::setComponentName(const std::string &pComponentName)
 {
+    if (!isCellmlIdentifier(pComponentName)) {
+        return false;
+    }
+
     pimpl()->setComponentName(pComponentName);
+
+    return true;
 }
 
 const std::string &SedChangeAttribute::variableName() const
@@ -236,9 +246,15 @@ const std::string &SedChangeAttribute::variableName() const
     return pimpl()->variableName();
 }
 
-void SedChangeAttribute::setVariableName(const std::string &pVariableName)
+bool SedChangeAttribute::setVariableName(const std::string &pVariableName)
 {
+    if (!isCellmlIdentifier(pVariableName)) {
+        return false;
+    }
+
     pimpl()->setVariableName(pVariableName);
+
+    return true;
 }
 
 const std::string &SedChangeAttribute::newValue() const
@@ -246,9 +262,15 @@ const std::string &SedChangeAttribute::newValue() const
     return pimpl()->newValue();
 }
 
-void SedChangeAttribute::setNewValue(const std::string &pNewValue)
+bool SedChangeAttribute::setNewValue(const std::string &pNewValue)
 {
+    if (!isDouble(pNewValue)) {
+        return false;
+    }
+
     pimpl()->setNewValue(pNewValue);
+
+    return true;
 }
 
 } // namespace libOpenCOR

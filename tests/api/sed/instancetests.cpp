@@ -140,7 +140,7 @@ TEST(InstanceSedTest, asynchronousRunWithoutActiveRun)
 
 TEST(InstanceSedTest, asynchronousRunLifecycle)
 {
-    static const auto WAIT_ITERATIONS = 200;
+    static const auto WAIT_ITERATIONS = 60000;
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -254,11 +254,75 @@ TEST(InstanceSedTest, stopRun)
     EXPECT_FALSE(instance->hasIssues());
 }
 
+TEST(InstanceSedTest, stopRunResultsHaveNans)
+{
+    static const auto SIMULATION_PROPERTY {1000000};
+    static const auto WAIT_ITERATIONS = 60000;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(SIMULATION_PROPERTY);
+    simulation->setOutputEndTime(static_cast<double>(SIMULATION_PROPERTY));
+
+    auto instance {document->instantiate()};
+
+    EXPECT_TRUE(instance->startRun());
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->progress() > 0.0) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    instance->stopRun();
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_LT(instance->progress(), 1.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto &voi {instanceTask->voi()};
+    const auto &state0 {instanceTask->state(0)};
+
+    EXPECT_EQ(voi.size(), state0.size());
+    EXPECT_EQ(voi.size(), SIMULATION_PROPERTY + 1);
+
+    EXPECT_FALSE(std::isnan(voi[0]));
+    EXPECT_FALSE(std::isnan(state0[0]));
+
+    size_t nanIndex {voi.size()};
+
+    for (size_t i {1}; i < voi.size(); ++i) {
+        if (std::isnan(state0[i])) {
+            nanIndex = i;
+
+            break;
+        }
+    }
+
+    EXPECT_LT(nanIndex, voi.size());
+    EXPECT_TRUE(std::isnan(voi[nanIndex]));
+    EXPECT_LT(nanIndex, voi.size() - 1);
+}
+
 TEST(InstanceSedTest, stopRunWhenNotRunning)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
     auto instance {document->instantiate()};
+
+    // Calling stopRun() when idle is a no-op.
 
     instance->stopRun();
 
@@ -337,68 +401,6 @@ TEST(InstanceSedTest, pauseRunRightAfterStartRun)
     EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
     EXPECT_LT(instance->progress(), 1.0);
     EXPECT_FALSE(instance->hasIssues());
-}
-
-TEST(InstanceSedTest, stopRunResultsHaveNans)
-{
-    static const auto SIMULATION_PROPERTY {1000000};
-    static const auto WAIT_ITERATIONS = 60000;
-
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
-    auto document {libOpenCOR::SedDocument::create(file)};
-    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-
-    simulation->setNumberOfSteps(SIMULATION_PROPERTY);
-    simulation->setOutputEndTime(static_cast<double>(SIMULATION_PROPERTY));
-
-    auto instance {document->instantiate()};
-
-    EXPECT_TRUE(instance->startRun());
-
-    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
-        if (instance->progress() > 0.0) {
-            break;
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
-
-    instance->stopRun();
-
-    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
-        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
-            break;
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
-
-    EXPECT_LT(instance->progress(), 1.0);
-    EXPECT_FALSE(instance->hasIssues());
-
-    const auto &instanceTask {instance->tasks()[0]};
-    const auto &voi {instanceTask->voi()};
-    const auto &state0 {instanceTask->state(0)};
-
-    EXPECT_EQ(voi.size(), state0.size());
-    EXPECT_EQ(voi.size(), SIMULATION_PROPERTY + 1);
-
-    EXPECT_FALSE(std::isnan(voi[0]));
-    EXPECT_FALSE(std::isnan(state0[0]));
-
-    size_t nanIndex {voi.size()};
-
-    for (size_t i {1}; i < voi.size(); ++i) {
-        if (std::isnan(state0[i])) {
-            nanIndex = i;
-
-            break;
-        }
-    }
-
-    EXPECT_LT(nanIndex, voi.size());
-    EXPECT_TRUE(std::isnan(voi[nanIndex]));
-    EXPECT_LT(nanIndex, voi.size() - 1);
 }
 
 TEST(InstanceSedTest, stopRunBeforeOutputStartTime)

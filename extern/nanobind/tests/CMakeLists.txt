@@ -13,6 +13,44 @@ if (NB_TEST_SHARED_BUILD)
   set(NB_EXTRA_ARGS ${NB_EXTRA_ARGS} NB_SHARED)
 endif()
 
+# Extension flavor keywords without the backend-selecting ones, for test
+# extensions that pick their own backend below
+set(NB_FLAVOR_ARGS "")
+if (NB_TEST_FREE_THREADED)
+  set(NB_FLAVOR_ARGS FREE_THREADED)
+endif()
+
+# NB_TEST_SPLIT_MODE runs the test suite in split mode: every test extension
+# resolves the compiled backend from a backend module at import time.
+# NB_TEST_SPLIT_WHEEL routes the suite through the installed
+# 'nanobind_backend' module (from the nanobind-backend wheel) instead of a
+# locally built one. Both are internal testing knobs passed via -D.
+if (NB_TEST_SPLIT_MODE)
+  if (NB_FREE_THREADED AND NOT NB_TEST_FREE_THREADED)
+    message(FATAL_ERROR "NB_TEST_SPLIT_MODE=ON on a free-threaded interpreter "
+      "requires NB_TEST_FREE_THREADED=ON (a free-threaded backend serves "
+      "only free-threaded extensions)")
+  endif()
+
+  # Build a local backend module and route every test extension through it
+  nanobind_add_backend(nanobind_backend_test)
+
+  # Stub generation imports the extensions, which need their backend
+  set(NB_BACKEND_DEPENDS nanobind_backend_test)
+
+  if (NB_TEST_SPLIT_WHEEL)
+    # The local backend above still serves the fill() handshake tests
+    set(NB_EXTRA_ARGS ${NB_EXTRA_ARGS} BACKEND_MODULE nanobind_backend)
+  else()
+    set(NB_EXTRA_ARGS ${NB_EXTRA_ARGS} BACKEND_MODULE nanobind_backend_test)
+  endif()
+endif()
+
+# NB_EXTRA_ARGS for test extensions in the 'mydomain' domain. In split mode,
+# these share the backend module with everything else; the domain isolates
+# their type universe regardless.
+set(NB_EXTRA_ARGS_MYDOMAIN ${NB_EXTRA_ARGS} NB_DOMAIN mydomain)
+
 # ---------------------------------------------------------------------------
 # Compile with a few more compiler warnings turned on
 # ---------------------------------------------------------------------------
@@ -102,6 +140,9 @@ endforeach()
 
 target_sources(test_intrusive_ext PRIVATE test_intrusive_impl.cpp)
 
+# Compile-time freeze checks for the frozen ABI surface of nb_backend.h
+target_sources(test_functions_ext PRIVATE test_abi_layout.cpp)
+
 if (CMAKE_CONFIGURATION_TYPES)
   set(OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>)
 else()
@@ -131,7 +172,7 @@ foreach (NAME functions classes ndarray jax tensorflow stl enum typing make_iter
     MODULE test_${NAME}_ext
     OUTPUT ${PYI_PREFIX}test_${NAME}_ext.pyi
     PYTHON_PATH $<TARGET_FILE_DIR:test_${NAME}_ext>
-    DEPENDS test_${NAME}_ext ${EXTRA_DEPENDS}
+    DEPENDS test_${NAME}_ext ${EXTRA_DEPENDS} ${NB_BACKEND_DEPENDS}
     ${EXTRA})
 endforeach()
 
@@ -155,10 +196,31 @@ target_compile_definitions(inter_module PRIVATE -DSHARED_BUILD)
 target_compile_features(inter_module PRIVATE cxx_std_17)
 target_include_directories(inter_module PRIVATE ${NB_DIR}/include)
 
-nanobind_add_module(test_inter_module_1_ext NB_DOMAIN mydomain test_inter_module_1.cpp ${NB_EXTRA_ARGS})
-nanobind_add_module(test_inter_module_2_ext NB_DOMAIN mydomain test_inter_module_2.cpp ${NB_EXTRA_ARGS})
+# An extension that sets up nanobind via nb::register_module() instead of NB_MODULE()
+nanobind_add_module(test_foreign_ext test_foreign.cpp ${NB_EXTRA_ARGS})
+
+nanobind_add_module(test_inter_module_1_ext test_inter_module_1.cpp ${NB_EXTRA_ARGS_MYDOMAIN})
+nanobind_add_module(test_inter_module_2_ext test_inter_module_2.cpp ${NB_EXTRA_ARGS_MYDOMAIN})
 target_link_libraries(test_inter_module_1_ext PRIVATE inter_module)
 target_link_libraries(test_inter_module_2_ext PRIVATE inter_module)
+
+if (NB_TEST_SPLIT_MODE)
+  # Bindings spread over two translation units that exchange bound types;
+  # validates that the per-DSO dispatch table merges into a single instance.
+  # The LTO twin re-checks this under interprocedural optimization.
+  set(NB_ABI_MULTI_SOURCES test_abi_multi_1.cpp test_abi_multi_2.cpp)
+  nanobind_add_module(test_abi_multi_ext ${NB_ABI_MULTI_SOURCES}
+    ${NB_EXTRA_ARGS})
+  nanobind_add_module(test_abi_multi_lto_ext ${NB_ABI_MULTI_SOURCES} LTO
+    ${NB_EXTRA_ARGS})
+  target_compile_definitions(test_abi_multi_lto_ext PRIVATE
+    NB_ABI_MULTI_NAME=test_abi_multi_lto_ext NB_ABI_MULTI_NS=abi_multi_lto)
+
+  # Points at a backend module that does not exist; its import must fail
+  # with an instructive error message
+  nanobind_add_module(test_abi_missing_ext test_abi_missing.cpp
+    BACKEND_MODULE nanobind_backend_absent ${NB_FLAVOR_ARGS})
+endif()
 
 set(TEST_FILES
   common.py
@@ -171,6 +233,7 @@ set(TEST_FILES
   test_enum.py
   test_eval.py
   test_exception.py
+  test_foreign.py
   test_functions.py
   test_holders.py
   test_inter_module.py
@@ -184,9 +247,11 @@ set(TEST_FILES
   test_jax.py
   test_tensorflow.py
   test_stubs.py
+  test_stubgen.py
   test_typing.py
   test_thread.py
   test_specialization.py
+  test_abi.py
 
   # Stub reference files
   test_classes_ext.pyi.ref
@@ -201,7 +266,10 @@ set(TEST_FILES
   py_stub_test.py
   py_stub_test.pyi.ref
   py_recursive_stub_test/__init__.pyi.ref
+  py_recursive_stub_test/alias.pyi.ref
   py_recursive_stub_test/bar.pyi.ref
+  py_recursive_stub_test/sub/__init__.pyi.ref
+  py_recursive_stub_test/sub/mod.pyi.ref
   test_prefix_module/__init__.pyi.ref
   test_prefix_module/prefix.pyi.ref
   test_prefix_module/prefixabc.pyi.ref
@@ -218,7 +286,12 @@ if (NOT (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR) OR MSVC)
       COMMAND ${CMAKE_COMMAND} -E copy_if_different ${IN_FILE} ${OUT_FILE})
   endforeach()
 
-  add_custom_target(copy-tests ALL DEPENDS ${TEST_FILES_OUT})
+  # The unit tests in test_stubgen.py need a copy of stubgen.py next to them
+  add_custom_command(
+    DEPENDS ${NB_DIR}/src/stubgen.py OUTPUT ${OUT_DIR}/stubgen.py
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${NB_DIR}/src/stubgen.py ${OUT_DIR}/stubgen.py)
+
+  add_custom_target(copy-tests ALL DEPENDS ${TEST_FILES_OUT} ${OUT_DIR}/stubgen.py)
   set(PY_STUB_TEST ${OUT_DIR}/py_stub_test.py)
 endif()
 
@@ -238,7 +311,11 @@ nanobind_add_stub(
     ${PYI_PREFIX}py_recursive_stub_test
   OUTPUT
     ${PYI_PREFIX}py_recursive_stub_test/__init__.pyi
+    ${PYI_PREFIX}py_recursive_stub_test/alias.pyi
     ${PYI_PREFIX}py_recursive_stub_test/bar.pyi
+    ${PYI_PREFIX}py_recursive_stub_test/sub/__init__.pyi
+    ${PYI_PREFIX}py_recursive_stub_test/sub/mod.pyi
+  PATTERN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/pattern_file_recursive.nb
   PYTHON_PATH ${CMAKE_CURRENT_SOURCE_DIR}
 )
 

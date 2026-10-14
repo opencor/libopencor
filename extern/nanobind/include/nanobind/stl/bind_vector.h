@@ -35,11 +35,23 @@ template <> struct iterator_access<typename std::vector<bool>::iterator> {
     result_type operator()(typename std::vector<bool>::iterator &it) const { return *it; }
 };
 
+/// Render the repr of a sequence in Python list syntax
+NB_NOINLINE inline PyObject *repr_list(PyObject *o) {
+    object name = steal(NB_CALL(nb_inst_name)(o));
+    list items;
+    for (size_t i = 0, l = len(o); i < l; ++i)
+        items.append(repr(handle(o)[i]));
+    object body = steal(raise_if_null(
+        PyUnicode_Join(str(", ").ptr(), items.ptr())));
+    return raise_if_null(
+        PyUnicode_FromFormat("%U([%U])", name.ptr(), body.ptr()));
+}
+
 NAMESPACE_END(detail)
 
 
 template <typename Vector,
-          rv_policy Policy = rv_policy::automatic_reference,
+          rv_policy::value Policy = rv_policy::automatic_reference_v,
           typename... Args>
 class_<Vector> bind_vector(handle scope, const char *name, Args &&...args) {
     using ValueRef = typename detail::iterator_access<typename Vector::iterator>::result_type;
@@ -59,36 +71,45 @@ class_<Vector> bind_vector(handle scope, const char *name, Args &&...args) {
         return borrow<class_<Vector>>(cl_cur);
     }
 
+    // The nb::lock_self() and nb::arg().lock() annotations protect the C++
+    // container from concurrent modification in free-threaded builds. They have
+    // no effect in GIL-protected Python.
     auto cl = class_<Vector>(scope, name, std::forward<Args>(args)...)
         .def(init<>(), "Default constructor")
 
-        .def("__len__", [](const Vector &v) { return v.size(); })
+        .def("__len__", [](const Vector &v) { return v.size(); }, lock_self())
 
         .def("__bool__",
              [](const Vector &v) { return !v.empty(); },
+             lock_self(),
              "Check whether the vector is nonempty")
 
+        // __repr__ needs no annotation of its own. ``repr_list`` reaches the
+        // vector through the locked ``__len__`` and ``__getitem__`` methods.
         .def("__repr__",
              [](handle_t<Vector> h) {
                 return steal<str>(detail::repr_list(h.ptr()));
              })
 
+        // The index-based iterator remains valid when the vector is modified
+        // during iteration, whether from the loop body or by another thread
         .def("__iter__",
-             [](Vector &v) {
-                 return make_iterator<Policy>(type<Vector>(), "Iterator",
-                                              v.begin(), v.end());
-             }, keep_alive<0, 1>())
+             [](handle_t<Vector> h) {
+                 return detail::make_index_iterator<Policy, Vector>(
+                     type<Vector>(), "Iterator", h);
+             })
 
         .def("__getitem__",
              [](Vector &v, Py_ssize_t i) -> ValueRef {
                  return v[detail::wrap(i, v.size())];
-             }, Policy)
+             }, rv_policy::policy_tag<Policy>(), lock_self())
 
         .def("clear", [](Vector &v) { v.clear(); },
+             lock_self(),
              "Remove all items from list.");
 
     if constexpr (detail::is_copy_constructible_v<Value>) {
-        cl.def(init<const Vector &>(),
+        cl.def(init<const Vector &>(), arg().lock(),
                "Copy constructor");
 
         cl.def("__init__", [](Vector *v, typed<iterable, Value> seq) {
@@ -107,7 +128,8 @@ class_<Vector> bind_vector(handle scope, const char *name, Args &&...args) {
 
         cl.def("append",
                [](Vector &v, const Value &value) { v.push_back(value); },
-               "Append `arg` to the end of the list.")
+               lock_self(),
+               "Append ``arg`` to the end of the list.")
 
           .def("insert",
                [](Vector &v, Py_ssize_t i, const Value &x) {
@@ -117,7 +139,8 @@ class_<Vector> bind_vector(handle scope, const char *name, Args &&...args) {
                        throw index_error();
                    v.insert(v.begin() + i, x);
                },
-               "Insert object `arg1` before index `arg0`.")
+               lock_self(),
+               "Insert object ``arg1`` before index ``arg0``.")
 
            .def("pop",
                 [](Vector &v, Py_ssize_t i) {
@@ -126,8 +149,8 @@ class_<Vector> bind_vector(handle scope, const char *name, Args &&...args) {
                     v.erase(v.begin() + (ptrdiff_t) index);
                     return result;
                 },
-                arg("index") = -1,
-                "Remove and return item at `index` (default last).")
+                arg("index") = -1, lock_self(),
+                "Remove and return item at ``index`` (default last).")
 
           .def("extend",
                [](Vector &v, const Vector &src) {
@@ -144,17 +167,18 @@ class_<Vector> bind_vector(handle scope, const char *name, Args &&...args) {
                        v.insert(v.end(), src.begin(), src.end());
                    }
                },
-               "Extend `self` by appending elements from `arg`.")
+               lock_self(), arg().lock(),
+               "Extend ``self`` by appending elements from ``arg``.")
 
           .def("__setitem__",
                [](Vector &v, Py_ssize_t i, const Value &value) {
                    v[detail::wrap(i, v.size())] = value;
-               })
+               }, lock_self())
 
           .def("__delitem__",
                [](Vector &v, Py_ssize_t i) {
                    v.erase(v.begin() + (ptrdiff_t) detail::wrap(i, (size_t) v.size()));
-               })
+               }, lock_self())
 
           .def("__getitem__",
                [](const Vector &v, const slice &slice) -> Vector * {
@@ -168,7 +192,7 @@ class_<Vector> bind_vector(handle scope, const char *name, Args &&...args) {
                    }
 
                    return seq.release();
-               })
+               }, lock_self())
 
           .def("__setitem__",
                [](Vector &v, const slice &slice, const Vector &value) {
@@ -194,7 +218,7 @@ class_<Vector> bind_vector(handle scope, const char *name, Args &&...args) {
                            start += step;
                        }
                    }
-               })
+               }, lock_self(), arg(), arg().lock())
 
           .def("__delitem__",
                [](Vector &v, const slice &slice) {
@@ -216,17 +240,19 @@ class_<Vector> bind_vector(handle scope, const char *name, Args &&...args) {
                            stop -= step;
                        }
                    }
-               });
+               }, lock_self());
     }
 
     if constexpr (detail::is_equality_comparable_v<Value>) {
-        cl.def(self == self, sig("def __eq__(self, arg: object, /) -> bool"))
-          .def(self != self, sig("def __ne__(self, arg: object, /) -> bool"))
+        cl.def(self == self, sig("def __eq__(self, arg: object, /) -> bool"),
+               lock_self(), arg().lock())
+          .def(self != self, sig("def __ne__(self, arg: object, /) -> bool"),
+               lock_self(), arg().lock())
 
           .def("__contains__",
                [](const Vector &v, const Value &x) {
                    return std::find(v.begin(), v.end(), x) != v.end();
-               })
+               }, lock_self())
 
           .def("__contains__", // fallback for incompatible types
                [](const Vector &, handle) { return false; })
@@ -234,7 +260,8 @@ class_<Vector> bind_vector(handle scope, const char *name, Args &&...args) {
           .def("count",
                [](const Vector &v, const Value &x) {
                    return std::count(v.begin(), v.end(), x);
-               }, "Return number of occurrences of `arg`.")
+               }, lock_self(),
+               "Return number of occurrences of ``arg``.")
 
           .def("remove",
                [](Vector &v, const Value &x) {
@@ -244,7 +271,8 @@ class_<Vector> bind_vector(handle scope, const char *name, Args &&...args) {
                    else
                        throw value_error();
                },
-               "Remove first occurrence of `arg`.");
+               lock_self(),
+               "Remove first occurrence of ``arg``.");
     }
 
     return cl;

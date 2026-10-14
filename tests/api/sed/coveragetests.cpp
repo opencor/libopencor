@@ -76,7 +76,7 @@ TEST(CoverageSedTest, models)
     EXPECT_FALSE(model->addChange(nullptr));
     EXPECT_FALSE(model->removeAllChanges());
 
-    auto changeAttribute {libOpenCOR::SedChangeAttribute::create("component", "variable", "newValue")};
+    auto changeAttribute {libOpenCOR::SedChangeAttribute::create("component", "variable", "1.23")};
 
     EXPECT_TRUE(model->addChange(changeAttribute));
 
@@ -368,6 +368,148 @@ TEST(CoverageSedTest, sedBase)
     auto simulation {libOpenCOR::SedOneStep::create(document)};
 
     EXPECT_EQ(simulation->id(), "simulation2");
+
+    EXPECT_TRUE(libOpenCOR::SedBase::isValidId("my_simulation"));
+    EXPECT_TRUE(simulation->setId("my_simulation"));
+    EXPECT_EQ(simulation->id(), "my_simulation");
+
+    // An id that is not a valid SED-ML identifier is rejected, leaving the id unchanged.
+
+    for (const auto &id : std::vector<std::string> {"", "my simulation", "1simulation", "simulation-1", "simulation\x01", "\xFF"}) {
+        EXPECT_FALSE(libOpenCOR::SedBase::isValidId(id));
+        EXPECT_FALSE(simulation->setId(id));
+        EXPECT_EQ(simulation->id(), "my_simulation");
+    }
+}
+
+TEST(CoverageSedTest, sedIds)
+{
+    // An id must be unique within the simulation experiment description for which an object was created.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto model {document->models()[0]};
+    auto simulation {document->simulations()[0]};
+    auto task {document->tasks()[0]};
+
+    EXPECT_EQ(model->id(), "model1");
+    EXPECT_EQ(simulation->id(), "simulation1");
+    EXPECT_EQ(task->id(), "task1");
+
+    // A new object is not given the id of an existing object, but it can be given an id that is not used anymore.
+
+    EXPECT_TRUE(model->setId("model2"));
+
+    auto otherModel {libOpenCOR::SedModel::create(document, file)};
+
+    EXPECT_EQ(otherModel->id(), "model1");
+
+    // An id that is already used by another object, whatever its type, is a duplicate and is therefore rejected,
+    // leaving the id unchanged, even though it is a valid SED-ML identifier. The id of an object is, however, not a
+    // duplicate, so an object can be given its own id.
+
+    for (const auto &id : std::vector<std::string> {"model2", "simulation1", "task1"}) {
+        EXPECT_TRUE(libOpenCOR::SedBase::isValidId(id));
+        EXPECT_TRUE(otherModel->isDuplicateId(id));
+        EXPECT_FALSE(otherModel->setId(id));
+        EXPECT_EQ(otherModel->id(), "model1");
+    }
+
+    EXPECT_FALSE(otherModel->isDuplicateId("model1"));
+    EXPECT_TRUE(otherModel->setId("model1"));
+    EXPECT_FALSE(otherModel->isDuplicateId("my_model"));
+
+    // A removed object releases its id, which can then be given to another object, in which case the id of the removed
+    // object is a duplicate and the removed object can only be added back once it has been given another id.
+
+    EXPECT_TRUE(document->removeModel(model));
+    EXPECT_FALSE(model->isDuplicateId("model2"));
+    EXPECT_TRUE(otherModel->setId("model2"));
+    EXPECT_TRUE(model->isDuplicateId("model2"));
+    EXPECT_FALSE(model->setId("model2"));
+    EXPECT_FALSE(document->addModel(model));
+    EXPECT_TRUE(model->setId("my_model"));
+    EXPECT_TRUE(document->addModel(model));
+    EXPECT_TRUE(otherModel->isDuplicateId("my_model"));
+    EXPECT_FALSE(otherModel->setId("my_model"));
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0], model);
+
+    // A destroyed object releases its id, even if it was never added to its simulation experiment description, so that
+    // its id can then be given to another object.
+
+    auto transientModel {libOpenCOR::SedModel::create(document, file)};
+
+    EXPECT_EQ(transientModel->id(), "model1");
+    EXPECT_TRUE(otherModel->isDuplicateId("model1"));
+
+    transientModel.reset();
+
+    EXPECT_FALSE(otherModel->isDuplicateId("model1"));
+    EXPECT_TRUE(otherModel->setId("model1"));
+    EXPECT_EQ(otherModel->id(), "model1");
+
+    // An object can only be added to the simulation experiment description for which it was created.
+
+    auto otherDocument {libOpenCOR::SedDocument::create()};
+
+    EXPECT_FALSE(otherDocument->addModel(otherModel));
+    EXPECT_FALSE(otherDocument->addSimulation(simulation));
+    EXPECT_FALSE(otherDocument->addTask(task));
+    EXPECT_FALSE(otherDocument->hasModels());
+    EXPECT_FALSE(otherDocument->hasSimulations());
+    EXPECT_FALSE(otherDocument->hasTasks());
+
+    // An object which simulation experiment description doesn't exist anymore has no duplicate id, so it can be given
+    // any valid id, but it cannot be added to another simulation experiment description.
+
+    auto orphanSimulation {libOpenCOR::SedOneStep::create(otherDocument)};
+
+    otherDocument.reset();
+
+    EXPECT_EQ(orphanSimulation->id(), "simulation1");
+    EXPECT_FALSE(orphanSimulation->isDuplicateId("my_simulation"));
+    EXPECT_TRUE(orphanSimulation->setId("my_simulation"));
+    EXPECT_EQ(orphanSimulation->id(), "my_simulation");
+    EXPECT_FALSE(document->addSimulation(orphanSimulation));
+}
+
+TEST(CoverageSedTest, sedChangeAttribute)
+{
+    // A change attribute can only be created with component and variable names that are valid CellML identifiers and
+    // with a new value that is a valid double value.
+
+    EXPECT_EQ(libOpenCOR::SedChangeAttribute::create("my component", "variable", "1.23"), nullptr);
+    EXPECT_EQ(libOpenCOR::SedChangeAttribute::create("component", "1variable", "1.23"), nullptr);
+    EXPECT_EQ(libOpenCOR::SedChangeAttribute::create("component", "variable", "abc"), nullptr);
+
+    auto changeAttribute {libOpenCOR::SedChangeAttribute::create("component", "variable", "1.23")};
+
+    EXPECT_TRUE(changeAttribute->setComponentName("new_component"));
+    EXPECT_TRUE(changeAttribute->setVariableName("new_variable"));
+
+    // A new value can be any decimal number, which value must be finite once rounded to the nearest double value.
+
+    for (const auto &newValue : std::vector<std::string> {"1.", ".5", "+1.5e-3", "-1E+3", "1e-400", "4.56"}) {
+        EXPECT_TRUE(changeAttribute->setNewValue(newValue));
+        EXPECT_EQ(changeAttribute->newValue(), newValue);
+    }
+
+    // A component name, variable name, or new value that is not valid is rejected, leaving it unchanged.
+
+    for (const auto &name : std::vector<std::string> {"", "my component", "1component", "_1", "component\x01", "\xFF"}) {
+        EXPECT_FALSE(changeAttribute->setComponentName(name));
+        EXPECT_FALSE(changeAttribute->setVariableName(name));
+    }
+
+    for (const auto &newValue : std::vector<std::string> {"", "abc", "1.23abc", "1.23\x01", "\xFF", ".", "1e400", "inf", "nan", "0x1", " 1"}) {
+        EXPECT_FALSE(changeAttribute->setNewValue(newValue));
+    }
+
+    EXPECT_EQ(changeAttribute->componentName(), "new_component");
+    EXPECT_EQ(changeAttribute->variableName(), "new_variable");
+    EXPECT_EQ(changeAttribute->newValue(), "4.56");
+    EXPECT_EQ(changeAttribute->target(), "/cellml:model/cellml:component[@name='new_component']/cellml:variable[@name='new_variable']");
 }
 
 TEST(CoverageSedTest, sedOneStep)
@@ -933,4 +1075,128 @@ TEST(CoverageSedTest, sedmlFileWithBareFilename)
     auto file {libOpenCOR::File::create("cellml_2.sedml")};
 
     file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.sedml")).c_str()));
+}
+
+TEST(CoverageSedTest, sedmlFileWithInvalidIdsAndChangeNames)
+{
+    // libSEDML doesn't reject an id that is not a valid SED-ML identifier nor a change with component and/or variable
+    // names that are not valid CellML identifiers, so such an id is replaced with the one generated by libOpenCOR and
+    // such a change is ignored.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the id 'my model' of the model is not a valid SED-ML identifier. The id 'model1' has been used instead."},
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the component name 'my component' for the change of type 'changeAttribute' is not a valid CellML identifier. The change has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the variable name '1x' for the change of type 'changeAttribute' is not a valid CellML identifier. The change has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the id 'my simulation' of the simulation is not a valid SED-ML identifier. The id 'simulation1' has been used instead."},
+    }};
+
+    auto cellmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("my_model.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(R"(<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="my model" language="urn:sedml:language:cellml" source="cellml_2.cellml">
+      <listOfChanges>
+        <changeAttribute target="/cellml:model/cellml:component[@name='my component']/cellml:variable[@name='x']" newValue="1.23"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='1x']" newValue="4.56"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='x']" newValue="7.89"/>
+      </listOfChanges>
+    </model>
+  </listOfModels>
+  <listOfSimulations>
+    <oneStep id="my simulation" step="1"/>
+  </listOfSimulations>
+</sedML>
+)"));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), cellmlFile);
+    EXPECT_EQ(document->models()[0]->id(), "model1");
+    EXPECT_EQ(document->models()[0]->changeCount(), 1U);
+    EXPECT_EQ(document->simulations().size(), 1U);
+    EXPECT_EQ(document->simulations()[0]->id(), "simulation1");
+}
+
+TEST(CoverageSedTest, sedmlFileWithInvalidIdsAndClashingValidIds)
+{
+    // An id that is not a valid SED-ML identifier is replaced with the one generated by libOpenCOR, which must not be
+    // the id of another model or simulation (e.g., "model1" and "simulation1" below).
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the id 'my model' of the model is not a valid SED-ML identifier. The id 'model2' has been used instead."},
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the id 'my simulation' of the simulation is not a valid SED-ML identifier. The id 'simulation2' has been used instead."},
+    }};
+
+    auto cellmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("my_model.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(R"(<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="my model" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <oneStep id="my simulation" step="1"/>
+    <oneStep id="simulation1" step="1"/>
+  </listOfSimulations>
+</sedML>
+)"));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+    EXPECT_EQ(document->models().size(), 2U);
+    EXPECT_EQ(document->models()[0]->file(), cellmlFile);
+    EXPECT_EQ(document->models()[0]->id(), "model2");
+    EXPECT_EQ(document->models()[1]->file(), cellmlFile);
+    EXPECT_EQ(document->models()[1]->id(), "model1");
+    EXPECT_EQ(document->simulations().size(), 2U);
+    EXPECT_EQ(document->simulations()[0]->id(), "simulation2");
+    EXPECT_EQ(document->simulations()[1]->id(), "simulation1");
+}
+
+TEST(CoverageSedTest, sedmlFileWithDuplicateIds)
+{
+    // An id that is already used is replaced with the one generated by libOpenCOR. This includes a model and a
+    // simulation with the same id since all the ids of a SED-ML file share the same namespace.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the id 'my_id' of the model is already used. The id 'model1' has been used instead."},
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the id 'my_id' of the simulation is already used. The id 'simulation1' has been used instead."},
+    }};
+
+    auto cellmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("my_model.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(R"(<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="my_id" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+    <model id="my_id" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <oneStep id="my_id" step="1"/>
+    <oneStep id="my_simulation" step="1"/>
+  </listOfSimulations>
+</sedML>
+)"));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+    EXPECT_EQ(document->models().size(), 2U);
+    EXPECT_EQ(document->models()[0]->id(), "my_id");
+    EXPECT_EQ(document->models()[1]->id(), "model1");
+    EXPECT_EQ(document->simulations().size(), 2U);
+    EXPECT_EQ(document->simulations()[0]->id(), "simulation1");
+    EXPECT_EQ(document->simulations()[1]->id(), "my_simulation");
+
+    // The ids of the SED-ML file are only reserved while it is being imported.
+
+    EXPECT_EQ(libOpenCOR::SedOneStep::create(document)->id(), "simulation2");
 }

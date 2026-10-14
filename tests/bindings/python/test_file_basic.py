@@ -16,6 +16,7 @@
 import libopencor as loc
 import os
 import platform
+import pytest
 import shutil
 import tempfile
 import threading
@@ -47,11 +48,13 @@ def test_local_file():
 
 
 def test_existing_relative_local_file():
+    # Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file.
+
     orig_dir = os.getcwd()
 
     os.chdir(utils.resource_path())
 
-    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    file = loc.File("cellml_2.cellml")
 
     assert file.contents != []
     assert_issues(file, expected_no_issues)
@@ -63,7 +66,7 @@ def test_non_existing_relative_local_file():
     if platform.system() == "Windows":
         file = loc.File("some\\.\\relative\\..\\..\\path\\.\\..\\dir\\file.txt")
     else:
-        file = loc.File("some/./relative/../../path/./../dir/file.txt")
+        file = loc.File("some/relative/../../path/../dir/file.txt")
 
     assert file.type == loc.File.Type.IrretrievableFile
 
@@ -116,6 +119,73 @@ def test_too_long_local_file_name():
     assert_issues(file, expected_non_existing_file_issues)
 
 
+def test_local_file_with_null_character():
+    # A file name with a null character cannot exist and must never be truncated at that null character (e.g.,
+    # "/some/path/file.txt\0.cellml" must not be considered to be "/some/path/file.txt").
+
+    file_path = utils.resource_path("cellml_2.cellml")
+    file_name = file_path + "\0.txt"
+    file = loc.File(file_name)
+
+    assert file.type == loc.File.Type.IrretrievableFile
+    assert file.file_name == file_name
+    assert file.url == ""
+    assert file.path == file_name
+    assert file.contents == []
+    assert_issues(file, expected_non_existing_file_issues)
+    assert loc.File(file_path) != file
+
+
+def test_local_file_with_non_utf8_character():
+    # A file name that is not valid UTF-8 (e.g., "/some/path/\xFF.cellml", which is what "file:///some/path/%FF.cellml"
+    # gets percent-decoded to) must not result in an exception being thrown and must be kept as is.
+
+    file_name = utils.resource_path("\udcff.cellml")
+    file = loc.File(file_name)
+
+    assert file.type == loc.File.Type.IrretrievableFile
+    assert file.file_name.endswith("\udcff.cellml")
+    assert file.file_name == file_name
+    assert file.url == ""
+    assert file.path == file_name
+    assert file.contents == []
+    assert_issues(file, expected_non_existing_file_issues)
+
+    if platform.system() == "Windows":
+        assert (
+            loc.File(
+                "file:///" + utils.forward_slash_path(utils.resource_path("%FF.cellml"))
+            )
+            == file
+        )
+    else:
+        assert loc.File("file://" + utils.resource_path("%FF.cellml")) == file
+
+    # A file name with a character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also kept as is.
+
+    emoji_file_name = utils.resource_path("\U0001f600.cellml")
+    emoji_file = loc.File(emoji_file_name)
+
+    assert emoji_file.type == loc.File.Type.IrretrievableFile
+    assert emoji_file.file_name.endswith("\U0001f600.cellml")
+    assert emoji_file.file_name == emoji_file_name
+    assert_issues(emoji_file, expected_non_existing_file_issues)
+
+    if platform.system() == "Windows":
+        assert (
+            loc.File(
+                "file:///"
+                + utils.forward_slash_path(utils.resource_path("%F0%9F%98%80.cellml"))
+            )
+            == emoji_file
+        )
+    else:
+        assert (
+            loc.File("file://" + utils.resource_path("%F0%9F%98%80.cellml"))
+            == emoji_file
+        )
+
+
 def test_local_directory():
     # A directory is not a file, but it must not result in an exception being thrown.
 
@@ -140,6 +210,30 @@ def test_url_based_local_file():
     assert file.path == file_path
     assert file.contents == []
     assert_issues(file, expected_non_existing_file_issues)
+
+    # A scheme is case-insensitive.
+
+    if platform.system() == "Windows":
+        assert loc.File("FILE:///" + utils.forward_slash_path(file_path)) == file
+    else:
+        assert loc.File("FILE://" + file_path) == file
+
+    # A "file" URL with the "localhost" host or without an authority also refers to a local file while a "file" URL
+    # with another host refers to a remote file.
+
+    if platform.system() == "Windows":
+        url_path = "/" + utils.forward_slash_path(file_path)
+    else:
+        url_path = file_path
+
+    assert loc.File("file://localhost" + url_path) == file
+    assert loc.File("file:" + url_path) == file
+
+    remote_file = loc.File("file://example.com" + url_path, False)
+
+    assert remote_file != file
+    assert remote_file.file_name == ""
+    assert remote_file.url == "file://example.com" + url_path
 
 
 def test_local_files_with_percent_signs():
@@ -232,6 +326,35 @@ def test_remote_files_with_percent_encoded_characters():
     assert loc.File("https://example.com/100%25.cellml", False) == percent_file
     assert loc.File(percent_file.url, False) == percent_file
 
+    # A percent-encoded character that is not valid UTF-8 is also decoded.
+
+    non_utf8_file = loc.File("https://example.com/%FF.cellml", False)
+
+    assert non_utf8_file.url == "https://example.com/\udcff.cellml"
+    assert loc.File(non_utf8_file.url, False) == non_utf8_file
+
+    # A percent-encoded character that is outside of the Basic Multilingual Plane (e.g., an emoji) is also decoded.
+
+    emoji_file = loc.File("https://example.com/%F0%9F%98%80.cellml", False)
+
+    assert emoji_file.url == "https://example.com/\U0001f600.cellml"
+    assert loc.File(emoji_file.url, False) == emoji_file
+
+    # The representation of a file which URL is not valid UTF-8 has its invalid bytes escaped.
+    # Note: this has no C++ or JavaScript equivalent since a file has no representation in C++ or JavaScript.
+
+    assert repr(non_utf8_file) == 'File("https://example.com/\\xff.cellml")'
+
+    # A string with a lone surrogate that doesn't stand for an invalid byte (i.e. other than U+DC80 to U+DCFF) is
+    # rejected.
+    # Note: this has no C++ equivalent since a std::string cannot contain a lone surrogate.
+
+    with pytest.raises(TypeError):
+        loc.File("https://example.com/\ud800.cellml", False)
+
+    with pytest.raises(TypeError):
+        loc.File("https://example.com/\udc41.cellml", False)
+
 
 def test_remote_file():
     file = loc.File(utils.RemoteFile)
@@ -245,6 +368,8 @@ def test_remote_file():
 
 def test_remote_file_local_copy():
     # The local copy of a remote file must exist for as long as the remote file exists, and be deleted with it.
+    # Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
+    #       remote file is never downloaded.
 
     file = loc.File(utils.RemoteFile)
     file_name = file.file_name
@@ -259,6 +384,8 @@ def test_remote_file_local_copy():
 def test_local_file_matching_local_copy_of_remote_file():
     # A local file must never be confused with the local copy of a remote file, and deleting it must not delete that
     # local copy (since it is not a file that we downloaded).
+    # Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
+    #       remote file is never downloaded.
 
     file_manager = loc.FileManager.instance()
     remote_file = loc.File(utils.RemoteFile)
@@ -266,6 +393,7 @@ def test_local_file_matching_local_copy_of_remote_file():
     local_file = loc.File(file_name)
 
     assert local_file != remote_file
+    assert local_file.file_name == os.path.realpath(file_name)
     assert local_file.url == ""
     assert local_file.contents == remote_file.contents
     assert file_manager.file_count == 2
@@ -301,18 +429,48 @@ def test_remote_file_with_dot_segments():
     assert file.path == "https://example.com/c/model.cellml"
 
 
+def test_remote_file_with_upper_case_scheme():
+    # A scheme is case-insensitive, so it gets normalised to lowercase.
+
+    file = loc.File("HTTPS://example.com/model.cellml", False)
+
+    assert file.url == "https://example.com/model.cellml"
+    assert file.path == "https://example.com/model.cellml"
+    assert loc.File("https://example.com/model.cellml", False) == file
+    assert loc.File("Https://example.com/model.cellml", False) == file
+    assert loc.FileManager.instance().file("HTTPS://example.com/model.cellml") == file
+
+
+def test_remote_file_with_upper_case_host():
+    # A host is case-insensitive, so it gets normalised to lowercase, unlike a path which is case-sensitive.
+
+    file = loc.File("https://EXAMPLE.com/model.cellml", False)
+
+    assert file.url == "https://example.com/model.cellml"
+    assert file.path == "https://example.com/model.cellml"
+    assert loc.File("https://example.com/model.cellml", False) == file
+    assert loc.File("https://Example.COM/model.cellml", False) == file
+    assert loc.FileManager.instance().file("https://EXAMPLE.com/model.cellml") == file
+    assert loc.File("https://example.com/MODEL.cellml", False) != file
+
+
 def test_remote_file_matching_local_file():
+    # The host and path of a URL must never be resolved as a local file, even if such a local file exists.
+
     orig_dir = os.getcwd()
+    temp_dir = os.path.join(
+        tempfile.gettempdir(), "libopencor_remote_file_matching_local_file"
+    )
 
-    with tempfile.TemporaryDirectory() as temp_dir:
-        os.makedirs(os.path.join(temp_dir, "example.com"))
-        open(os.path.join(temp_dir, "example.com", "model.cellml"), "w").close()
+    os.makedirs(os.path.join(temp_dir, "example.com"), exist_ok=True)
+    open(os.path.join(temp_dir, "example.com", "model.cellml"), "w").close()
 
-        os.chdir(temp_dir)
+    os.chdir(temp_dir)
 
-        url = loc.File("https://example.com/model.cellml", False).url
+    url = loc.File("https://example.com/model.cellml", False).url
 
-        os.chdir(orig_dir)
+    os.chdir(orig_dir)
+    shutil.rmtree(temp_dir)
 
     assert url == "https://example.com/model.cellml"
 
@@ -369,6 +527,8 @@ def test_concurrent_file_creations():
 def test_concurrent_file_downloads():
     # Remote files that are downloaded at the same time must each have their own local copy, so that deleting the local
     # copy of one of them doesn't delete the local copy of another one.
+    # Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
+    #       remote file is never downloaded.
 
     THREAD_COUNT = 8
 
@@ -431,9 +591,7 @@ def test_remote_virtual_file():
     )
 
     assert file.type == loc.File.Type.UnknownFile
-
     assert file.file_name == ""
-
     assert (
         file.url
         == "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt"
@@ -478,7 +636,7 @@ def test_file_manager():
 
     assert not file_manager.has_files
     assert file_manager.file_count == 0
-    assert len(file_manager) == 0
+    assert len(file_manager.files) == 0
     assert file_manager.file(0) is None
     assert file_manager.file(file_path) is None
 
@@ -487,16 +645,22 @@ def test_file_manager():
 
     assert same_file_manager.has_files
     assert same_file_manager.file_count == 1
-    assert len(file_manager) == 1
-    assert list(file_manager) == [local_file]
+    assert len(same_file_manager.files) == 1
     assert file_manager.file(0) == local_file
     assert same_file_manager.file(file_path) == local_file
+
+    # A file manager is sized and iterable.
+    # Note: this has no C++ or JavaScript equivalent since a file manager is neither sized nor iterable in C++ or
+    #       JavaScript.
+
+    assert len(file_manager) == 1
+    assert list(file_manager) == [local_file]
 
     remote_file = loc.File(utils.RemoteFile)
 
     assert file_manager.has_files
     assert file_manager.file_count == 2
-    assert len(file_manager) == 2
+    assert len(file_manager.files) == 2
     assert file_manager.file(1) == remote_file
     assert file_manager.file(utils.RemoteFile) == remote_file
 
@@ -504,7 +668,7 @@ def test_file_manager():
 
     assert same_file_manager.has_files
     assert same_file_manager.file_count == 1
-    assert len(file_manager) == 1
+    assert len(same_file_manager.files) == 1
     assert file_manager.file(1) is None
     assert same_file_manager.file(file_path) is None
 
@@ -512,7 +676,7 @@ def test_file_manager():
 
     assert same_file_manager.has_files
     assert same_file_manager.file_count == 2
-    assert len(file_manager) == 2
+    assert len(same_file_manager.files) == 2
     assert file_manager.file(1) == local_file
     assert same_file_manager.file(file_path) == local_file
 
@@ -520,7 +684,7 @@ def test_file_manager():
 
     assert not file_manager.has_files
     assert file_manager.file_count == 0
-    assert len(file_manager) == 0
+    assert len(file_manager.files) == 0
     assert file_manager.file(0) is None
     assert file_manager.file(1) is None
     assert file_manager.file(utils.RemoteFile) is None

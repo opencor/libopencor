@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "stringconverter.h"
+
 #include <libopencor>
 
 void loggerApi()
@@ -43,8 +45,8 @@ void loggerApi()
     emscripten::class_<libOpenCOR::Issue>("Issue")
         .smart_ptr<libOpenCOR::IssuePtr>("Issue")
         .property("type", &libOpenCOR::Issue::type)
-        .property("typeAsString", &libOpenCOR::Issue::typeAsString)
-        .property("description", &libOpenCOR::Issue::description);
+        .property("typeAsString", &JsStringResult<&libOpenCOR::Issue::typeAsString>::call)
+        .property("description", &JsStringResult<&libOpenCOR::Issue::description>::call);
 
     // clang-format off
     EM_ASM({

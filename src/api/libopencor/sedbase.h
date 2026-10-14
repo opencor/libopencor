@@ -30,6 +30,8 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SedBase: public Logger
 {
+    friend class SedDocument;
+
 public:
     /**
      * Constructors, destructor, and assignment operators.
@@ -54,14 +56,44 @@ public:
     const std::string &id() const;
 
     /**
-     * @brief Set the id.
+     * @brief Return whether the given id is a valid SED-ML identifier.
      *
-     * Set the id.
+     * Return whether the given id is a valid SED-ML identifier, i.e. it starts with a letter or an underscore, followed
+     * by any number of letters, digits, and underscores.
      *
      * @param pId The id as a @c std::string.
+     *
+     * @return @c true if the given id is a valid SED-ML identifier, @c false otherwise.
      */
 
-    void setId(const std::string &pId);
+    static bool isValidId(const std::string &pId);
+
+    /**
+     * @brief Return whether the given id is a duplicate.
+     *
+     * Return whether the given id is already used by another object of the simulation experiment description for which
+     * this object was created. The id of this object is not a duplicate unless this object was removed from its
+     * simulation experiment description and another object was then given its id.
+     *
+     * @param pId The id as a @c std::string.
+     *
+     * @return @c true if the given id is a duplicate, @c false otherwise.
+     */
+
+    bool isDuplicateId(const std::string &pId) const;
+
+    /**
+     * @brief Set the id.
+     *
+     * Set the id, if it is a valid SED-ML identifier (see @ref isValidId) and if it is not a duplicate (see
+     * @ref isDuplicateId).
+     *
+     * @param pId The id as a @c std::string.
+     *
+     * @return @c true if the id was set, @c false otherwise (in which case the id is left unchanged).
+     */
+
+    bool setId(const std::string &pId);
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
