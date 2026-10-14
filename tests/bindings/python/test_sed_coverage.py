@@ -510,6 +510,22 @@ def test_sed_ids():
     assert len(document.models) == 1
     assert document.models[0] == model
 
+    # A destroyed object releases its id, even if it was never added to its simulation experiment description, so that
+    # its id can then be given to another object.
+
+    transient_model = loc.SedModel(document, file)
+
+    assert transient_model.id == "model1"
+    assert other_model.is_duplicate_id("model1")
+
+    del transient_model
+
+    assert not other_model.is_duplicate_id("model1")
+
+    other_model.id = "model1"
+
+    assert other_model.id == "model1"
+
     # An object can only be added to the simulation experiment description for which it was created.
 
     other_document = loc.SedDocument()

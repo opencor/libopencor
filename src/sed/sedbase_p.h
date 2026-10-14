@@ -35,6 +35,7 @@ public:
 
     explicit Impl(const std::string &pId = {});
     explicit Impl(const SedDocumentPtr &pDocument, const std::string &pIdPrefix);
+    ~Impl() override;
 
     bool isDuplicateId(const std::string &pId) const;
 

@@ -33,6 +33,20 @@ SedBase::Impl::Impl(const SedDocumentPtr &pDocument, const std::string &pIdPrefi
 {
 }
 
+SedBase::Impl::~Impl()
+{
+    // Release our id if it is reserved in our document, if we still have one, so that it can be given to another object
+    // (e.g., if we were created for our document, but never added to it).
+
+    if (mHasReservedId) {
+        auto document {mDocument.lock()};
+
+        if (document != nullptr) {
+            document->pimpl()->mIds.erase(mId);
+        }
+    }
+}
+
 bool SedBase::Impl::isDuplicateId(const std::string &pId) const
 {
     // Check whether the given id is used by another object of our document, if we still have one. Our own id is not a

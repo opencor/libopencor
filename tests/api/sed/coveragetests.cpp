@@ -435,6 +435,20 @@ TEST(CoverageSedTest, sedIds)
     EXPECT_EQ(document->models().size(), 1U);
     EXPECT_EQ(document->models()[0], model);
 
+    // A destroyed object releases its id, even if it was never added to its simulation experiment description, so that
+    // its id can then be given to another object.
+
+    auto transientModel {libOpenCOR::SedModel::create(document, file)};
+
+    EXPECT_EQ(transientModel->id(), "model1");
+    EXPECT_TRUE(otherModel->isDuplicateId("model1"));
+
+    transientModel.reset();
+
+    EXPECT_FALSE(otherModel->isDuplicateId("model1"));
+    EXPECT_TRUE(otherModel->setId("model1"));
+    EXPECT_EQ(otherModel->id(), "model1");
+
     // An object can only be added to the simulation experiment description for which it was created.
 
     auto otherDocument {libOpenCOR::SedDocument::create()};

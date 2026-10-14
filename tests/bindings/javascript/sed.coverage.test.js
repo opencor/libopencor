@@ -510,6 +510,22 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.models.length, 1);
     assert.strictEqual(document.models[0].isAliasOf(model), true);
 
+    // A destroyed object releases its id, even if it was never added to its simulation experiment description, so that
+    // its id can then be given to another object.
+
+    const transientModel = new loc.SedModel(document, file);
+
+    assert.strictEqual(transientModel.id, 'model1');
+    assert.strictEqual(otherModel.isDuplicateId('model1'), true);
+
+    transientModel.delete();
+
+    assert.strictEqual(otherModel.isDuplicateId('model1'), false);
+
+    otherModel.id = 'model1';
+
+    assert.strictEqual(otherModel.id, 'model1');
+
     // An object can only be added to the simulation experiment description for which it was created.
 
     const otherDocument = new loc.SedDocument();
