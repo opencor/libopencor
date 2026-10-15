@@ -47,9 +47,8 @@ void fileApi()
 
             // Note: we avoid using emscripten::typed_memory_view() as an intermediate step since it creates a
             //       JavaScript's TypedArray view directly backed by wasmMemory.buffer. This is fragile and would break
-            //       if ALLOW_MEMORY_GROWTH was to be enabled or if pthreads/SharedArrayBuffer support were to be added.
-            //       By performing the copy entirely within a single EM_ASM() block, HEAPU8 is fetched and used
-            //       atomically.
+            //       if ALLOW_MEMORY_GROWTH was to be enabled. By performing the copy entirely within a single EM_ASM()
+            //       block, HEAPU8 is fetched and used atomically.
 
             return emscripten::val::take_ownership(static_cast<emscripten::EM_VAL>(EM_ASM_PTR({
                 let jsArray = new Uint8Array(HEAPU8.subarray($0, $0 + $1));
