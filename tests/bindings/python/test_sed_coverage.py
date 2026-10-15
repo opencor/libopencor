@@ -417,10 +417,11 @@ def test_sed_base():
     ]:
         assert not loc.SedBase.is_valid_id(id)
 
-        with pytest.raises(ValueError) as exception_info:
+        with pytest.raises(
+            ValueError, match=r"^The id is not a valid SED-ML identifier\.$"
+        ):
             simulation.id = id
 
-        assert str(exception_info.value) == "The id is not a valid SED-ML identifier."
         assert simulation.id == "my_simulation"
 
     # A string with a lone surrogate that doesn't stand for an invalid byte (i.e. other than U+DC80 to U+DCFF) is
@@ -469,10 +470,9 @@ def test_sed_ids():
         assert loc.SedBase.is_valid_id(id)
         assert other_model.is_duplicate_id(id)
 
-        with pytest.raises(ValueError) as exception_info:
+        with pytest.raises(ValueError, match=r"^The id is already used\.$"):
             other_model.id = id
 
-        assert str(exception_info.value) == "The id is already used."
         assert other_model.id == "model1"
 
     assert not other_model.is_duplicate_id("model1")
@@ -491,10 +491,9 @@ def test_sed_ids():
 
     assert model.is_duplicate_id("model2")
 
-    with pytest.raises(ValueError) as exception_info:
+    with pytest.raises(ValueError, match=r"^The id is already used\.$"):
         model.id = "model2"
 
-    assert str(exception_info.value) == "The id is already used."
     assert not document.add_model(model)
 
     model.id = "my_model"
@@ -502,10 +501,8 @@ def test_sed_ids():
     assert document.add_model(model)
     assert other_model.is_duplicate_id("my_model")
 
-    with pytest.raises(ValueError) as exception_info:
+    with pytest.raises(ValueError, match=r"^The id is already used\.$"):
         other_model.id = "my_model"
-
-    assert str(exception_info.value) == "The id is already used."
 
     assert len(document.models) == 1
     assert document.models[0] == model
