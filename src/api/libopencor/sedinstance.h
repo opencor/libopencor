@@ -88,6 +88,10 @@ public:
      * plot them progressively). The simulation settings and model changes used are those in effect when this method is
      * called.
      *
+     * Note: in a Web browser, this method can only be used if the page is cross-origin isolated (i.e. served with the
+     * "Cross-Origin-Opener-Policy: same-origin" and "Cross-Origin-Embedder-Policy: require-corp" HTTP headers) since
+     * threads are otherwise not supported, in which case an error is thrown.
+     *
      * @return @c true if a new run was started, @c false if a run is already in progress.
      */
 
@@ -97,6 +101,10 @@ public:
      * @brief Wait for any currently-running instance to complete.
      *
      * Wait for any currently-running instance to complete.
+     *
+     * Note: in a Web browser, calling this method on the main thread straight after @ref startRun() blocks forever
+     * since the background thread cannot start until the main thread returns to its event loop, so poll @ref status()
+     * instead.
      *
      * @return The elapsed time in milliseconds for the last completed instance run.
      */
