@@ -625,21 +625,22 @@ std::string canonicalFileName(const std::string &pFileName)
         return pathToString(filePath.lexically_normal());
     }
 
-    // If the file exists then use std::filesystem::canonical() since it resolves symbolic links, etc.
-    // Note: this fails if the file doesn't exist.
-
-    std::error_code errorCode;
-    auto res {std::filesystem::canonical(filePath, errorCode)};
-
-    if (!errorCode) {
-        return pathToString(res);
-    }
-
-    // The file doesn't exist, so if its file name has a root directory (i.e., it is an absolute file name or, on
-    // Windows, a file name relative to the root of the current drive) then use std::filesystem::weakly_canonical()
-    // since it returns a file name that is as close to the canonical version as possible.
+    // If the file name has a root directory (i.e., it is an absolute file name or, on Windows, a file name relative to
+    // the root of the current drive) then use std::filesystem::canonical() if the file exists since it resolves
+    // symbolic links, etc. or std::filesystem::weakly_canonical() otherwise since it returns a file name that is as
+    // close to the canonical version as possible.
+    // Note: we don't do this for a relative file name since both functions would resolve it against the current working
+    //       directory, meaning that its canonical version would depend on whether a file with that name happens to
+    //       exist in the current working directory.
 
     if (filePath.has_root_directory()) {
+        std::error_code errorCode;
+        auto res {std::filesystem::canonical(filePath, errorCode)};
+
+        if (!errorCode) {
+            return pathToString(res);
+        }
+
         res = std::filesystem::weakly_canonical(filePath, errorCode);
 
         if (!errorCode) {
@@ -649,8 +650,9 @@ std::string canonicalFileName(const std::string &pFileName)
 #endif
 
     // The file name is relative (or something went wrong), so normalise it lexically. Unlike
-    // std::filesystem::weakly_canonical(), this doesn't depend on the current working directory, and it keeps leading
-    // ".." components (e.g., "a/../../b" becomes "../b").
+    // std::filesystem::canonical() and std::filesystem::weakly_canonical(), this doesn't depend on the current working
+    // directory (whether the file exists or not), and it keeps leading ".." components (e.g., "a/../../b" becomes
+    // "../b").
 
     return pathToString(filePath.lexically_normal());
 }

@@ -595,6 +595,20 @@ TEST(UtilsTest, canonicalFileName)
     EXPECT_EQ(libOpenCOR::canonicalFileName(std::string(libOpenCOR::RESOURCE_LOCATION) + "/api/../cellml_2.cellml"),
               libOpenCOR::resourcePath("cellml_2.cellml"));
 
+    // Existing relative file, which must be normalised lexically (i.e. without using the current working directory).
+
+    auto origDir {std::filesystem::current_path()};
+
+    std::filesystem::current_path(libOpenCOR::resourcePath("api"));
+
+#ifdef BUILDING_ON_WINDOWS
+    EXPECT_EQ(libOpenCOR::canonicalFileName("../api/./../cellml_2.cellml"), R"(..\cellml_2.cellml)");
+#else
+    EXPECT_EQ(libOpenCOR::canonicalFileName("../api/./../cellml_2.cellml"), "../cellml_2.cellml");
+#endif
+
+    std::filesystem::current_path(origDir);
+
     // Non-existing absolute file.
 
     EXPECT_EQ(libOpenCOR::canonicalFileName(std::string(libOpenCOR::RESOURCE_LOCATION) + "/non/existing/../../file.txt"),

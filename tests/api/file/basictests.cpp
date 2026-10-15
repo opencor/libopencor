@@ -63,7 +63,8 @@ TEST(BasicFileTest, localFile)
 
 TEST(BasicFileTest, existingRelativeLocalFile)
 {
-    // Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file.
+    // An existing relative file name must stay relative, i.e. it must not be resolved against the current working
+    // directory.
 
     auto origDir {std::filesystem::current_path()};
 
@@ -71,6 +72,8 @@ TEST(BasicFileTest, existingRelativeLocalFile)
 
     auto file {libOpenCOR::File::create("cellml_2.cellml")};
 
+    EXPECT_EQ(file->fileName(), "cellml_2.cellml");
+    EXPECT_EQ(file->path(), "cellml_2.cellml");
     EXPECT_FALSE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, expectedNoIssues());
 
