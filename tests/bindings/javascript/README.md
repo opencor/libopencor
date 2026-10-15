@@ -7,4 +7,4 @@ cd [libOpenCOR]
 emrun --browser chrome build/tests/bindings/javascript/index.html
 ```
 
-Note: libOpenCOR's JavaScript bindings require `SharedArrayBuffer` for pthread support, which in turn requires the `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` HTTP headers (or their `<meta>` equivalents, which are already present in the HTML). If the demo page fails to load the WebAssembly module, verify that these headers are being served.
+Note: libOpenCOR's JavaScript bindings require `SharedArrayBuffer` to run a simulation in a background thread (i.e. using `startRun()`), which in turn requires the page to be served with the `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` HTTP headers. `emrun` serves them, but if you use another Web server, you must make sure that it serves them too (Web browsers ignore their `<meta>` equivalents). Otherwise, `startRun()` throws an error.

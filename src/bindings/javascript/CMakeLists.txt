@@ -71,7 +71,10 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
         #          catching the std::out_of_range exception thrown by std::stoi()). Unlike Emscripten's
         #          JavaScript-based exception handling, WebAssembly exception handling has no runtime cost when no
         #          exception is thrown.
-        # Note #3: those flags are also used to build our third-party libraries (see packages.cmake), so that they are
+        # Note #3: the linker flags also allow the WebAssembly table to grow (-sALLOW_TABLE_GROWTH), which we need to
+        #          install the functions of the WebAssembly modules that we generate for our models (see
+        #          initialiseWorkerWasmJS()).
+        # Note #4: those flags are also used to build our third-party libraries (see packages.cmake), so that they are
         #          all built with exception handling too.
 
         set(EMSCRIPTEN_COMPILER_FLAGS "-fwasm-exceptions -matomics -mbulk-memory -msimd128 -pthread -sSHARED_MEMORY=1")

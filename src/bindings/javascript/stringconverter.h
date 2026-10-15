@@ -39,8 +39,8 @@ limitations under the License.
 //          we throw using emscripten::val::throw_() rather than from within an EM_ASM() block since the latter is
 //          declared as not throwing. Also, a JavaScript exception that leaves WebAssembly doesn't restore the
 //          WebAssembly stack pointer, meaning that some of the WebAssembly stack would be leaked every time a binding
-//          throws. So, every binding that may throw (i.e. that uses fromJsString() or throwRangeError()) must be listed
-//          in restoreStackOnThrow() (see main.cpp).
+//          throws. So, every binding that may throw (i.e. that uses fromJsString(), throwError(), or throwRangeError())
+//          must be listed in restoreStackOnThrow() (see main.cpp).
 
 EMSCRIPTEN_DECLARE_VAL_TYPE(JsString);
 
@@ -186,6 +186,14 @@ inline std::string fromJsString(const JsString &pString)
 
     return res;
     // clang-format on
+}
+
+[[noreturn]] inline void throwError(std::string_view pMessage)
+{
+    // Throw a JavaScript Error with the given message (see Note #4), e.g., when something cannot be done in the current
+    // JavaScript environment.
+
+    emscripten::val::global("Error").new_(std::string(pMessage)).throw_();
 }
 
 [[noreturn]] inline void throwRangeError(std::string_view pMessage)

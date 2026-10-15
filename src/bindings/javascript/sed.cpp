@@ -18,6 +18,8 @@ limitations under the License.
 
 #include <libopencor>
 
+#include <emscripten/threading.h>
+
 namespace {
 
 constexpr std::string_view INVALID_ID_ERROR {"The id is not a valid SED-ML identifier."};
@@ -26,6 +28,7 @@ constexpr std::string_view COMPONENT_NAME_ERROR {"The component name is not a va
 constexpr std::string_view VARIABLE_NAME_ERROR {"The variable name is not a valid CellML identifier."};
 constexpr std::string_view NEW_VALUE_ERROR {"The new value is not a valid double value."};
 constexpr std::string_view CHANGE_ATTRIBUTE_ERROR {"The component and variable names must be valid CellML identifiers and the new value must be a valid double value."};
+constexpr std::string_view START_RUN_ERROR {"The instance cannot be run in a background thread since threads are not supported (in a Web browser, the page must be cross-origin isolated)."};
 
 void setId(libOpenCOR::SedBase &pThis, const JsString &pId)
 {
@@ -153,7 +156,20 @@ void sedApi()
         .smart_ptr<libOpenCOR::SedInstancePtr>("SedInstance")
         .property("status", &libOpenCOR::SedInstance::status)
         .function("run", &libOpenCOR::SedInstance::run)
-        .function("startRun", &libOpenCOR::SedInstance::startRun)
+        // clang-format off
+        .function("startRun", emscripten::optional_override([](libOpenCOR::SedInstance &pThis) {
+            // Note: threads require SharedArrayBuffer, which a Web browser only provides to a page that is cross-origin
+            //       isolated (i.e. served with the "Cross-Origin-Opener-Policy: same-origin" and
+            //       "Cross-Origin-Embedder-Policy: require-corp" HTTP headers). Without it, startRun() would fail to
+            //       create its thread and throw a C++ exception, which would reach JavaScript as an opaque
+            //       WebAssembly.Exception, so we throw an Error with a meaningful message instead.
+
+            if (!emscripten_has_threading_support()) {
+                throwError(START_RUN_ERROR);
+            }
+
+            return pThis.startRun();
+        })) // clang-format on
         .function("waitForRun", &libOpenCOR::SedInstance::waitForRun)
         .function("pauseRun", &libOpenCOR::SedInstance::pauseRun)
         .function("resumeRun", &libOpenCOR::SedInstance::resumeRun)

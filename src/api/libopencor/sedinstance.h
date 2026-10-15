@@ -75,6 +75,10 @@ public:
      * Run all the tasks associated with this instance. If a run is already in progress (see @ref startRun), then wait
      * for it to complete before running all the tasks associated with this instance.
      *
+     * Note: in a Web browser, calling this method on the main thread straight after @ref startRun() blocks forever
+     * since the background thread cannot start until the main thread returns to its event loop, so poll @ref status()
+     * until the instance is idle first.
+     *
      * @return The elapsed time in milliseconds.
      */
 
@@ -88,6 +92,15 @@ public:
      * plot them progressively). The simulation settings and model changes used are those in effect when this method is
      * called.
      *
+     * Note: in a Web browser, this method can only be used if the page is cross-origin isolated (i.e. served with the
+     * "Cross-Origin-Opener-Policy: same-origin" and "Cross-Origin-Embedder-Policy: require-corp" HTTP headers) since
+     * threads are otherwise not supported, in which case an error is thrown. Also, if the page has a Content Security
+     * Policy, it must allow blob: workers (i.e. worker-src blob:) since the run would otherwise never start, i.e. the
+     * status of the instance would remain RUNNING. Finally, deleting the instance on the main thread before its run has
+     * actually started (e.g., straight after calling this method) blocks forever since the instance stops its run and
+     * waits for it to complete before being deleted, but the background thread cannot start until the main thread
+     * returns to its event loop.
+     *
      * @return @c true if a new run was started, @c false if a run is already in progress.
      */
 
@@ -97,6 +110,10 @@ public:
      * @brief Wait for any currently-running instance to complete.
      *
      * Wait for any currently-running instance to complete.
+     *
+     * Note: in a Web browser, calling this method on the main thread straight after @ref startRun() blocks forever
+     * since the background thread cannot start until the main thread returns to its event loop, so poll @ref status()
+     * until the instance is idle first.
      *
      * @return The elapsed time in milliseconds for the last completed instance run.
      */

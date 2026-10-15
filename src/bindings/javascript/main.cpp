@@ -35,8 +35,9 @@ namespace {
 void restoreStackOnThrow()
 {
     // Make sure that the WebAssembly stack pointer gets restored when a binding throws a JavaScript exception (see Note
-    // #4 in stringconverter.h), i.e. a binding that takes a string (see fromJsString()) or that may reject a value (see
-    // throwRangeError()), as Embind itself does for a binding that allocates its arguments on the WebAssembly stack.
+    // #4 in stringconverter.h), i.e. a binding that takes a string (see fromJsString()), that may reject a value (see
+    // throwRangeError()), or that may fail in the current JavaScript environment (see throwError()), as Embind itself
+    // does for a binding that allocates its arguments on the WebAssembly stack.
     // Note #1: a binding is listed as "<class name>:<member name>|<member name>|...", where a member name is that of a
     //          method, a static method, a property (in which case its setter is wrapped), or "constructor" (in which
     //          case the class is wrapped using a Proxy, so that it otherwise behaves as before, e.g., for instanceof).
@@ -55,7 +56,7 @@ void restoreStackOnThrow()
                 stackRestore(sp);
             }
         };
-        let bindings = 'File:constructor|childFileFromFileName FileManager:fileFromFileNameOrUrl SedBase:id|isDuplicateId|isValidId SedChangeAttribute:constructor|componentName|variableName|newValue SedDocument:serialise Strings:push_back|resize|set'.split(' ');
+        let bindings = 'File:constructor|childFileFromFileName FileManager:fileFromFileNameOrUrl SedBase:id|isDuplicateId|isValidId SedChangeAttribute:constructor|componentName|variableName|newValue SedDocument:serialise SedInstance:startRun Strings:push_back|resize|set'.split(' ');
 
         addOnPostCtor(() => bindings.forEach((binding) => {
             let parts = binding.split(':');

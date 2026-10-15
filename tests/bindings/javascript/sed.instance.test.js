@@ -209,6 +209,73 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
+  test('Many asynchronous runs', () => {
+    // Note: each asynchronous run is done in its own thread, the resources of which must be released once the run has
+    //       been waited for. Otherwise, our WASM version would run out of memory after a few hundred runs.
+
+    const RUN_COUNT = 300;
+    const SIMULATION_PROPERTY = 10;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = SIMULATION_PROPERTY;
+    simulation.outputEndTime = SIMULATION_PROPERTY;
+
+    const instance = document.instantiate();
+
+    for (let i = 0; i < RUN_COUNT; ++i) {
+      assert.strictEqual(instance.startRun(), true);
+      assert.ok(instance.waitForRun() > 0.0);
+    }
+
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Asynchronous run without threading support', () => {
+    // Note: this has no C++ or Python equivalent since threads are always supported in C++ and Python while, in a Web
+    //       browser, they are only supported if the page is cross-origin isolated, i.e. if SharedArrayBuffer is
+    //       available, hence we simulate this by hiding SharedArrayBuffer.
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+    const sharedArrayBuffer = globalThis.SharedArrayBuffer;
+
+    delete globalThis.SharedArrayBuffer;
+
+    try {
+      assert.throws(
+        () => {
+          instance.startRun();
+        },
+        {
+          name: 'Error',
+          message:
+            'The instance cannot be run in a background thread since threads are not supported (in a Web browser, the page must be cross-origin isolated).'
+        }
+      );
+    } finally {
+      globalThis.SharedArrayBuffer = sharedArrayBuffer;
+    }
+
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
+
+    // The instance can still be run, be it synchronously or, once threads are supported again, asynchronously.
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.startRun(), true);
+    assert.ok(instance.waitForRun() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
   test('Progress before any run', () => {
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 

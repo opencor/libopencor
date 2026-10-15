@@ -24,6 +24,7 @@ limitations under the License.
 #include <condition_variable>
 #include <future>
 #include <mutex>
+#include <thread>
 
 namespace libOpenCOR {
 
@@ -39,6 +40,7 @@ public:
 
     mutable std::atomic<bool> mRunning {false};
     mutable std::mutex mRunMutex;
+    mutable std::thread mRunThread;
     mutable std::future<double> mRunFuture;
     mutable std::atomic<double> mLastRunElapsedTime {0.0};
 
@@ -55,6 +57,7 @@ public:
 
     void prepareRun();
     double executeRun();
+    double joinRun();
 
     double run();
     bool startRun();

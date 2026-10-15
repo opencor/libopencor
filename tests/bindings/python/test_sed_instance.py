@@ -199,6 +199,29 @@ def test_asynchronous_run_can_be_restarted():
     assert not instance.has_issues
 
 
+def test_many_asynchronous_runs():
+    # Note: each asynchronous run is done in its own thread, the resources of which must be released once the run has
+    #       been waited for. Otherwise, our WASM version would run out of memory after a few hundred runs.
+
+    RUN_COUNT = 300
+    SIMULATION_PROPERTY = 10
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.number_of_steps = SIMULATION_PROPERTY
+    simulation.output_end_time = float(SIMULATION_PROPERTY)
+
+    instance = document.instantiate()
+
+    for _ in range(RUN_COUNT):
+        assert instance.start_run() is True
+        assert instance.wait_for_run() > 0.0
+
+    assert not instance.has_issues
+
+
 def test_progress_before_any_run():
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)

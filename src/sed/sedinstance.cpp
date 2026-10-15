@@ -265,6 +265,20 @@ double SedInstance::Impl::executeRun()
     return res;
 }
 
+double SedInstance::Impl::joinRun()
+{
+    // Wait for our asynchronous run to complete and return its elapsed time (or rethrow the exception it threw).
+    // Note: we join the thread of our asynchronous run rather than only wait for its future to become ready, so that
+    //       the thread's resources get released straight away. Indeed, our WASM version would otherwise only release
+    //       them (i.e. free the thread's stack and make its Web worker available for another thread) once the main
+    //       thread returns to its event loop, meaning that asynchronous runs started and waited for from a loop (e.g.,
+    //       a parameter sweep in Node.js) would eventually exhaust our WASM memory.
+
+    mRunThread.join();
+
+    return mRunFuture.get();
+}
+
 double SedInstance::Impl::run()
 {
     const std::scoped_lock<std::mutex> runLock(mRunMutex);
@@ -272,7 +286,7 @@ double SedInstance::Impl::run()
     // Wait for any asynchronous run to complete since our tasks cannot be run while they are already being run.
 
     if (mRunFuture.valid()) {
-        mLastRunElapsedTime.store(mRunFuture.get(), std::memory_order_relaxed);
+        mLastRunElapsedTime.store(joinRun(), std::memory_order_relaxed);
     }
 
     // Reset our control flags (see the note in prepareRun()).
@@ -310,7 +324,7 @@ bool SedInstance::Impl::startRun()
             return false;
         }
 
-        mLastRunElapsedTime.store(mRunFuture.get(), std::memory_order_relaxed);
+        mLastRunElapsedTime.store(joinRun(), std::memory_order_relaxed);
     }
 
     // Reset our control flags (see the note in prepareRun()).
@@ -329,21 +343,29 @@ bool SedInstance::Impl::startRun()
     // Note #1: we must be flagged as not running anymore once our run is done, even if executeRun() throws an exception
     //          (it reports a failure as an issue, but it might still throw, e.g., std::bad_alloc when adding an issue),
     //          hence we use a guard to do so. Otherwise, we would be stuck in RUNNING.
-    // Note #2: std::async() may throw an exception (e.g., std::system_error if no thread could be created), in which
-    //          case we must also be flagged as not running anymore. We have no way to trigger such an exception in our
-    //          tests, hence we ignore our try...catch statement during code coverage.
+    // Note #2: we use a joinable thread rather than std::async() since the latter may use a detached thread (e.g., with
+    //          libc++), which we couldn't join (see joinRun()). We still use a future (through a packaged task) so that
+    //          we can retrieve the elapsed time of our run or the exception that it threw.
+    // Note #3: creating our thread may throw an exception (e.g., std::system_error if no thread could be created), in
+    //          which case we must also be flagged as not running anymore and must not have a future (since it would
+    //          never become ready). We have no way to trigger such an exception in our tests, hence we ignore our
+    //          try...catch statement during code coverage.
+
+    std::packaged_task<double()> runTask([this]() {
+        auto resetRunning = [](std::atomic<bool> *pRunning) {
+            pRunning->store(false, std::memory_order_release);
+        };
+        const std::unique_ptr<std::atomic<bool>, decltype(resetRunning)> runningGuard {&mRunning, resetRunning};
+
+        return executeRun();
+    });
+    auto runFuture {runTask.get_future()};
 
 #ifndef CODE_COVERAGE_ENABLED
     try {
 #endif
-        mRunFuture = std::async(std::launch::async, [this]() {
-            auto resetRunning = [](std::atomic<bool> *pRunning) {
-                pRunning->store(false, std::memory_order_release);
-            };
-            const std::unique_ptr<std::atomic<bool>, decltype(resetRunning)> runningGuard {&mRunning, resetRunning};
-
-            return executeRun();
-        });
+        mRunThread = std::thread(std::move(runTask));
+        mRunFuture = std::move(runFuture);
 #ifndef CODE_COVERAGE_ENABLED
     } catch (...) {
         mRunning.store(false, std::memory_order_release);
@@ -363,7 +385,7 @@ double SedInstance::Impl::waitForRun()
         return mLastRunElapsedTime.load(std::memory_order_relaxed);
     }
 
-    mLastRunElapsedTime.store(mRunFuture.get(), std::memory_order_relaxed);
+    mLastRunElapsedTime.store(joinRun(), std::memory_order_relaxed);
     mRunning.store(false, std::memory_order_release);
 
     return mLastRunElapsedTime.load(std::memory_order_relaxed);
