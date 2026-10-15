@@ -919,6 +919,217 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instanceTask.voi[instanceTask.voi.length - 1], 2.0 * outputEndTime);
   });
 
+  test('Model changes used when starting run', () => {
+    // Note: the model changes used by a run are those in effect when the run is started, even if they get changed
+    //       while the run is in progress.
+
+    const file = new loc.File(utils.resourcePath('api/sed/variables_initialised_using_variables.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const model = document.model(0);
+    const change = new loc.SedChangeAttribute('main', 'k', '5.0');
+
+    model.addChange(change);
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+
+    change.newValue = '7.0';
+    model.addChange(new loc.SedChangeAttribute('main', 'x', '9.0'));
+
+    assert.ok(instance.waitForRun() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+
+    assert.strictEqual(instanceTask.stateName(0), 'main/x');
+    assert.strictEqual(instanceTask.state(0)[0], 5.0);
+
+    // Running our instance again should use our new model changes.
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    assert.strictEqual(instanceTask.state(0)[0], 9.0);
+
+    model.removeChange(model.changes[1]);
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    assert.strictEqual(instanceTask.state(0)[0], 7.0);
+  });
+
+  test('Change model after stop run', async () => {
+    // Note: stopping a run doesn't wait for it to be done, so our model may get changed while the stopped run is still
+    //       in progress, which must not affect it.
+
+    const NUMBER_OF_RUNS = 1000;
+
+    const file = new loc.File(utils.resourcePath('api/sed/variables_initialised_using_variables.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const model = document.model(0);
+    const instance = document.instantiate();
+
+    for (let i = 0; i < NUMBER_OF_RUNS; ++i) {
+      assert.strictEqual(instance.startRun(), true);
+
+      instance.stopRun();
+
+      model.removeAllChanges();
+      model.addChange(new loc.SedChangeAttribute('main', 'k', String(i)));
+
+      instance.waitForRun();
+
+      assert.strictEqual(instance.hasIssues, false);
+
+      // Note: this has no C++ or Python equivalent since the threads of our previous runs can only be cleaned up when
+      //       we return to the event loop, which we must do or we would eventually run out of memory.
+
+      await sleep(0);
+    }
+
+    // Running our instance again should use our last model change.
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+
+    assert.strictEqual(instanceTask.stateName(0), 'main/x');
+    assert.strictEqual(instanceTask.state(0)[0], NUMBER_OF_RUNS - 1);
+  });
+
+  test('Model changes that cannot be applied', () => {
+    // Note: model changes that cannot be applied are reported and ignored, but they don't prevent an instance from
+    //       being run, whether they are present when the instance is created or added afterwards.
+
+    const expectedInstantiationIssues = [
+      [
+        loc.Issue.Type.WARNING,
+        "Task instance | Change attribute: the variable 'unknown' in component 'main' could not be found and therefore could not be changed."
+      ]
+    ];
+    const expectedRunIssues = [
+      [
+        loc.Issue.Type.WARNING,
+        "Task | Change attribute: the variable 'unknown' in component 'main' could not be found and therefore could not be changed."
+      ]
+    ];
+    const expectedOtherRunIssues = [
+      [
+        loc.Issue.Type.WARNING,
+        "Task | Change attribute: the computed constant 'cc' in component 'main' cannot be changed. Only state variables and constants can be changed."
+      ]
+    ];
+
+    const file = new loc.File(utils.resourcePath('api/sed/variables_initialised_using_variables.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const model = document.model(0);
+
+    model.addChange(new loc.SedChangeAttribute('main', 'k', '5.0'));
+    model.addChange(new loc.SedChangeAttribute('main', 'unknown', '7.0'));
+
+    const instance = document.instantiate();
+
+    assertIssues(loc, instance, expectedInstantiationIssues);
+
+    assert.ok(instance.run() > 0.0);
+    assertIssues(loc, instance, expectedRunIssues);
+
+    const instanceTask = instance.tasks[0];
+
+    assert.strictEqual(instanceTask.stateName(0), 'main/x');
+    assert.strictEqual(instanceTask.state(0)[0], 5.0);
+
+    // Removing our model change that cannot be applied and running our instance again should not report any issues.
+
+    model.removeChange(model.changes[1]);
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    assert.strictEqual(instanceTask.state(0)[0], 5.0);
+
+    // Adding another model change that cannot be applied and running our instance again should report it.
+
+    model.addChange(new loc.SedChangeAttribute('main', 'cc', '9.0'));
+
+    assert.ok(instance.run() > 0.0);
+    assertIssues(loc, instance, expectedOtherRunIssues);
+
+    assert.strictEqual(instanceTask.state(0)[0], 5.0);
+
+    // Removing that model change and running our instance again should not report any issues.
+
+    model.removeChange(model.changes[1]);
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    assert.strictEqual(instanceTask.state(0)[0], 5.0);
+  });
+
+  test('Initialisation fixed by model changes', () => {
+    // Note: an initialisation issue (e.g., an NLA system that cannot be solved) doesn't prevent an instance from being
+    //       run once it has been fixed (e.g., using some model changes), even if it was present when the instance was
+    //       created.
+
+    const expectedInstantiationIssues = [
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values).'
+      ]
+    ];
+    const expectedRunIssues = [
+      [
+        loc.Issue.Type.ERROR,
+        'Task | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values).'
+      ]
+    ];
+    const file = new loc.File(utils.resourcePath('api/sed/kinsol_with_inf_and_or_nan_values.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const model = document.model(0);
+    const instance = document.instantiate();
+
+    assertIssues(loc, instance, expectedInstantiationIssues);
+
+    assert.strictEqual(instance.run(), 0.0);
+    assertIssues(loc, instance, expectedRunIssues);
+
+    // Adding some model changes that fix our NLA system and running our instance again should not report any issues.
+
+    model.addChange(new loc.SedChangeAttribute('main', 'q_3', '1.0'));
+    model.addChange(new loc.SedChangeAttribute('main', 'q_4', '1.0'));
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+
+    assert.strictEqual(instanceTask.stateName(2), 'main/q_3');
+    assert.strictEqual(instanceTask.state(2)[0], 1.0);
+
+    // Removing those model changes and running our instance again should report our initialisation issue again.
+
+    model.removeAllChanges();
+
+    assert.strictEqual(instance.run(), 0.0);
+    assertIssues(loc, instance, expectedRunIssues);
+  });
+
   test('Run while asynchronous run in progress', () => {
     // Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to
     //       complete before running the instance again.
@@ -1370,7 +1581,7 @@ test.describe('Sed instance tests', () => {
     assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
-        'Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.'
+        'Task | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.'
       ]
     ]);
 

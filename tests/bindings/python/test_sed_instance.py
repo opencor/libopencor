@@ -842,6 +842,208 @@ def test_simulation_settings_used_when_starting_run():
     assert instance_task.voi[-1] == 2.0 * output_end_time
 
 
+def test_model_changes_used_when_starting_run():
+    # Note: the model changes used by a run are those in effect when the run is started, even if they get changed while
+    #       the run is in progress.
+
+    file = loc.File(
+        utils.resource_path("api/sed/variables_initialised_using_variables.cellml")
+    )
+    document = loc.SedDocument(file)
+    model = document.model(0)
+    change = loc.SedChangeAttribute("main", "k", "5.0")
+
+    model.add_change(change)
+
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    change.new_value = "7.0"
+    model.add_change(loc.SedChangeAttribute("main", "x", "9.0"))
+
+    assert instance.wait_for_run() > 0.0
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+
+    assert instance_task.state_name(0) == "main/x"
+    assert instance_task.state(0)[0] == 5.0
+
+    # Running our instance again should use our new model changes.
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    assert instance_task.state(0)[0] == 9.0
+
+    model.remove_change(model.changes[1])
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    assert instance_task.state(0)[0] == 7.0
+
+
+def test_change_model_after_stop_run():
+    # Note: stopping a run doesn't wait for it to be done, so our model may get changed while the stopped run is still
+    #       in progress, which must not affect it.
+
+    NUMBER_OF_RUNS = 1000
+
+    file = loc.File(
+        utils.resource_path("api/sed/variables_initialised_using_variables.cellml")
+    )
+    document = loc.SedDocument(file)
+    model = document.model(0)
+    instance = document.instantiate()
+
+    for i in range(NUMBER_OF_RUNS):
+        assert instance.start_run() is True
+
+        instance.stop_run()
+
+        model.remove_all_changes()
+        model.add_change(loc.SedChangeAttribute("main", "k", str(i)))
+
+        instance.wait_for_run()
+
+        assert not instance.has_issues
+
+    # Running our instance again should use our last model change.
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+
+    assert instance_task.state_name(0) == "main/x"
+    assert instance_task.state(0)[0] == NUMBER_OF_RUNS - 1
+
+
+def test_model_changes_that_cannot_be_applied():
+    # Note: model changes that cannot be applied are reported and ignored, but they don't prevent an instance from
+    #       being run, whether they are present when the instance is created or added afterwards.
+
+    expected_instantiation_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "Task instance | Change attribute: the variable 'unknown' in component 'main' could not be found and therefore could not be changed.",
+        ],
+    ]
+    expected_run_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "Task | Change attribute: the variable 'unknown' in component 'main' could not be found and therefore could not be changed.",
+        ],
+    ]
+    expected_other_run_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "Task | Change attribute: the computed constant 'cc' in component 'main' cannot be changed. Only state variables and constants can be changed.",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path("api/sed/variables_initialised_using_variables.cellml")
+    )
+    document = loc.SedDocument(file)
+    model = document.model(0)
+
+    model.add_change(loc.SedChangeAttribute("main", "k", "5.0"))
+    model.add_change(loc.SedChangeAttribute("main", "unknown", "7.0"))
+
+    instance = document.instantiate()
+
+    assert_issues(instance, expected_instantiation_issues)
+
+    assert instance.run() > 0.0
+    assert_issues(instance, expected_run_issues)
+
+    instance_task = instance.tasks[0]
+
+    assert instance_task.state_name(0) == "main/x"
+    assert instance_task.state(0)[0] == 5.0
+
+    # Removing our model change that cannot be applied and running our instance again should not report any issues.
+
+    model.remove_change(model.changes[1])
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    assert instance_task.state(0)[0] == 5.0
+
+    # Adding another model change that cannot be applied and running our instance again should report it.
+
+    model.add_change(loc.SedChangeAttribute("main", "cc", "9.0"))
+
+    assert instance.run() > 0.0
+    assert_issues(instance, expected_other_run_issues)
+
+    assert instance_task.state(0)[0] == 5.0
+
+    # Removing that model change and running our instance again should not report any issues.
+
+    model.remove_change(model.changes[1])
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    assert instance_task.state(0)[0] == 5.0
+
+
+def test_initialisation_fixed_by_model_changes():
+    # Note: an initialisation issue (e.g., an NLA system that cannot be solved) doesn't prevent an instance from being
+    #       run once it has been fixed (e.g., using some model changes), even if it was present when the instance was
+    #       created.
+
+    expected_instantiation_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task instance | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values).",
+        ],
+    ]
+    expected_run_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values).",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path("api/sed/kinsol_with_inf_and_or_nan_values.cellml")
+    )
+    document = loc.SedDocument(file)
+    model = document.model(0)
+    instance = document.instantiate()
+
+    assert_issues(instance, expected_instantiation_issues)
+
+    assert instance.run() == 0.0
+    assert_issues(instance, expected_run_issues)
+
+    # Adding some model changes that fix our NLA system and running our instance again should not report any issues.
+
+    model.add_change(loc.SedChangeAttribute("main", "q_3", "1.0"))
+    model.add_change(loc.SedChangeAttribute("main", "q_4", "1.0"))
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+
+    assert instance_task.state_name(2) == "main/q_3"
+    assert instance_task.state(2)[0] == 1.0
+
+    # Removing those model changes and running our instance again should report our initialisation issue again.
+
+    model.remove_all_changes()
+
+    assert instance.run() == 0.0
+    assert_issues(instance, expected_run_issues)
+
+
 def test_run_while_asynchronous_run_in_progress():
     # Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to
     #       complete before running the instance again.
@@ -1231,10 +1433,16 @@ def test_nla_model_with_no_nla_solver():
 
 
 def test_dae_model():
-    expected_issues = [
+    expected_instantiation_issues = [
         [
             loc.Issue.Type.Error,
             "Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
+        ],
+    ]
+    expected_run_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
         ],
     ]
 
@@ -1248,11 +1456,11 @@ def test_dae_model():
 
     instance = document.instantiate()
 
-    assert_issues(instance, expected_issues)
+    assert_issues(instance, expected_instantiation_issues)
 
     instance.run()
 
-    assert_issues(instance, expected_issues)
+    assert_issues(instance, expected_run_issues)
 
     kinsol.linear_solver = loc.SolverKinsol.LinearSolver.Dense
 

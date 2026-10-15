@@ -20,7 +20,7 @@ from utils import assert_issues
 
 
 def test_ode_changes():
-    expected_issues = [
+    expected_instantiation_issues = [
         [
             loc.Issue.Type.Warning,
             "Task instance | Change attribute: the variable of integration 'time' in component 'environment' cannot be changed. Only state variables and constants can be changed.",
@@ -38,14 +38,56 @@ def test_ode_changes():
             "Task instance | Change attribute: the algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed.",
         ],
     ]
+    expected_run_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "Task | Change attribute: the variable of integration 'time' in component 'environment' cannot be changed. Only state variables and constants can be changed.",
+        ],
+        [
+            loc.Issue.Type.Warning,
+            "Task | Change attribute: the variable 'X' in component 'membrane' could not be found and therefore could not be changed.",
+        ],
+        [
+            loc.Issue.Type.Warning,
+            "Task | Change attribute: the computed constant 'E_Na' in component 'sodium_channel' cannot be changed. Only state variables and constants can be changed.",
+        ],
+        [
+            loc.Issue.Type.Warning,
+            "Task | Change attribute: the algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed.",
+        ],
+    ]
 
     file = loc.File(utils.resource_path("api/solver/ode_sed_changes.omex"))
     document = loc.SedDocument(file)
     instance = document.instantiate()
 
-    instance.run()
+    assert_issues(instance, expected_instantiation_issues)
 
-    assert_issues(instance, expected_issues)
+    # Running our instance should report the same issues, but our changes that could not be applied should have been
+    # ignored rather than prevent our instance from being run, i.e. our change that could be applied should have been
+    # applied.
+
+    assert instance.run() > 0.0
+    assert_issues(instance, expected_run_issues)
+
+    instance_task = instance.tasks[0]
+
+    assert instance_task.state_name(0) == "membrane/V"
+    assert instance_task.state(0)[0] == 3.0
+
+    # Running our instance again should report the same issues (rather than accumulate them).
+
+    assert instance.run() > 0.0
+    assert_issues(instance, expected_run_issues)
+
+    # Instantiating our document again should report the same issues (rather than accumulate them).
+
+    other_instance = document.instantiate()
+
+    assert_issues(other_instance, expected_instantiation_issues)
+
+    assert other_instance.run() > 0.0
+    assert_issues(other_instance, expected_run_issues)
 
 
 def test_algebraic_changes():

@@ -56,21 +56,7 @@ static emscripten::val toFloat64Array(std::span<const double> data)
 
 SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask)
 {
-    auto res {SedInstanceTaskPtr {new SedInstanceTask {pTask}}};
-
-    res->pimpl()->mOwner = res;
-
-    // Initialise the instance task, but only if there are no issues with it.
-
-#ifndef CODE_COVERAGE_ENABLED
-    if (!res->hasIssues()) {
-#endif
-        res->pimpl()->initialise();
-#ifndef CODE_COVERAGE_ENABLED
-    }
-#endif
-
-    return res;
+    return SedInstanceTaskPtr {new SedInstanceTask {pTask}};
 }
 
 SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
@@ -363,9 +349,14 @@ void SedInstanceTask::Impl::nanFillResults(size_t pFromIndex)
     nanFillRowTails(mResults.algebraicVariables, mAlgebraicVariableCount);
 }
 
-void SedInstanceTask::Impl::applyChanges()
+void SedInstanceTask::Impl::retrieveChanges()
 {
     // Retrieve our changes (see SedChangeAttribute::Impl::apply()).
+    // Note: we are called from the thread that creates our instance or that runs us or starts running us (see
+    //       SedInstance::Impl::Impl() and prepareRun()), i.e. before we actually get run. This means that our changes
+    //       are those that were in effect when we were asked to be run, even if they get changed while we are being
+    //       run. It also means that we don't access our model while we are being run, so our model can safely be
+    //       changed while we are being run.
 
     mChanges.clear();
 
@@ -377,17 +368,18 @@ void SedInstanceTask::Impl::applyChanges()
 
         ASSERT_NE(changeAttribute, nullptr);
 
-        changeAttribute->pimpl()->apply(mOwner.lock(), mAnalyserModel);
-
-        addIssues(changeAttribute, "Change attribute");
+        changeAttribute->pimpl()->apply(this, mAnalyserModel);
     }
+}
 
-    // Apply our changes, which means setting our changed variables and reinitialising the variables that are
-    // initialised using another variable since our generated code initialised them before we could apply our changes.
-    // We need to do this both before computing our computed constants (since they may depend on a changed variable or
-    // a variable that is initialised using another variable) and after (since our generated code initialises a
-    // variable that depends on a computed constant when computing our computed constants, which means that it may
-    // override a change to that variable).
+void SedInstanceTask::Impl::applyChanges()
+{
+    // Apply our changes (see retrieveChanges()), which means setting our changed variables and reinitialising the
+    // variables that are initialised using another variable since our generated code initialised them before we could
+    // apply our changes. We need to do this both before computing our computed constants (since they may depend on a
+    // changed variable or a variable that is initialised using another variable) and after (since our generated code
+    // initialises a variable that depends on a computed constant when computing our computed constants, which means
+    // that it may override a change to that variable).
 
     auto isChangedVariable = [this](const double *pVariable) {
         return std::ranges::any_of(mChanges, [pVariable](const auto &pChange) {
@@ -600,8 +592,8 @@ bool SedInstanceTask::Impl::prepareRun()
     // Note: we are called from the thread that runs us or that starts running us (see SedInstance::Impl::prepareRun()),
     //       i.e. before we actually get run. This means that our results are (re)allocated before we get run, so that
     //       they can be safely retrieved while we are being run (e.g., to plot them progressively). This also means
-    //       that our simulation settings are those that were in effect when we were asked to be run, even if they get
-    //       changed while we are being run.
+    //       that our simulation settings and model changes are those that were in effect when we were asked to be
+    //       run, even if they get changed while we are being run.
 
     // Reset our progress counters.
 
@@ -638,6 +630,14 @@ bool SedInstanceTask::Impl::prepareRun()
 
     allocateResults(mDifferentialModel ? mNumberOfSteps + 1 : 1);
 
+    // Retrieve our changes.
+    // Note: this must be done after (re)allocating our results. Indeed, retrieving our changes may result in some
+    //       warnings (e.g., a change that cannot be applied) and should the (re)allocation of our results then throw an
+    //       exception, those warnings would never be reported nor reset (see SedInstance::Impl::prepareRun()), which
+    //       would prevent us from ever being run again.
+
+    retrieveChanges();
+
     // Set our total number of steps.
 
     mTotalSteps.store(mNumberOfSteps, std::memory_order_relaxed);
@@ -654,7 +654,8 @@ double SedInstanceTask::Impl::run()
     auto startTime {std::chrono::high_resolution_clock::now()};
 
     // (Re)initialise our model.
-    // Note: reinitialise our model because we initialised it when we created the instance task.
+    // Note: reinitialise our model because it was initialised when our instance was created (see
+    //       SedInstance::Impl::Impl()).
 
     initialise();
 

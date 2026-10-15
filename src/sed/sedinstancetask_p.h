@@ -64,12 +64,9 @@ struct SedInstanceTaskInitialisation
 using SedInstanceTaskInitialisations = std::vector<SedInstanceTaskInitialisation>;
 using SedInstanceTaskChanges = std::vector<std::pair<double *, double>>;
 
-using SedInstanceTaskWeakPtr = std::weak_ptr<SedInstanceTask>;
-
 class SedInstanceTask::Impl: public Logger::Impl
 {
 public:
-    SedInstanceTaskWeakPtr mOwner;
     CellmlFileRuntimePtr mRuntime;
     SedSimulationPtr mSimulation;
     SedUniformTimeCoursePtr mSedUniformTimeCourse;
@@ -136,6 +133,7 @@ public:
     void trackResults(size_t pIndex);
     void nanFillResults(size_t pFromIndex);
 
+    void retrieveChanges();
     void applyChanges();
     void initialise();
     bool prepareRun();

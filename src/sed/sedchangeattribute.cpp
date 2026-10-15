@@ -87,12 +87,19 @@ void SedChangeAttribute::Impl::serialise(xmlNodePtr pNode) const
     xmlAddChild(pNode, node);
 }
 
-void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
-                                     const libcellml::AnalyserModelPtr &pAnalyserModel)
+void SedChangeAttribute::Impl::apply(SedInstanceTask::Impl *pInstanceTaskPimpl,
+                                     const libcellml::AnalyserModelPtr &pAnalyserModel) const
 {
-    auto addCannotChangeWarning = [this](const std::string &pVariableName,
-                                         const std::string &pComponentName,
-                                         const char *pVariableType) {
+    // Note: we report our warnings to the instance task rather than to ourselves. Indeed, we are owned by a model,
+    //       which may be shared by several instance tasks, and our warnings would otherwise accumulate every time we
+    //       get applied.
+
+    auto addInstanceTaskWarning = [pInstanceTaskPimpl](const std::string &pWarning) {
+        pInstanceTaskPimpl->addIssue(Issue::Type::WARNING, pWarning, "Change attribute");
+    };
+    auto addCannotChangeWarning = [&addInstanceTaskWarning](const std::string &pVariableName,
+                                                            const std::string &pComponentName,
+                                                            const char *pVariableType) {
         std::string warning;
 
         warning.reserve(pVariableName.size() + pComponentName.size() + 120); // NOLINT
@@ -105,17 +112,16 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
         warning += pComponentName;
         warning += "' cannot be changed. Only state variables and constants can be changed.";
 
-        addWarning(warning);
+        addInstanceTaskWarning(warning);
     };
 
-    auto *instanceTaskPimpl {pInstanceTask->pimpl()};
     auto changeName {name(mComponentName, mVariableName)};
-    const auto stateCount = instanceTaskPimpl->stateCount();
-    const auto constantCount = instanceTaskPimpl->constantCount();
-    const auto computedConstantCount = instanceTaskPimpl->computedConstantCount();
-    const auto algebraicVariableCount = instanceTaskPimpl->algebraicVariableCount();
+    const auto stateCount = pInstanceTaskPimpl->stateCount();
+    const auto constantCount = pInstanceTaskPimpl->constantCount();
+    const auto computedConstantCount = pInstanceTaskPimpl->computedConstantCount();
+    const auto algebraicVariableCount = pInstanceTaskPimpl->algebraicVariableCount();
 
-    if (instanceTaskPimpl->voiName() == changeName) {
+    if (pInstanceTaskPimpl->voiName() == changeName) {
         auto voiVariable {pAnalyserModel->voi()->variable()};
         auto voiComponent {owningComponent(voiVariable)};
 
@@ -127,8 +133,8 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
     auto isParameterSet {false};
 
     for (size_t i {0}; i < stateCount; ++i) {
-        if (instanceTaskPimpl->stateName(i) == changeName) {
-            instanceTaskPimpl->mChanges.emplace_back(instanceTaskPimpl->mStates + i, toDouble(newValue())); // NOLINT
+        if (pInstanceTaskPimpl->stateName(i) == changeName) {
+            pInstanceTaskPimpl->mChanges.emplace_back(pInstanceTaskPimpl->mStates + i, toDouble(newValue())); // NOLINT
 
             isParameterSet = true;
 
@@ -138,8 +144,8 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
 
     if (!isParameterSet) {
         for (size_t i {0}; i < constantCount; ++i) {
-            if (instanceTaskPimpl->constantName(i) == changeName) {
-                instanceTaskPimpl->mChanges.emplace_back(instanceTaskPimpl->mConstants + i, toDouble(newValue())); // NOLINT
+            if (pInstanceTaskPimpl->constantName(i) == changeName) {
+                pInstanceTaskPimpl->mChanges.emplace_back(pInstanceTaskPimpl->mConstants + i, toDouble(newValue())); // NOLINT
 
                 isParameterSet = true;
 
@@ -152,7 +158,7 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
         const auto &computedConstants = pAnalyserModel->computedConstants();
 
         for (size_t i {0}; i < computedConstantCount; ++i) {
-            if (instanceTaskPimpl->computedConstantName(i) == changeName) {
+            if (pInstanceTaskPimpl->computedConstantName(i) == changeName) {
                 auto computedConstantVariable {computedConstants[i]->variable()};
                 auto computedConstantComponent {owningComponent(computedConstantVariable)};
 
@@ -169,7 +175,7 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
         const auto &algebraicVariables = pAnalyserModel->algebraicVariables();
 
         for (size_t i {0}; i < algebraicVariableCount; ++i) {
-            if (instanceTaskPimpl->algebraicVariableName(i) == changeName) {
+            if (pInstanceTaskPimpl->algebraicVariableName(i) == changeName) {
                 auto algebraicVariable {algebraicVariables[i]->variable()};
                 auto algebraicComponent {owningComponent(algebraicVariable)};
 
@@ -193,7 +199,7 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
         warning += mComponentName;
         warning += "' could not be found and therefore could not be changed.";
 
-        addWarning(warning);
+        addInstanceTaskWarning(warning);
     }
 }
 

@@ -661,6 +661,13 @@ test.describe('Sed coverage tests', () => {
     const instance = document.instantiate();
     const instanceTask = instance.tasks[0];
 
+    assertIssues(loc, instance, [
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.'
+      ]
+    ]);
+
     assert.strictEqual(instance.hasTasks, true);
     assert.strictEqual(instance.taskCount, 1);
     assert.deepStrictEqual(instance.task(0), instanceTask);
@@ -715,7 +722,7 @@ test.describe('Sed coverage tests', () => {
     assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
-        'Task instance | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.'
+        'Task | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.'
       ]
     ]);
   });

@@ -46,7 +46,7 @@ public:
 
     void serialise(xmlNodePtr pNode) const override;
 
-    void apply(const SedInstanceTaskPtr &pInstanceTask, const libcellml::AnalyserModelPtr &pAnalyserModel);
+    void apply(SedInstanceTask::Impl *pInstanceTaskPimpl, const libcellml::AnalyserModelPtr &pAnalyserModel) const;
 };
 
 } // namespace libOpenCOR

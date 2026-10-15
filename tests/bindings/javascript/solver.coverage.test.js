@@ -29,16 +29,7 @@ test.describe('Solver coverage tests', () => {
   });
 
   test('ODE changes', () => {
-    const file = new loc.File(utils.resourcePath('api/solver/ode_sed_changes.omex'));
-
-    file.setContents(utils.fileContents(file.path));
-
-    const document = new loc.SedDocument(file);
-    const instance = document.instantiate();
-
-    instance.run();
-
-    assertIssues(loc, instance, [
+    const expectedInstantiationIssues = [
       [
         loc.Issue.Type.WARNING,
         "Task instance | Change attribute: the variable of integration 'time' in component 'environment' cannot be changed. Only state variables and constants can be changed."
@@ -55,7 +46,59 @@ test.describe('Solver coverage tests', () => {
         loc.Issue.Type.WARNING,
         "Task instance | Change attribute: the algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed."
       ]
-    ]);
+    ];
+    const expectedRunIssues = [
+      [
+        loc.Issue.Type.WARNING,
+        "Task | Change attribute: the variable of integration 'time' in component 'environment' cannot be changed. Only state variables and constants can be changed."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "Task | Change attribute: the variable 'X' in component 'membrane' could not be found and therefore could not be changed."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "Task | Change attribute: the computed constant 'E_Na' in component 'sodium_channel' cannot be changed. Only state variables and constants can be changed."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "Task | Change attribute: the algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed."
+      ]
+    ];
+    const file = new loc.File(utils.resourcePath('api/solver/ode_sed_changes.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assertIssues(loc, instance, expectedInstantiationIssues);
+
+    // Running our instance should report the same issues, but our changes that could not be applied should have been
+    // ignored rather than prevent our instance from being run, i.e. our change that could be applied should have been
+    // applied.
+
+    assert.ok(instance.run() > 0.0);
+    assertIssues(loc, instance, expectedRunIssues);
+
+    const instanceTask = instance.tasks[0];
+
+    assert.strictEqual(instanceTask.stateName(0), 'membrane/V');
+    assert.strictEqual(instanceTask.state(0)[0], 3.0);
+
+    // Running our instance again should report the same issues (rather than accumulate them).
+
+    assert.ok(instance.run() > 0.0);
+    assertIssues(loc, instance, expectedRunIssues);
+
+    // Instantiating our document again should report the same issues (rather than accumulate them).
+
+    const otherInstance = document.instantiate();
+
+    assertIssues(loc, otherInstance, expectedInstantiationIssues);
+
+    assert.ok(otherInstance.run() > 0.0);
+    assertIssues(loc, otherInstance, expectedRunIssues);
   });
 
   test('Algebraic changes', () => {
