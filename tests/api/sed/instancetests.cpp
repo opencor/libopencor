@@ -988,6 +988,50 @@ TEST(InstanceSedTest, modelChangesThatCannotBeApplied)
     EXPECT_EQ(instanceTask->state(0)[0], 5.0);
 }
 
+TEST(InstanceSedTest, initialisationFixedByModelChanges)
+{
+    // Note: an initialisation issue (e.g., an NLA system that cannot be solved) doesn't prevent an instance from being
+    //       run once it has been fixed (e.g., using some model changes), even if it was present when the instance was
+    //       created.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_INSTANTIATION_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values)."},
+    }};
+    static const libOpenCOR::ExpectedIssues EXPECTED_RUN_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values)."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/kinsol_with_inf_and_or_nan_values.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &model {document->model(0)};
+    auto instance {document->instantiate()};
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_INSTANTIATION_ISSUES);
+
+    EXPECT_EQ(instance->run(), 0.0);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_RUN_ISSUES);
+
+    // Adding some model changes that fix our NLA system and running our instance again should not report any issues.
+
+    model->addChange(libOpenCOR::SedChangeAttribute::create("main", "q_3", "1.0"));
+    model->addChange(libOpenCOR::SedChangeAttribute::create("main", "q_4", "1.0"));
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+
+    EXPECT_EQ(instanceTask->stateName(2), "main/q_3");
+    EXPECT_EQ(instanceTask->state(2)[0], 1.0);
+
+    // Removing those model changes and running our instance again should report our initialisation issue again.
+
+    model->removeAllChanges();
+
+    EXPECT_EQ(instance->run(), 0.0);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_RUN_ISSUES);
+}
+
 TEST(InstanceSedTest, runWhileAsynchronousRunInProgress)
 {
     // Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to
@@ -1386,8 +1430,11 @@ TEST(InstanceSedTest, nlaModelWithNoNlaSolver)
 
 TEST(InstanceSedTest, daeModel)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+    static const libOpenCOR::ExpectedIssues EXPECTED_INSTANTIATION_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
+    }};
+    static const libOpenCOR::ExpectedIssues EXPECTED_RUN_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"))};
@@ -1400,11 +1447,11 @@ TEST(InstanceSedTest, daeModel)
 
     auto instance {document->instantiate()};
 
-    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_INSTANTIATION_ISSUES);
 
     instance->run();
 
-    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_RUN_ISSUES);
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 

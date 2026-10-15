@@ -556,8 +556,11 @@ TEST(CoverageSedTest, sedUniformTimeCourse)
 
 TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+    static const libOpenCOR::ExpectedIssues EXPECTED_INSTANTIATION_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "Task instance | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
+    }};
+    static const libOpenCOR::ExpectedIssues EXPECTED_RUN_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
     }};
     static const auto UPPER_HALF_BANDWIDTH {-1};
 
@@ -570,6 +573,8 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
 
     auto instance {document->instantiate()};
     const auto &instanceTask {instance->tasks()[0]};
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_INSTANTIATION_ISSUES);
 
     EXPECT_EQ(instance->hasTasks(), true);
     EXPECT_EQ(instance->taskCount(), 1U);
@@ -622,7 +627,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
 
     instance->run();
 
-    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_RUN_ISSUES);
 }
 
 TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskNonDifferentialModel)

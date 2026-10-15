@@ -648,10 +648,16 @@ def test_sed_uniform_time_course():
 
 
 def test_sed_instance_and_sed_instance_task_differential_model():
-    expected_issues = [
+    expected_instantiation_issues = [
         [
             loc.Issue.Type.Error,
             "Task instance | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
+        ],
+    ]
+    expected_run_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
         ],
     ]
 
@@ -664,6 +670,8 @@ def test_sed_instance_and_sed_instance_task_differential_model():
 
     instance = document.instantiate()
     instance_task = instance.tasks[0]
+
+    assert_issues(instance, expected_instantiation_issues)
 
     assert instance.has_tasks
     assert instance.task_count == 1
@@ -723,7 +731,7 @@ def test_sed_instance_and_sed_instance_task_differential_model():
 
     instance.run()
 
-    assert_issues(instance, expected_issues)
+    assert_issues(instance, expected_run_issues)
 
 
 def test_sed_instance_and_sed_instance_task_non_differential_model():

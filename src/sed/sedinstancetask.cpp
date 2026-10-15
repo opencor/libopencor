@@ -56,20 +56,7 @@ static emscripten::val toFloat64Array(std::span<const double> data)
 
 SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask)
 {
-    auto res {SedInstanceTaskPtr {new SedInstanceTask {pTask}}};
-
-    // Retrieve the changes to the model and initialise the instance task, but only if there are no issues with it.
-
-#ifndef CODE_COVERAGE_ENABLED
-    if (!res->hasIssues()) {
-#endif
-        res->pimpl()->retrieveChanges();
-        res->pimpl()->initialise();
-#ifndef CODE_COVERAGE_ENABLED
-    }
-#endif
-
-    return res;
+    return SedInstanceTaskPtr {new SedInstanceTask {pTask}};
 }
 
 SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
@@ -365,10 +352,11 @@ void SedInstanceTask::Impl::nanFillResults(size_t pFromIndex)
 void SedInstanceTask::Impl::retrieveChanges()
 {
     // Retrieve our changes (see SedChangeAttribute::Impl::apply()).
-    // Note: we are called from the thread that creates us or that runs us or starts running us (see create() and
-    //       prepareRun()), i.e. before we actually get run. This means that our changes are those that were in effect
-    //       when we were asked to be run, even if they get changed while we are being run. It also means that we don't
-    //       access our model while we are being run, so our model can safely be changed while we are being run.
+    // Note: we are called from the thread that creates our instance or that runs us or starts running us (see
+    //       SedInstance::Impl::Impl() and prepareRun()), i.e. before we actually get run. This means that our changes
+    //       are those that were in effect when we were asked to be run, even if they get changed while we are being
+    //       run. It also means that we don't access our model while we are being run, so our model can safely be
+    //       changed while we are being run.
 
     mChanges.clear();
 
@@ -662,7 +650,8 @@ double SedInstanceTask::Impl::run()
     auto startTime {std::chrono::high_resolution_clock::now()};
 
     // (Re)initialise our model.
-    // Note: reinitialise our model because we initialised it when we created the instance task.
+    // Note: reinitialise our model because it was initialised when our instance was created (see
+    //       SedInstance::Impl::Impl()).
 
     initialise();
 

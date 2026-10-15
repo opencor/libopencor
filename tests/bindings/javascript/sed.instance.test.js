@@ -1079,6 +1079,57 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instanceTask.state(0)[0], 5.0);
   });
 
+  test('Initialisation fixed by model changes', () => {
+    // Note: an initialisation issue (e.g., an NLA system that cannot be solved) doesn't prevent an instance from being
+    //       run once it has been fixed (e.g., using some model changes), even if it was present when the instance was
+    //       created.
+
+    const expectedInstantiationIssues = [
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values).'
+      ]
+    ];
+    const expectedRunIssues = [
+      [
+        loc.Issue.Type.ERROR,
+        'Task | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values).'
+      ]
+    ];
+    const file = new loc.File(utils.resourcePath('api/sed/kinsol_with_inf_and_or_nan_values.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const model = document.model(0);
+    const instance = document.instantiate();
+
+    assertIssues(loc, instance, expectedInstantiationIssues);
+
+    assert.strictEqual(instance.run(), 0.0);
+    assertIssues(loc, instance, expectedRunIssues);
+
+    // Adding some model changes that fix our NLA system and running our instance again should not report any issues.
+
+    model.addChange(new loc.SedChangeAttribute('main', 'q_3', '1.0'));
+    model.addChange(new loc.SedChangeAttribute('main', 'q_4', '1.0'));
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+
+    assert.strictEqual(instanceTask.stateName(2), 'main/q_3');
+    assert.strictEqual(instanceTask.state(2)[0], 1.0);
+
+    // Removing those model changes and running our instance again should report our initialisation issue again.
+
+    model.removeAllChanges();
+
+    assert.strictEqual(instance.run(), 0.0);
+    assertIssues(loc, instance, expectedRunIssues);
+  });
+
   test('Run while asynchronous run in progress', () => {
     // Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to
     //       complete before running the instance again.
@@ -1530,7 +1581,7 @@ test.describe('Sed instance tests', () => {
     assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
-        'Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.'
+        'Task | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.'
       ]
     ]);
 

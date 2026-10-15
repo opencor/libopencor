@@ -993,6 +993,57 @@ def test_model_changes_that_cannot_be_applied():
     assert instance_task.state(0)[0] == 5.0
 
 
+def test_initialisation_fixed_by_model_changes():
+    # Note: an initialisation issue (e.g., an NLA system that cannot be solved) doesn't prevent an instance from being
+    #       run once it has been fixed (e.g., using some model changes), even if it was present when the instance was
+    #       created.
+
+    expected_instantiation_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task instance | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values).",
+        ],
+    ]
+    expected_run_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values).",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path("api/sed/kinsol_with_inf_and_or_nan_values.cellml")
+    )
+    document = loc.SedDocument(file)
+    model = document.model(0)
+    instance = document.instantiate()
+
+    assert_issues(instance, expected_instantiation_issues)
+
+    assert instance.run() == 0.0
+    assert_issues(instance, expected_run_issues)
+
+    # Adding some model changes that fix our NLA system and running our instance again should not report any issues.
+
+    model.add_change(loc.SedChangeAttribute("main", "q_3", "1.0"))
+    model.add_change(loc.SedChangeAttribute("main", "q_4", "1.0"))
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+
+    assert instance_task.state_name(2) == "main/q_3"
+    assert instance_task.state(2)[0] == 1.0
+
+    # Removing those model changes and running our instance again should report our initialisation issue again.
+
+    model.remove_all_changes()
+
+    assert instance.run() == 0.0
+    assert_issues(instance, expected_run_issues)
+
+
 def test_run_while_asynchronous_run_in_progress():
     # Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to
     #       complete before running the instance again.
@@ -1382,10 +1433,16 @@ def test_nla_model_with_no_nla_solver():
 
 
 def test_dae_model():
-    expected_issues = [
+    expected_instantiation_issues = [
         [
             loc.Issue.Type.Error,
             "Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
+        ],
+    ]
+    expected_run_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
         ],
     ]
 
@@ -1399,11 +1456,11 @@ def test_dae_model():
 
     instance = document.instantiate()
 
-    assert_issues(instance, expected_issues)
+    assert_issues(instance, expected_instantiation_issues)
 
     instance.run()
 
-    assert_issues(instance, expected_issues)
+    assert_issues(instance, expected_run_issues)
 
     kinsol.linear_solver = loc.SolverKinsol.LinearSolver.Dense
 

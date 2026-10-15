@@ -59,8 +59,8 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
         }
 
         // Create an instance of all the tasks, if they are all valid.
-        // Note: a task instance that has some errors cannot be run (see prepareRun()), hence its issues are reported
-        //       and kept track of (see below).
+        // Note: a task instance that has some issues (e.g., its model could not be compiled) cannot be run (see
+        //       prepareRun()), hence its issues are reported and kept track of (see below).
 
         if (tasksValid) {
             mTasks.reserve(tasks.size());
@@ -70,9 +70,11 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
 
                 mTasks.push_back(taskInstance);
 
-                if (taskInstance->hasErrors()) {
+#ifndef CODE_COVERAGE_ENABLED
+                if (taskInstance->hasIssues()) {
                     addIssues(taskInstance, "Task instance");
                 }
+#endif
             }
         }
     } else {
@@ -86,18 +88,29 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
     mTasksErrors = mErrors;
     mTasksWarnings = mWarnings;
 
-    // Report the issues of the task instances that have no errors, i.e. the warnings about the changes that could not
-    // be applied to their model (see SedChangeAttribute::Impl::apply()), and reset them so that those task instances
-    // can be run.
-    // Note: those warnings are not kept track of since the changes of a task instance are retrieved again every time
-    //       it is run, at which point those warnings get reported again, if still relevant (see prepareRun()).
+    // Initialise the task instances that have no issues, so that we can report the issues with their changes (e.g., a
+    // change that cannot be applied) and their initialisation (e.g., an NLA system that cannot be solved), and reset
+    // those issues so that they don't prevent those task instances from being run.
+    // Note: those issues are not kept track of since they depend on the changes to the model and on the simulation
+    //       settings, both of which may be changed before the instance is run. Instead, the changes of a task instance
+    //       are retrieved again and the task instance is initialised again every time it is run, at which point those
+    //       issues get reported again, if still relevant (see prepareRun() and executeRun()).
 
     for (const auto &task : mTasks) {
-        if (!task->hasErrors()) {
+#ifndef CODE_COVERAGE_ENABLED
+        if (!task->hasIssues()) {
+#endif
+            auto *taskPimpl {task->pimpl()};
+
+            taskPimpl->retrieveChanges();
+            taskPimpl->initialise();
+
             addIssues(task, "Task instance");
 
-            task->pimpl()->removeAllIssues();
+            taskPimpl->removeAllIssues();
+#ifndef CODE_COVERAGE_ENABLED
         }
+#endif
     }
 }
 
@@ -156,9 +169,12 @@ void SedInstance::Impl::prepareRun()
     }
 
     // Prepare all the tasks associated with this instance to be run unless they have some issues.
-    // Note: a task may throw an exception (e.g., std::bad_alloc if its results cannot be allocated), in which case we
-    //       report it as an error rather than let it escape and we don't run any of our tasks. We have no way to
-    //       trigger such an exception in our tests, hence we ignore our try...catch statement during code coverage.
+    // Note #1: a task may throw an exception (e.g., std::bad_alloc if its results cannot be allocated), in which case
+    //          we report it as an error rather than let it escape and we don't run any of our tasks. We have no way to
+    //          trigger such an exception in our tests, hence we ignore our try...catch statement during code coverage.
+    // Note #2: a task only has issues at this stage if its instance could not be created (e.g., its model could not be
+    //          compiled, see Impl()), which we have no way to trigger in our tests, hence we ignore our check during
+    //          code coverage.
 
     mTasksToRun.clear();
 
@@ -168,7 +184,9 @@ void SedInstance::Impl::prepareRun()
         mTasksToRun.reserve(mTasks.size());
 
         for (const auto &task : mTasks) {
+#ifndef CODE_COVERAGE_ENABLED
             if (!task->hasIssues()) {
+#endif
                 const auto taskPrepared {task->pimpl()->prepareRun()};
 
                 // Report the issues of the task, if any (i.e. the errors about its simulation or the warnings about the
@@ -184,7 +202,9 @@ void SedInstance::Impl::prepareRun()
                 if (taskPrepared) {
                     mTasksToRun.push_back(task);
                 }
+#ifndef CODE_COVERAGE_ENABLED
             }
+#endif
         }
 #ifndef CODE_COVERAGE_ENABLED
     } catch (const std::exception &exception) {
