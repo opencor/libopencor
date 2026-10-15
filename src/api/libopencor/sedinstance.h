@@ -90,7 +90,9 @@ public:
      *
      * Note: in a Web browser, this method can only be used if the page is cross-origin isolated (i.e. served with the
      * "Cross-Origin-Opener-Policy: same-origin" and "Cross-Origin-Embedder-Policy: require-corp" HTTP headers) since
-     * threads are otherwise not supported, in which case an error is thrown.
+     * threads are otherwise not supported, in which case an error is thrown. Also, if the page has a Content Security
+     * Policy, it must allow blob: workers (i.e. worker-src blob:) since the run would otherwise never start, i.e. the
+     * status of the instance would remain RUNNING.
      *
      * @return @c true if a new run was started, @c false if a run is already in progress.
      */

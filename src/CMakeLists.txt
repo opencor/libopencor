@@ -373,7 +373,8 @@ if(EMSCRIPTEN)
     #          performance (and it links faster), -flto to use the LTO version of Emscripten's system libraries and to
     #          optimise LLVM, which we build as LLVM bitcode (see src/3rdparty/LLVM/CMakeLists.txt; our other object
     #          files are not LTO ones), -pthread to enable native threading support, -sASSERTIONS=0 to disable
-    #          assertions (they are not needed in production), -sEXPORT_ES6=1 to export ES6 modules,
+    #          assertions (they are not needed in production), -sCROSS_ORIGIN=1 to support our .js file being loaded
+    #          from another origin than that of the Web page (see Note #5), -sEXPORT_ES6=1 to export ES6 modules,
     #          -sEXPORTED_FUNCTIONS to export the functions we need (i.e. those needed by the WebAssembly modules that
     #          we generate for our models, see initialiseWorkerWasmJS()), -sEXPORTED_RUNTIME_METHODS to export the
     #          runtime methods we need, -sINITIAL_MEMORY=2GB to have enough memory for "big" models, -sMODULARIZE=1 to
@@ -384,6 +385,15 @@ if(EMSCRIPTEN)
     #          but we now support threading, which means that our memory is shared, and to allow shared memory to grow
     #          would make JavaScript's accesses to it (e.g., through HEAPU8) slower. So, now, we use
     #          -sINITIAL_MEMORY=2GB and don't allow memory growth.
+    # Note #5: a Web browser only creates a worker (and therefore a thread) from a script that has the same origin as
+    #          the Web page, so without -sCROSS_ORIGIN=1, a thread couldn't be created if our .js file was loaded from
+    #          another origin (e.g., a CDN), i.e. startRun() would throw an error (Chrome) or never complete (Firefox).
+    #          With -sCROSS_ORIGIN=1, a worker is instead created from a Blob URL (which has the same origin as the Web
+    #          page) that imports our .js file, whatever the origin of our .js file. This means that our .js file, if
+    #          loaded from another origin, must be served with CORS headers and that a Web page that has a Content
+    #          Security Policy must allow blob: workers (i.e. worker-src blob:), even if our .js file has the same
+    #          origin as the Web page. Otherwise, a run started using startRun() would never actually start (both in
+    #          Chrome and Firefox).
 
     set(DTS_FILE ${CMAKE_PROJECT_NAME}.d.ts)
 
@@ -395,6 +405,7 @@ if(EMSCRIPTEN)
                         -flto
                         -pthread
                         -sASSERTIONS=0
+                        -sCROSS_ORIGIN=1
                         -sEXPORT_ES6=1
                         -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_nlaSolverAddress,_wasmNlaSolve,_pow,_sqrt,_fabs,_exp,_exp2,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh]
                         -sEXPORTED_RUNTIME_METHODS=HEAPU8
