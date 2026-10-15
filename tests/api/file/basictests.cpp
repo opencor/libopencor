@@ -72,12 +72,12 @@ TEST(BasicFileTest, existingRelativeLocalFile)
 
     auto file {libOpenCOR::File::create("cellml_2.cellml")};
 
+    std::filesystem::current_path(origDir);
+
     EXPECT_EQ(file->fileName(), "cellml_2.cellml");
     EXPECT_EQ(file->path(), "cellml_2.cellml");
     EXPECT_FALSE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, expectedNoIssues());
-
-    std::filesystem::current_path(origDir);
 }
 
 TEST(BasicFileTest, nonExistingRelativeLocalFile)

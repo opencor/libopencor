@@ -62,12 +62,12 @@ test.describe('File basic tests', () => {
 
     const file = new loc.File('cellml_2.cellml');
 
+    process.chdir(origDir);
+
     assert.strictEqual(file.fileName, 'cellml_2.cellml');
     assert.strictEqual(file.path, 'cellml_2.cellml');
     assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
     assertIssues(loc, file, expectedNoIssues);
-
-    process.chdir(origDir);
   });
 
   test('Non-existing relative local file', () => {

@@ -57,12 +57,12 @@ def test_existing_relative_local_file():
 
     file = loc.File("cellml_2.cellml")
 
+    os.chdir(orig_dir)
+
     assert file.file_name == "cellml_2.cellml"
     assert file.path == "cellml_2.cellml"
     assert file.contents != []
     assert_issues(file, expected_no_issues)
-
-    os.chdir(orig_dir)
 
 
 def test_non_existing_relative_local_file():
