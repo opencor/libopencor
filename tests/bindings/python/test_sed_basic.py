@@ -16,6 +16,9 @@
 import libopencor as loc
 import os
 import platform
+import pytest
+import shutil
+import tempfile
 import utils
 from utils import assert_issues
 
@@ -139,6 +142,49 @@ def test_sedml_file_with_relative_cellml_file_in_working_directory():
     assert document.models[0].file.path == utils.resource_path(
         "api/sed/cellml_2.cellml"
     )
+
+
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="A symbolic link usually requires some special privileges on Windows.",
+)
+def test_sedml_file_with_relative_cellml_file_through_symbolic_link():
+    # A relative model source that starts with a ".." component is relative to the actual location of the SED-ML file,
+    # i.e. to the parent directory of the target of a symbolic link if the SED-ML file is accessed through it (e.g.,
+    # "link/../model.cellml" refers to "real/model.cellml" if "link" is a symbolic link to "real/sub").
+    # Note: a symbolic link usually requires some special privileges on Windows.
+
+    dir_path = os.path.join(
+        tempfile.gettempdir(),
+        "libopencor_sedml_file_with_relative_cellml_file_through_symbolic_link",
+    )
+
+    shutil.rmtree(dir_path, ignore_errors=True)
+    os.makedirs(os.path.join(dir_path, "real", "sub"))
+    os.makedirs(os.path.join(dir_path, "cwd"))
+    shutil.copyfile(
+        utils.resource_path("cellml_2.cellml"),
+        os.path.join(dir_path, "real", "model.cellml"),
+    )
+    os.symlink("../real/sub", os.path.join(dir_path, "cwd", "link"))
+
+    orig_dir = os.getcwd()
+
+    os.chdir(os.path.join(dir_path, "cwd"))
+
+    file = loc.File("link/simulation.sedml", False)
+
+    file.contents = utils.text_to_list(sedml_contents("../model.cellml"))
+
+    document = loc.SedDocument(file)
+
+    os.chdir(orig_dir)
+
+    assert len(document.models) == 1
+    assert document.models[0].file.path == "link/../model.cellml"
+    assert document.models[0].file.type == loc.File.Type.CellmlFile
+
+    shutil.rmtree(dir_path)
 
 
 def test_sedml_file_with_unsupported_scheme_cellml_file():

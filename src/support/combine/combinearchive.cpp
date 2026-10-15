@@ -22,6 +22,7 @@ limitations under the License.
 #include "combine/combinearchive.h"
 #include "omex/CaContent.h"
 
+#include <algorithm>
 #include <atomic>
 #include <filesystem>
 #include <unordered_map>
@@ -87,12 +88,26 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
         //          could then be confused with another managed file (which contents would get replaced) or even with
         //          the COMBINE archive itself (resulting in an infinite recursion), so we ignore such a file. To
         //          determine where the file is located, we use its file name as determined by File::create().
+        // Note #3: the file name of a file that is located within the COMBINE archive has no ".." component after the
+        //          location of the COMBINE archive, unless it follows a symbolic link (see canonicalFileName()), in
+        //          which case the file may be located outside of the COMBINE archive (e.g.,
+        //          "archive.omex.contents/../file.cellml" if "archive.omex.contents" is a symbolic link), so we also
+        //          ignore such a file.
 
         auto decodedLocation {decodeUrl(location)};
         auto fileNameOrUrl {mArchiveLocation + decodedLocation};
         auto [isLocalFile, fileName] {retrieveFileInfo(fileNameOrUrl)};
+        auto isLocatedWithinArchive {fileName.starts_with(mArchiveLocation)};
 
-        if (!fileName.starts_with(mArchiveLocation)) {
+        if (isLocatedWithinArchive) {
+            auto filePathWithinArchive {stringToPath(fileName.substr(mArchiveLocationSize))};
+
+            isLocatedWithinArchive = std::ranges::none_of(filePathWithinArchive, [](const auto &pComponent) {
+                return pComponent == "..";
+            });
+        }
+
+        if (!isLocatedWithinArchive) {
             std::string warning;
 
             warning.reserve(location.size() + 64); // NOLINT

@@ -424,7 +424,7 @@ std::string decodeUrl(const std::string &pUrl, bool pDecodeReservedCharacters)
     return res;
 }
 
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
 std::string forwardSlashPath(const std::string &pPath)
 {
     static constexpr auto BACKSLASH {"\\\\"};
@@ -435,7 +435,7 @@ std::string forwardSlashPath(const std::string &pPath)
 }
 #endif
 
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
 namespace {
 
 // Conversion between a UTF-8 std::string and a UTF-16 std::wstring, to be used instead of the one done by
@@ -579,7 +579,7 @@ std::wstring stringToUtf16(const std::string &pString)
 
 std::filesystem::path stringToPath(const std::string &pString)
 {
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     return stringToUtf16(pString);
 #else
     return std::u8string {pString.begin(), pString.end()};
@@ -590,7 +590,7 @@ std::string pathToString(const std::filesystem::path &pPath)
 {
     auto path {pPath};
 
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     return utf16ToUtf8(path.make_preferred().native());
 #else
     return path.make_preferred().string();
@@ -625,32 +625,81 @@ std::string canonicalFileName(const std::string &pFileName)
         return pathToString(filePath.lexically_normal());
     }
 
-    // If the file exists then use std::filesystem::canonical() since it resolves symbolic links, etc.
-    // Note: this fails if the file doesn't exist.
-
-    std::error_code errorCode;
-    auto res {std::filesystem::canonical(filePath, errorCode)};
-
-    if (!errorCode) {
-        return pathToString(res);
-    }
-
-    // The file doesn't exist, so if its file name has a root directory (i.e., it is an absolute file name or, on
-    // Windows, a file name relative to the root of the current drive) then use std::filesystem::weakly_canonical()
-    // since it returns a file name that is as close to the canonical version as possible.
+    // If the file name has a root directory (i.e., it is an absolute file name or, on Windows, a file name relative to
+    // the root of the current drive) then use std::filesystem::canonical() if the file exists since it resolves
+    // symbolic links, etc. or std::filesystem::weakly_canonical() otherwise since it returns a file name that is as
+    // close to the canonical version as possible.
+    // Note: we don't do this for a relative file name since both functions would resolve it against the current working
+    //       directory, meaning that its canonical version would depend on whether a file with that name happens to
+    //       exist in the current working directory.
 
     if (filePath.has_root_directory()) {
+        std::error_code errorCode;
+        auto res {std::filesystem::canonical(filePath, errorCode)};
+
+        if (!errorCode) {
+            return pathToString(res);
+        }
+
         res = std::filesystem::weakly_canonical(filePath, errorCode);
 
         if (!errorCode) {
             return pathToString(res);
         }
+    } else {
+        // The file name is relative, so normalise it lexically (see below), except that a ".." component must not
+        // cancel a component that is a symbolic link since it then refers to the parent directory of the target of that
+        // symbolic link (e.g., "link/../file.txt" doesn't refer to "file.txt" if "link" is a symbolic link to
+        // "some/path/dir", but to "some/path/file.txt"), so we keep both components.
+        // Note: whether a component is a symbolic link depends on the current working directory, but a file name that
+        //       has no symbolic link followed by a ".." component is normalised lexically, as below.
+
+        std::filesystem::path res;
+        auto hasSymbolicLink {false};
+        auto hasTrailingSeparator {false};
+
+        for (const auto &component : filePath) {
+            hasTrailingSeparator = false;
+
+            if (component == "..") {
+                if (res.has_relative_path() && (res.filename() != "..")) {
+                    std::error_code errorCode;
+
+                    if (!std::filesystem::is_symlink(res, errorCode)) {
+                        res = res.parent_path();
+                        hasTrailingSeparator = true;
+
+                        continue;
+                    }
+
+                    hasSymbolicLink = true;
+                }
+
+                res /= component;
+            } else if (component.empty() || (component == ".")) {
+                hasTrailingSeparator = true;
+            } else {
+                res /= component;
+            }
+        }
+
+        // Like std::filesystem::path::lexically_normal(), keep a trailing directory separator, unless the last
+        // component is "..".
+
+        if (hasSymbolicLink) {
+            if (hasTrailingSeparator && (res.filename() != "..")) {
+                res /= "";
+            }
+
+            return pathToString(res);
+        }
     }
 #endif
 
-    // The file name is relative (or something went wrong), so normalise it lexically. Unlike
-    // std::filesystem::weakly_canonical(), this doesn't depend on the current working directory, and it keeps leading
-    // ".." components (e.g., "a/../../b" becomes "../b").
+    // The file name is relative (and has no symbolic link followed by a ".." component) or something went wrong, so
+    // normalise it lexically. Unlike std::filesystem::canonical() and std::filesystem::weakly_canonical(), this doesn't
+    // depend on the current working directory (whether the file exists or not), and it keeps leading ".." components
+    // (e.g., "a/../../b" becomes "../b").
 
     return pathToString(filePath.lexically_normal());
 }
@@ -668,7 +717,7 @@ std::string canonicalUrl(const std::string &pUrl)
     static constexpr auto DOT {"."};
     static constexpr auto DOT_DOT {".."};
 
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     auto url {forwardSlashPath(pUrl)};
 #else
     const auto &url {pUrl};
@@ -891,7 +940,7 @@ std::string urlPath(const std::string &pPath)
 
     if (isLocalPath && stringToPath(path).is_absolute()) {
         static const std::string FILE_SCHEME {"file://"};
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
         static constexpr auto FORWARD_SLASH {"/"};
 
         return FILE_SCHEME + FORWARD_SLASH + forwardSlashPath(path);
@@ -899,6 +948,15 @@ std::string urlPath(const std::string &pPath)
         return FILE_SCHEME + path;
 #endif
     }
+
+#ifdef BUILDING_ON_WINDOWS
+    // A relative file name is used as is, but its backslashes must become forward slashes since it is used as a
+    // relative URI reference (e.g., "some\path\model.cellml" must become "some/path/model.cellml").
+
+    if (isLocalPath) {
+        return forwardSlashPath(path);
+    }
+#endif
 
     return path;
 }

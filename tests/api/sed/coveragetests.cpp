@@ -109,7 +109,7 @@ std::string sedChangesExpectedSerialisation(const std::string &pSource, const st
   <listOfModels>
     <model id="model" language="urn:sedml:language:cellml" source="file://)")
         .append(
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
             std::string("/").append(libOpenCOR::forwardSlashPath(pSource))
 #else
             pSource

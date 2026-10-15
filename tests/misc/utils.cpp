@@ -20,6 +20,7 @@ limitations under the License.
 
 #include <clocale>
 #include <cmath>
+#include <filesystem>
 #include <limits>
 
 #ifdef NAN
@@ -264,7 +265,7 @@ TEST(UtilsTest, retrieveFileInfo)
     std::tie(isLocalFile, fileNameOrUrl) = libOpenCOR::retrieveFileInfo("https://EXAMPLE.com\\A");
 
     EXPECT_FALSE(isLocalFile);
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     EXPECT_EQ(fileNameOrUrl, "https://example.com/A");
 #else
     EXPECT_EQ(fileNameOrUrl, "https://example.com\\A");
@@ -283,7 +284,7 @@ TEST(UtilsTest, stringToPathAndPathToString)
         EXPECT_EQ(libOpenCOR::pathToString(libOpenCOR::stringToPath(fileName)), fileName);
     }
 
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     // On Windows, a path may contain lone surrogates, which can be converted to a file name and back without being
     // altered.
 
@@ -595,6 +596,51 @@ TEST(UtilsTest, canonicalFileName)
     EXPECT_EQ(libOpenCOR::canonicalFileName(std::string(libOpenCOR::RESOURCE_LOCATION) + "/api/../cellml_2.cellml"),
               libOpenCOR::resourcePath("cellml_2.cellml"));
 
+    // Existing relative file, which must be normalised lexically (i.e. without using the current working directory).
+
+    auto origDir {std::filesystem::current_path()};
+
+    std::filesystem::current_path(libOpenCOR::resourcePath("api"));
+
+#ifdef BUILDING_ON_WINDOWS
+    EXPECT_EQ(libOpenCOR::canonicalFileName("../api/./../cellml_2.cellml"), R"(..\cellml_2.cellml)");
+#else
+    EXPECT_EQ(libOpenCOR::canonicalFileName("../api/./../cellml_2.cellml"), "../cellml_2.cellml");
+#endif
+
+    std::filesystem::current_path(origDir);
+
+#ifndef BUILDING_ON_WINDOWS
+    // Relative files with a symbolic link followed by a ".." component, which must be kept since the ".." component
+    // then refers to the parent directory of the target of the symbolic link (i.e. "real" rather than "cwd").
+    // Note: a symbolic link usually requires some special privileges on Windows.
+
+    auto dir {std::filesystem::temp_directory_path() / "libopencor_canonical_file_name_with_symbolic_link"};
+
+    std::filesystem::remove_all(dir);
+    std::filesystem::create_directories(dir / "real/sub/inner");
+    std::filesystem::create_directories(dir / "cwd");
+    std::filesystem::create_directory_symlink("../real/sub", dir / "cwd/link");
+
+    std::filesystem::current_path(dir / "cwd");
+
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/../file.txt"), "link/../file.txt");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/./../file.txt"), "link/../file.txt");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("non_existing/../link/../file.txt"), "link/../file.txt");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("../cwd/link/../file.txt"), "../cwd/link/../file.txt");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/../../file.txt"), "link/../../file.txt");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/../dir/"), "link/../dir/");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/../dir/."), "link/../dir/");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/../dir/.."), "link/..");
+
+    // A ".." component that doesn't follow a symbolic link is still normalised lexically.
+
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/inner/../file.txt"), "link/file.txt");
+
+    std::filesystem::current_path(origDir);
+    std::filesystem::remove_all(dir);
+#endif
+
     // Non-existing absolute file.
 
     EXPECT_EQ(libOpenCOR::canonicalFileName(std::string(libOpenCOR::RESOURCE_LOCATION) + "/non/existing/../../file.txt"),
@@ -650,7 +696,7 @@ TEST(UtilsTest, canonicalUrl)
     EXPECT_EQ(libOpenCOR::canonicalUrl("https://example.com#a/../b"), "https://example.com#a/../b");
     EXPECT_EQ(libOpenCOR::canonicalUrl("http://user@example.com:8080/a/../model.cellml"), "http://user@example.com:8080/model.cellml");
     EXPECT_EQ(libOpenCOR::canonicalUrl("example.com/a/../model.cellml"), "example.com/model.cellml");
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     EXPECT_EQ(libOpenCOR::canonicalUrl(R"(https://example.com\a\..\model.cellml)"), "https://example.com/model.cellml");
 #endif
 }

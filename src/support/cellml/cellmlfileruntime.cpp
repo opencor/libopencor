@@ -190,7 +190,7 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, size_t objectiveFunctionIndex, 
             generatorProfile->setNlaSolveCallString(differentialModel, WITH_EXTERNAL_VARIABLES,
                                                     "nlaSolve(nlaSolverAddress(), [INDEX], u, [SIZE], &rfi);\n");
 #else
-#    ifdef BUILDING_USING_MSVC
+#    ifdef BUILDING_ON_WINDOWS
             generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long long uintptr_t;
 typedef unsigned long long size_t;
 

@@ -155,6 +155,37 @@ def test_relative_local_cellml_file_without_base_path():
     assert document.serialise() == cvode_expected_serialisation("cellml_2.cellml")
 
 
+def test_relative_local_cellml_file_in_directory_without_base_path():
+    # A relative file name is serialised as a relative model source, so its directory separators must be forward
+    # slashes (i.e. not backslashes on Windows).
+
+    file = loc.File("some/path/cellml_2.cellml", False)
+
+    file.contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+
+    document = loc.SedDocument(file)
+
+    assert document.serialise() == cvode_expected_serialisation(
+        "some/path/cellml_2.cellml"
+    )
+
+    # Load the SED-ML file back.
+
+    sedml_file = loc.File("my_model.sedml", False)
+
+    sedml_file.contents = utils.text_to_list(document.serialise())
+
+    sedml_document = loc.SedDocument(sedml_file)
+
+    assert not sedml_document.has_issues
+    assert len(sedml_document.models) == 1
+    assert sedml_document.models[0].file == file
+
+    loc.FileManager.instance().unmanage(sedml_file)
+
+
 def test_local_cellml_file_with_percent_signs():
     # A model source is a URI reference, so the percent signs in the file name of a local model must be percent-encoded
     # for the model source to refer to that model when the SED-ML file is loaded back.
@@ -292,6 +323,41 @@ def test_local_cellml_file_with_colon():
         assert sedml_document.models[0].file == file
 
         loc.FileManager.instance().unmanage(sedml_file)
+
+
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="A file name cannot contain a colon on Windows.",
+)
+def test_relative_local_cellml_file_with_colon():
+    # A relative file name is serialised as a relative model source (even without a base path), so it must also be
+    # prefixed with "./" if its first segment contains a colon.
+    # Note: a file name cannot contain a colon on Windows.
+
+    cellml_contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
+    file = loc.File("my:model.cellml", False)
+
+    file.contents = cellml_contents
+
+    document = loc.SedDocument(file)
+
+    assert document.serialise() == cvode_expected_serialisation("./my:model.cellml")
+
+    # Load the SED-ML file back.
+
+    sedml_file = loc.File("my_model.sedml", False)
+
+    sedml_file.contents = utils.text_to_list(document.serialise())
+
+    sedml_document = loc.SedDocument(sedml_file)
+
+    assert not sedml_document.has_issues
+    assert len(sedml_document.models) == 1
+    assert sedml_document.models[0].file == file
+
+    loc.FileManager.instance().unmanage(sedml_file)
 
 
 def test_local_cellml_file_with_non_utf8_character():

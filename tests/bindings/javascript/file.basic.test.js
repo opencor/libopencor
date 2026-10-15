@@ -51,6 +51,25 @@ test.describe('File basic tests', () => {
     assertIssues(loc, file, expectedNoIssues);
   });
 
+  test('Existing relative local file', () => {
+    // An existing relative file name must stay relative, i.e. it must not be resolved against the current working
+    // directory.
+    // Note: the file has no contents since our JavaScript bindings never retrieve the contents of a file.
+
+    const origDir = process.cwd();
+
+    process.chdir(utils.resourcePath());
+
+    const file = new loc.File('cellml_2.cellml');
+
+    process.chdir(origDir);
+
+    assert.strictEqual(file.fileName, 'cellml_2.cellml');
+    assert.strictEqual(file.path, 'cellml_2.cellml');
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
+  });
+
   test('Non-existing relative local file', () => {
     // Note: the file is of unknown type and has no issues since our JavaScript bindings never retrieve the contents of
     //       a file.

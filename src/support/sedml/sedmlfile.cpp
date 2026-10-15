@@ -387,9 +387,9 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
     for (unsigned int i {0}; i < mDocument->getNumModels(); ++i) {
         auto source {mDocument->getModel(i)->getSource()};
 
-        // Note #1: a relative model source is relative to the SED-ML file, not to the current working directory, so
-        //          we must not canonicalise it before we know whether it is relative (a model source that exists
-        //          relative to the current working directory would otherwise become absolute).
+        // Note #1: a relative model source is relative to the SED-ML file, not to the current working directory, so we
+        //          only canonicalise it once we have resolved it against the location of the SED-ML file (see
+        //          FileManager::file() and File::create()).
         // Note #2: a model source is a URI reference (see https://www.rfc-editor.org/rfc/rfc3986#section-4.1), so it
         //          may be percent-encoded (e.g., "my%20model.cellml"). If the SED-ML file is a local file and the model
         //          source is a file name (i.e. neither a URL nor a "file" URL, which path is decoded by

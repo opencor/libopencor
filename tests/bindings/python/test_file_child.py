@@ -15,6 +15,10 @@
 
 from libopencor import File, FileManager, Issue
 import os
+import platform
+import pytest
+import shutil
+import tempfile
 import utils
 
 
@@ -169,6 +173,66 @@ def test_combine_archive_with_files_outside_of_it():
     utils.assert_issues(file, expected_issues)
     assert sibling.contents == some_contents
     assert FileManager.instance().file_count == 3
+
+
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="A symbolic link usually requires some special privileges on Windows.",
+)
+def test_combine_archive_with_files_outside_of_it_through_symbolic_link():
+    # The files of a COMBINE archive are located in a directory which name is that of the COMBINE archive followed by
+    # ".contents". If such a directory happens to exist and to be a symbolic link then the ".." components that follow
+    # it are kept (see canonicalFileName()), but the files they refer to are still located outside of the COMBINE
+    # archive, so they must still be ignored.
+    # Note: a symbolic link usually requires some special privileges on Windows.
+
+    expected_issues = [
+        [
+            Issue.Type.Warning,
+            "COMBINE archive: the file '../sibling.cellml' is not located within the COMBINE archive. It has been ignored.",
+        ],
+        [
+            Issue.Type.Warning,
+            "COMBINE archive: the file '%2E%2E/encoded_sibling.cellml' is not located within the COMBINE archive. It has been ignored.",
+        ],
+        [
+            Issue.Type.Warning,
+            "COMBINE archive: the file '../entries_outside_of_archive.omex' is not located within the COMBINE archive. It has been ignored.",
+        ],
+    ]
+
+    dir_path = os.path.join(
+        tempfile.gettempdir(),
+        "libopencor_combine_archive_with_files_outside_of_it_through_symbolic_link",
+    )
+
+    shutil.rmtree(dir_path, ignore_errors=True)
+    os.makedirs(os.path.join(dir_path, "real"))
+    os.makedirs(os.path.join(dir_path, "cwd"))
+    shutil.copyfile(
+        utils.resource_path("api/file/entries_outside_of_archive.omex"),
+        os.path.join(dir_path, "cwd", "entries_outside_of_archive.omex"),
+    )
+    os.symlink(
+        "../real",
+        os.path.join(dir_path, "cwd", "entries_outside_of_archive.omex.contents"),
+    )
+
+    orig_dir = os.getcwd()
+
+    os.chdir(os.path.join(dir_path, "cwd"))
+
+    file = File("entries_outside_of_archive.omex")
+
+    os.chdir(orig_dir)
+
+    assert file.type == File.Type.CombineArchive
+    assert file.child_file_count == 1
+    assert file.child_file("model.cellml") is not None
+    utils.assert_issues(file, expected_issues)
+    assert FileManager.instance().file_count == 2
+
+    shutil.rmtree(dir_path)
 
 
 def test_combine_archive_with_percent_encoded_locations():

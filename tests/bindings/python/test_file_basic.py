@@ -48,7 +48,8 @@ def test_local_file():
 
 
 def test_existing_relative_local_file():
-    # Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file.
+    # An existing relative file name must stay relative, i.e. it must not be resolved against the current working
+    # directory.
 
     orig_dir = os.getcwd()
 
@@ -56,10 +57,12 @@ def test_existing_relative_local_file():
 
     file = loc.File("cellml_2.cellml")
 
+    os.chdir(orig_dir)
+
+    assert file.file_name == "cellml_2.cellml"
+    assert file.path == "cellml_2.cellml"
     assert file.contents != []
     assert_issues(file, expected_no_issues)
-
-    os.chdir(orig_dir)
 
 
 def test_non_existing_relative_local_file():
