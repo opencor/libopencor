@@ -209,6 +209,33 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
+  test('Many asynchronous runs', () => {
+    // Note: each asynchronous run is done in its own thread, the resources of which must be released once the run has
+    //       been waited for. Otherwise, our WASM version would run out of memory after a few hundred runs.
+
+    const RUN_COUNT = 300;
+    const SIMULATION_PROPERTY = 10;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = SIMULATION_PROPERTY;
+    simulation.outputEndTime = SIMULATION_PROPERTY;
+
+    const instance = document.instantiate();
+
+    for (let i = 0; i < RUN_COUNT; ++i) {
+      assert.strictEqual(instance.startRun(), true);
+      assert.ok(instance.waitForRun() > 0.0);
+    }
+
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
   test('Asynchronous run without threading support', () => {
     // Note: this has no C++ or Python equivalent since threads are always supported in C++ and Python while, in a Web
     //       browser, they are only supported if the page is cross-origin isolated, i.e. if SharedArrayBuffer is

@@ -177,6 +177,31 @@ TEST(InstanceSedTest, asynchronousRunCanBeRestarted)
     EXPECT_FALSE(instance->hasIssues());
 }
 
+TEST(InstanceSedTest, manyAsynchronousRuns)
+{
+    // Note: each asynchronous run is done in its own thread, the resources of which must be released once the run has
+    //       been waited for. Otherwise, our WASM version would run out of memory after a few hundred runs.
+
+    static const auto RUN_COUNT = 300;
+    static const auto SIMULATION_PROPERTY = 10;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(SIMULATION_PROPERTY);
+    simulation->setOutputEndTime(static_cast<double>(SIMULATION_PROPERTY));
+
+    auto instance {document->instantiate()};
+
+    for (size_t i {0}; i < RUN_COUNT; ++i) {
+        EXPECT_TRUE(instance->startRun());
+        EXPECT_GT(instance->waitForRun(), 0.0);
+    }
+
+    EXPECT_FALSE(instance->hasIssues());
+}
+
 TEST(InstanceSedTest, progressBeforeAnyRun)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
