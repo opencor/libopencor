@@ -20,6 +20,7 @@ limitations under the License.
 
 #include <clocale>
 #include <cmath>
+#include <filesystem>
 #include <limits>
 
 #ifdef NAN
@@ -608,6 +609,37 @@ TEST(UtilsTest, canonicalFileName)
 #endif
 
     std::filesystem::current_path(origDir);
+
+#ifndef BUILDING_ON_WINDOWS
+    // Relative files with a symbolic link followed by a ".." component, which must be kept since the ".." component
+    // then refers to the parent directory of the target of the symbolic link (i.e. "real" rather than "cwd").
+    // Note: a symbolic link usually requires some special privileges on Windows.
+
+    auto dir {std::filesystem::temp_directory_path() / "libopencor_canonical_file_name_with_symbolic_link"};
+
+    std::filesystem::remove_all(dir);
+    std::filesystem::create_directories(dir / "real/sub/inner");
+    std::filesystem::create_directories(dir / "cwd");
+    std::filesystem::create_directory_symlink("../real/sub", dir / "cwd/link");
+
+    std::filesystem::current_path(dir / "cwd");
+
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/../file.txt"), "link/../file.txt");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/./../file.txt"), "link/../file.txt");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("non_existing/../link/../file.txt"), "link/../file.txt");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("../cwd/link/../file.txt"), "../cwd/link/../file.txt");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/../../file.txt"), "link/../../file.txt");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/../dir/"), "link/../dir/");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/../dir/."), "link/../dir/");
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/../dir/.."), "link/..");
+
+    // A ".." component that doesn't follow a symbolic link is still normalised lexically.
+
+    EXPECT_EQ(libOpenCOR::canonicalFileName("link/inner/../file.txt"), "link/file.txt");
+
+    std::filesystem::current_path(origDir);
+    std::filesystem::remove_all(dir);
+#endif
 
     // Non-existing absolute file.
 

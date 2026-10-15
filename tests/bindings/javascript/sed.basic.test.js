@@ -15,6 +15,9 @@ limitations under the License.
 */
 
 import assert from 'node:assert';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 
 import libOpenCOR from './libopencor.js';
@@ -150,6 +153,41 @@ test.describe('Sed basic tests', () => {
 
     assert.strictEqual(document.models.length, 1);
     assert.strictEqual(document.models[0].file.path, utils.resourcePath('api/sed/cellml_2.cellml'));
+  });
+
+  test('SED-ML file with relative CellML file through symbolic link', () => {
+    // A relative model source that starts with a ".." component is relative to the actual location of the SED-ML file,
+    // i.e. to the parent directory of the target of a symbolic link if the SED-ML file is accessed through it (e.g.,
+    // "link/../model.cellml" refers to "real/model.cellml" if "link" is a symbolic link to "real/sub").
+    // Note: our JavaScript bindings use a virtual file system, so a symbolic link is never followed (i.e. the model
+    //       source is normalised lexically, so "link/../model.cellml" becomes "model.cellml"), and they never retrieve
+    //       the contents of a file (i.e. the type of the model is unknown).
+
+    const dir = path.join(os.tmpdir(), 'libopencor_sedml_file_with_relative_cellml_file_through_symbolic_link');
+
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.mkdirSync(path.join(dir, 'real/sub'), { recursive: true });
+    fs.mkdirSync(path.join(dir, 'cwd'), { recursive: true });
+    fs.copyFileSync(utils.resourcePath('cellml_2.cellml'), path.join(dir, 'real/model.cellml'));
+    fs.symlinkSync('../real/sub', path.join(dir, 'cwd/link'));
+
+    const origDir = process.cwd();
+
+    process.chdir(path.join(dir, 'cwd'));
+
+    const file = new loc.File('link/simulation.sedml');
+
+    file.setContents(sedmlContents('../model.cellml'));
+
+    const document = new loc.SedDocument(file);
+
+    process.chdir(origDir);
+
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.path, 'model.cellml');
+    assert.strictEqual(document.models[0].file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+
+    fs.rmSync(dir, { recursive: true, force: true });
   });
 
   test('SED-ML file with unsupported scheme CellML file', () => {

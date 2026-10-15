@@ -15,6 +15,9 @@ limitations under the License.
 */
 
 import assert from 'node:assert';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 
 import libOpenCOR from './libopencor.js';
@@ -159,6 +162,58 @@ test.describe('File child tests', () => {
     utils.assertIssues(loc, file, expectedIssues);
     assert.deepStrictEqual(sibling.contents(), someContents);
     assert.strictEqual(loc.FileManager.instance().fileCount, 3);
+  });
+
+  test('COMBINE archive with files outside of it through symbolic link', () => {
+    // The files of a COMBINE archive are located in a directory which name is that of the COMBINE archive followed by
+    // ".contents". If such a directory happens to exist and to be a symbolic link then the ".." components that follow
+    // it are kept (see canonicalFileName()), but the files they refer to are still located outside of the COMBINE
+    // archive, so they must still be ignored.
+    // Note: our JavaScript bindings use a virtual file system, so a symbolic link is never followed (i.e. the ".."
+    //       components are normalised lexically), but the result must be the same.
+
+    const expectedIssues = [
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file '../sibling.cellml' is not located within the COMBINE archive. It has been ignored."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file '%2E%2E/encoded_sibling.cellml' is not located within the COMBINE archive. It has been ignored."
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "COMBINE archive: the file '../entries_outside_of_archive.omex' is not located within the COMBINE archive. It has been ignored."
+      ]
+    ];
+    const dir = path.join(os.tmpdir(), 'libopencor_combine_archive_with_files_outside_of_it_through_symbolic_link');
+
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.mkdirSync(path.join(dir, 'real'), { recursive: true });
+    fs.mkdirSync(path.join(dir, 'cwd'), { recursive: true });
+    fs.copyFileSync(
+      utils.resourcePath('api/file/entries_outside_of_archive.omex'),
+      path.join(dir, 'cwd/entries_outside_of_archive.omex')
+    );
+    fs.symlinkSync('../real', path.join(dir, 'cwd/entries_outside_of_archive.omex.contents'));
+
+    const origDir = process.cwd();
+
+    process.chdir(path.join(dir, 'cwd'));
+
+    const file = new loc.File('entries_outside_of_archive.omex');
+
+    file.setContents(utils.fileContents(file.path));
+
+    process.chdir(origDir);
+
+    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.childFileCount, 1);
+    assert.notStrictEqual(file.childFileFromFileName('model.cellml'), null);
+    utils.assertIssues(loc, file, expectedIssues);
+    assert.strictEqual(loc.FileManager.instance().fileCount, 2);
+
+    fs.rmSync(dir, { recursive: true, force: true });
   });
 
   test('COMBINE archive with percent-encoded locations', () => {

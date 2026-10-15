@@ -646,13 +646,60 @@ std::string canonicalFileName(const std::string &pFileName)
         if (!errorCode) {
             return pathToString(res);
         }
+    } else {
+        // The file name is relative, so normalise it lexically (see below), except that a ".." component must not
+        // cancel a component that is a symbolic link since it then refers to the parent directory of the target of that
+        // symbolic link (e.g., "link/../file.txt" doesn't refer to "file.txt" if "link" is a symbolic link to
+        // "some/path/dir", but to "some/path/file.txt"), so we keep both components.
+        // Note: whether a component is a symbolic link depends on the current working directory, but a file name that
+        //       has no symbolic link followed by a ".." component is normalised lexically, as below.
+
+        std::filesystem::path res;
+        auto hasSymbolicLink {false};
+        auto hasTrailingSeparator {false};
+
+        for (const auto &component : filePath) {
+            hasTrailingSeparator = false;
+
+            if (component == "..") {
+                if (res.has_relative_path() && (res.filename() != "..")) {
+                    std::error_code errorCode;
+
+                    if (!std::filesystem::is_symlink(res, errorCode)) {
+                        res = res.parent_path();
+                        hasTrailingSeparator = true;
+
+                        continue;
+                    }
+
+                    hasSymbolicLink = true;
+                }
+
+                res /= component;
+            } else if (component.empty() || (component == ".")) {
+                hasTrailingSeparator = true;
+            } else {
+                res /= component;
+            }
+        }
+
+        // Like std::filesystem::path::lexically_normal(), keep a trailing directory separator, unless the last
+        // component is "..".
+
+        if (hasSymbolicLink) {
+            if (hasTrailingSeparator && (res.filename() != "..")) {
+                res /= "";
+            }
+
+            return pathToString(res);
+        }
     }
 #endif
 
-    // The file name is relative (or something went wrong), so normalise it lexically. Unlike
-    // std::filesystem::canonical() and std::filesystem::weakly_canonical(), this doesn't depend on the current working
-    // directory (whether the file exists or not), and it keeps leading ".." components (e.g., "a/../../b" becomes
-    // "../b").
+    // The file name is relative (and has no symbolic link followed by a ".." component) or something went wrong, so
+    // normalise it lexically. Unlike std::filesystem::canonical() and std::filesystem::weakly_canonical(), this doesn't
+    // depend on the current working directory (whether the file exists or not), and it keeps leading ".." components
+    // (e.g., "a/../../b" becomes "../b").
 
     return pathToString(filePath.lexically_normal());
 }

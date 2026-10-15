@@ -18,6 +18,7 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include <filesystem>
 #include <libopencor>
 
 namespace {
@@ -154,6 +155,47 @@ TEST(ChildFileTest, combineArchiveWithFilesOutsideOfIt)
     EXPECT_EQ(sibling->contents(), someContents);
     EXPECT_EQ(libOpenCOR::FileManager::instance().fileCount(), 3U);
 }
+
+#ifndef BUILDING_ON_WINDOWS
+TEST(ChildFileTest, combineArchiveWithFilesOutsideOfItThroughSymbolicLink)
+{
+    // The files of a COMBINE archive are located in a directory which name is that of the COMBINE archive followed by
+    // ".contents". If such a directory happens to exist and to be a symbolic link then the ".." components that follow
+    // it are kept (see canonicalFileName()), but the files they refer to are still located outside of the COMBINE
+    // archive, so they must still be ignored.
+    // Note: a symbolic link usually requires some special privileges on Windows.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file '../sibling.cellml' is not located within the COMBINE archive. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file '%2E%2E/encoded_sibling.cellml' is not located within the COMBINE archive. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file '../entries_outside_of_archive.omex' is not located within the COMBINE archive. It has been ignored."},
+    }};
+
+    auto dir {std::filesystem::temp_directory_path() / "libopencor_combine_archive_with_files_outside_of_it_through_symbolic_link"};
+
+    std::filesystem::remove_all(dir);
+    std::filesystem::create_directories(dir / "real");
+    std::filesystem::create_directories(dir / "cwd");
+    std::filesystem::copy_file(libOpenCOR::resourcePath("api/file/entries_outside_of_archive.omex"), dir / "cwd/entries_outside_of_archive.omex");
+    std::filesystem::create_directory_symlink("../real", dir / "cwd/entries_outside_of_archive.omex.contents");
+
+    auto origDir {std::filesystem::current_path()};
+
+    std::filesystem::current_path(dir / "cwd");
+
+    auto file {libOpenCOR::File::create("entries_outside_of_archive.omex")};
+
+    std::filesystem::current_path(origDir);
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file->childFileCount(), 1U);
+    EXPECT_NE(file->childFile("model.cellml"), nullptr);
+    EXPECT_EQ_ISSUES(file, EXPECTED_ISSUES);
+    EXPECT_EQ(libOpenCOR::FileManager::instance().fileCount(), 2U);
+
+    std::filesystem::remove_all(dir);
+}
+#endif
 
 TEST(ChildFileTest, combineArchiveWithPercentEncodedLocations)
 {

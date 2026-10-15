@@ -146,6 +146,42 @@ TEST(BasicSedTest, sedmlFileWithRelativeCellmlFileInWorkingDirectory)
     EXPECT_EQ(document->models()[0]->file()->path(), libOpenCOR::resourcePath("api/sed/cellml_2.cellml"));
 }
 
+#ifndef BUILDING_ON_WINDOWS
+TEST(BasicSedTest, sedmlFileWithRelativeCellmlFileThroughSymbolicLink)
+{
+    // A relative model source that starts with a ".." component is relative to the actual location of the SED-ML file,
+    // i.e. to the parent directory of the target of a symbolic link if the SED-ML file is accessed through it (e.g.,
+    // "link/../model.cellml" refers to "real/model.cellml" if "link" is a symbolic link to "real/sub").
+    // Note: a symbolic link usually requires some special privileges on Windows.
+
+    auto dir {std::filesystem::temp_directory_path() / "libopencor_sedml_file_with_relative_cellml_file_through_symbolic_link"};
+
+    std::filesystem::remove_all(dir);
+    std::filesystem::create_directories(dir / "real/sub");
+    std::filesystem::create_directories(dir / "cwd");
+    std::filesystem::copy_file(libOpenCOR::resourcePath("cellml_2.cellml"), dir / "real/model.cellml");
+    std::filesystem::create_directory_symlink("../real/sub", dir / "cwd/link");
+
+    auto origDir {std::filesystem::current_path()};
+
+    std::filesystem::current_path(dir / "cwd");
+
+    auto file {libOpenCOR::File::create("link/simulation.sedml", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("../model.cellml").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    std::filesystem::current_path(origDir);
+
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file()->path(), "link/../model.cellml");
+    EXPECT_EQ(document->models()[0]->file()->type(), libOpenCOR::File::Type::CELLML_FILE);
+
+    std::filesystem::remove_all(dir);
+}
+#endif
+
 TEST(BasicSedTest, sedmlFileWithUnsupportedSchemeCellmlFile)
 {
     // A model source with a scheme other than "http", "https", or "file" is an absolute URI that we cannot retrieve, so
