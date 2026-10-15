@@ -47,6 +47,14 @@ def test_ode_changes():
 
     assert_issues(instance, expected_issues)
 
+    # Instantiating our document again should report the same issues (rather than accumulate them).
+
+    other_instance = document.instantiate()
+
+    other_instance.run()
+
+    assert_issues(other_instance, expected_issues)
+
 
 def test_algebraic_changes():
     # We want to solve a system of three unknowns:

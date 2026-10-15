@@ -842,6 +842,85 @@ def test_simulation_settings_used_when_starting_run():
     assert instance_task.voi[-1] == 2.0 * output_end_time
 
 
+def test_model_changes_used_when_starting_run():
+    # Note: the model changes used by a run are those in effect when the run is started, even if they get changed while
+    #       the run is in progress.
+
+    file = loc.File(
+        utils.resource_path("api/sed/variables_initialised_using_variables.cellml")
+    )
+    document = loc.SedDocument(file)
+    model = document.model(0)
+    change = loc.SedChangeAttribute("main", "k", "5.0")
+
+    model.add_change(change)
+
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    change.new_value = "7.0"
+    model.add_change(loc.SedChangeAttribute("main", "x", "9.0"))
+
+    assert instance.wait_for_run() > 0.0
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+
+    assert instance_task.state_name(0) == "main/x"
+    assert instance_task.state(0)[0] == 5.0
+
+    # Running our instance again should use our new model changes.
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    assert instance_task.state(0)[0] == 9.0
+
+    model.remove_change(model.changes[1])
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    assert instance_task.state(0)[0] == 7.0
+
+
+def test_change_model_after_stop_run():
+    # Note: stopping a run doesn't wait for it to be done, so our model may get changed while the stopped run is still
+    #       in progress, which must not affect it.
+
+    NUMBER_OF_RUNS = 1000
+
+    file = loc.File(
+        utils.resource_path("api/sed/variables_initialised_using_variables.cellml")
+    )
+    document = loc.SedDocument(file)
+    model = document.model(0)
+    instance = document.instantiate()
+
+    for i in range(NUMBER_OF_RUNS):
+        assert instance.start_run() is True
+
+        instance.stop_run()
+
+        model.remove_all_changes()
+        model.add_change(loc.SedChangeAttribute("main", "k", str(i)))
+
+        instance.wait_for_run()
+
+        assert not instance.has_issues
+
+    # Running our instance again should use our last model change.
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+
+    assert instance_task.state_name(0) == "main/x"
+    assert instance_task.state(0)[0] == NUMBER_OF_RUNS - 1
+
+
 def test_run_while_asynchronous_run_in_progress():
     # Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to
     #       complete before running the instance again.

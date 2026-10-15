@@ -29,16 +29,7 @@ test.describe('Solver coverage tests', () => {
   });
 
   test('ODE changes', () => {
-    const file = new loc.File(utils.resourcePath('api/solver/ode_sed_changes.omex'));
-
-    file.setContents(utils.fileContents(file.path));
-
-    const document = new loc.SedDocument(file);
-    const instance = document.instantiate();
-
-    instance.run();
-
-    assertIssues(loc, instance, [
+    const expectedIssues = [
       [
         loc.Issue.Type.WARNING,
         "Task instance | Change attribute: the variable of integration 'time' in component 'environment' cannot be changed. Only state variables and constants can be changed."
@@ -55,7 +46,25 @@ test.describe('Solver coverage tests', () => {
         loc.Issue.Type.WARNING,
         "Task instance | Change attribute: the algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed."
       ]
-    ]);
+    ];
+    const file = new loc.File(utils.resourcePath('api/solver/ode_sed_changes.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    instance.run();
+
+    assertIssues(loc, instance, expectedIssues);
+
+    // Instantiating our document again should report the same issues (rather than accumulate them).
+
+    const otherInstance = document.instantiate();
+
+    otherInstance.run();
+
+    assertIssues(loc, otherInstance, expectedIssues);
   });
 
   test('Algebraic changes', () => {

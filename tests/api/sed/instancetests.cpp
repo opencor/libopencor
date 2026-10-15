@@ -23,6 +23,7 @@ limitations under the License.
 #include <cmath>
 #include <limits>
 #include <span>
+#include <string>
 #include <thread>
 
 TEST(InstanceSedTest, noFile)
@@ -845,6 +846,84 @@ TEST(InstanceSedTest, simulationSettingsUsedWhenStartingRun)
 
     EXPECT_EQ(instanceTask->voi().size(), static_cast<size_t>(FACTOR * numberOfSteps) + 1);
     EXPECT_EQ(instanceTask->voi()[instanceTask->voi().size() - 1], FACTOR * outputEndTime);
+}
+
+TEST(InstanceSedTest, modelChangesUsedWhenStartingRun)
+{
+    // Note: the model changes used by a run are those in effect when the run is started, even if they get changed while
+    //       the run is in progress.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/variables_initialised_using_variables.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &model {document->model(0)};
+    auto change {libOpenCOR::SedChangeAttribute::create("main", "k", "5.0")};
+
+    model->addChange(change);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_TRUE(instance->startRun());
+
+    change->setNewValue("7.0");
+    model->addChange(libOpenCOR::SedChangeAttribute::create("main", "x", "9.0"));
+
+    EXPECT_GT(instance->waitForRun(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+
+    EXPECT_EQ(instanceTask->stateName(0), "main/x");
+    EXPECT_EQ(instanceTask->state(0)[0], 5.0);
+
+    // Running our instance again should use our new model changes.
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    EXPECT_EQ(instanceTask->state(0)[0], 9.0);
+
+    model->removeChange(model->changes()[1]);
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    EXPECT_EQ(instanceTask->state(0)[0], 7.0);
+}
+
+TEST(InstanceSedTest, changeModelAfterStopRun)
+{
+    // Note: stopping a run doesn't wait for it to be done, so our model may get changed while the stopped run is still
+    //       in progress, which must not affect it.
+
+    static const auto NUMBER_OF_RUNS {1000};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/variables_initialised_using_variables.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &model {document->model(0)};
+    auto instance {document->instantiate()};
+
+    for (auto i {0}; i < NUMBER_OF_RUNS; ++i) {
+        ASSERT_TRUE(instance->startRun());
+
+        instance->stopRun();
+
+        model->removeAllChanges();
+        model->addChange(libOpenCOR::SedChangeAttribute::create("main", "k", std::to_string(i)));
+
+        instance->waitForRun();
+
+        ASSERT_FALSE(instance->hasIssues());
+    }
+
+    // Running our instance again should use our last model change.
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+
+    EXPECT_EQ(instanceTask->stateName(0), "main/x");
+    EXPECT_EQ(instanceTask->state(0)[0], NUMBER_OF_RUNS - 1);
 }
 
 TEST(InstanceSedTest, runWhileAsynchronousRunInProgress)

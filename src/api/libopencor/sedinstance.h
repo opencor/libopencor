@@ -85,7 +85,8 @@ public:
      *
      * Start running, in a background thread, all the tasks associated with this instance. The results of the tasks
      * are (re)allocated before this method returns, so they can be retrieved while the tasks are being run (e.g., to
-     * plot them progressively). The simulation settings used are those in effect when this method is called.
+     * plot them progressively). The simulation settings and model changes used are those in effect when this method is
+     * called.
      *
      * @return @c true if a new run was started, @c false if a run is already in progress.
      */

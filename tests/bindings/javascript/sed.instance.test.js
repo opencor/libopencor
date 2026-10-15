@@ -919,6 +919,93 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instanceTask.voi[instanceTask.voi.length - 1], 2.0 * outputEndTime);
   });
 
+  test('Model changes used when starting run', () => {
+    // Note: the model changes used by a run are those in effect when the run is started, even if they get changed
+    //       while the run is in progress.
+
+    const file = new loc.File(utils.resourcePath('api/sed/variables_initialised_using_variables.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const model = document.model(0);
+    const change = new loc.SedChangeAttribute('main', 'k', '5.0');
+
+    model.addChange(change);
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+
+    change.newValue = '7.0';
+    model.addChange(new loc.SedChangeAttribute('main', 'x', '9.0'));
+
+    assert.ok(instance.waitForRun() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+
+    assert.strictEqual(instanceTask.stateName(0), 'main/x');
+    assert.strictEqual(instanceTask.state(0)[0], 5.0);
+
+    // Running our instance again should use our new model changes.
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    assert.strictEqual(instanceTask.state(0)[0], 9.0);
+
+    model.removeChange(model.changes[1]);
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    assert.strictEqual(instanceTask.state(0)[0], 7.0);
+  });
+
+  test('Change model after stop run', async () => {
+    // Note: stopping a run doesn't wait for it to be done, so our model may get changed while the stopped run is still
+    //       in progress, which must not affect it.
+
+    const NUMBER_OF_RUNS = 1000;
+
+    const file = new loc.File(utils.resourcePath('api/sed/variables_initialised_using_variables.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const model = document.model(0);
+    const instance = document.instantiate();
+
+    for (let i = 0; i < NUMBER_OF_RUNS; ++i) {
+      assert.strictEqual(instance.startRun(), true);
+
+      instance.stopRun();
+
+      model.removeAllChanges();
+      model.addChange(new loc.SedChangeAttribute('main', 'k', String(i)));
+
+      instance.waitForRun();
+
+      assert.strictEqual(instance.hasIssues, false);
+
+      // Note: this has no C++ or Python equivalent since the threads of our previous runs can only be cleaned up when
+      //       we return to the event loop, which we must do or we would eventually run out of memory.
+
+      await sleep(0);
+    }
+
+    // Running our instance again should use our last model change.
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+
+    assert.strictEqual(instanceTask.stateName(0), 'main/x');
+    assert.strictEqual(instanceTask.state(0)[0], NUMBER_OF_RUNS - 1);
+  });
+
   test('Run while asynchronous run in progress', () => {
     // Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to
     //       complete before running the instance again.

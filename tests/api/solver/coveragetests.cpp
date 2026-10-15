@@ -39,6 +39,14 @@ TEST(CoverageSolverTest, odeChanges)
     instance->run();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+
+    // Instantiating our document again should report the same issues (rather than accumulate them).
+
+    auto otherInstance {document->instantiate()};
+
+    otherInstance->run();
+
+    EXPECT_EQ_ISSUES(otherInstance, EXPECTED_ISSUES);
 }
 
 TEST(CoverageSolverTest, algebraicChanges)
