@@ -102,7 +102,7 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
         if (isLocatedWithinArchive) {
             auto filePathWithinArchive {stringToPath(fileName.substr(mArchiveLocationSize))};
 
-            isLocatedWithinArchive = std::none_of(filePathWithinArchive.begin(), filePathWithinArchive.end(), [](const auto &pComponent) {
+            isLocatedWithinArchive = std::ranges::none_of(filePathWithinArchive, [](const auto &pComponent) {
                 return pComponent == "..";
             });
         }
