@@ -244,6 +244,34 @@ test.describe('Sed serialise tests', () => {
     }
   });
 
+  test('Relative local CellML file with colon', () => {
+    // A relative file name is serialised as a relative model source (even without a base path), so it must also be
+    // prefixed with "./" if its first segment contains a colon.
+
+    const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
+    const file = new loc.File('my:model.cellml');
+
+    file.setContents(cellmlContents);
+
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation('./my:model.cellml'));
+
+    // Load the SED-ML file back.
+
+    const sedmlFile = new loc.File('my_model.sedml');
+
+    sedmlFile.setContents(new TextEncoder().encode(document.serialise()));
+
+    const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+    assert.strictEqual(sedmlDocument.hasIssues, false);
+    assert.strictEqual(sedmlDocument.models.length, 1);
+    assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+    loc.FileManager.instance().unmanage(sedmlFile);
+  });
+
   test('Local CellML file with non-UTF-8 character', () => {
     // A model source is an XML attribute, so the bytes in the file name of a local model that are not valid UTF-8 must
     // be percent-encoded for the SED-ML file to be valid and for the model source to refer to that model when the
