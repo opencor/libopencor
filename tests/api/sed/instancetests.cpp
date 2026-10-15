@@ -926,6 +926,68 @@ TEST(InstanceSedTest, changeModelAfterStopRun)
     EXPECT_EQ(instanceTask->state(0)[0], NUMBER_OF_RUNS - 1);
 }
 
+TEST(InstanceSedTest, modelChangesThatCannotBeApplied)
+{
+    // Note: model changes that cannot be applied are reported and ignored, but they don't prevent an instance from
+    //       being run, whether they are present when the instance is created or added afterwards.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_INSTANTIATION_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the variable 'unknown' in component 'main' could not be found and therefore could not be changed."},
+    }};
+    static const libOpenCOR::ExpectedIssues EXPECTED_RUN_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "Task | Change attribute: the variable 'unknown' in component 'main' could not be found and therefore could not be changed."},
+    }};
+    static const libOpenCOR::ExpectedIssues EXPECTED_OTHER_RUN_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "Task | Change attribute: the computed constant 'cc' in component 'main' cannot be changed. Only state variables and constants can be changed."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/variables_initialised_using_variables.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &model {document->model(0)};
+
+    model->addChange(libOpenCOR::SedChangeAttribute::create("main", "k", "5.0"));
+    model->addChange(libOpenCOR::SedChangeAttribute::create("main", "unknown", "7.0"));
+
+    auto instance {document->instantiate()};
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_INSTANTIATION_ISSUES);
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_RUN_ISSUES);
+
+    const auto &instanceTask {instance->tasks()[0]};
+
+    EXPECT_EQ(instanceTask->stateName(0), "main/x");
+    EXPECT_EQ(instanceTask->state(0)[0], 5.0);
+
+    // Removing our model change that cannot be applied and running our instance again should not report any issues.
+
+    model->removeChange(model->changes()[1]);
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    EXPECT_EQ(instanceTask->state(0)[0], 5.0);
+
+    // Adding another model change that cannot be applied and running our instance again should report it.
+
+    model->addChange(libOpenCOR::SedChangeAttribute::create("main", "cc", "9.0"));
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_OTHER_RUN_ISSUES);
+
+    EXPECT_EQ(instanceTask->state(0)[0], 5.0);
+
+    // Removing that model change and running our instance again should not report any issues.
+
+    model->removeChange(model->changes()[1]);
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    EXPECT_EQ(instanceTask->state(0)[0], 5.0);
+}
+
 TEST(InstanceSedTest, runWhileAsynchronousRunInProgress)
 {
     // Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to

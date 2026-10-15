@@ -1006,6 +1006,79 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instanceTask.state(0)[0], NUMBER_OF_RUNS - 1);
   });
 
+  test('Model changes that cannot be applied', () => {
+    // Note: model changes that cannot be applied are reported and ignored, but they don't prevent an instance from
+    //       being run, whether they are present when the instance is created or added afterwards.
+
+    const expectedInstantiationIssues = [
+      [
+        loc.Issue.Type.WARNING,
+        "Task instance | Change attribute: the variable 'unknown' in component 'main' could not be found and therefore could not be changed."
+      ]
+    ];
+    const expectedRunIssues = [
+      [
+        loc.Issue.Type.WARNING,
+        "Task | Change attribute: the variable 'unknown' in component 'main' could not be found and therefore could not be changed."
+      ]
+    ];
+    const expectedOtherRunIssues = [
+      [
+        loc.Issue.Type.WARNING,
+        "Task | Change attribute: the computed constant 'cc' in component 'main' cannot be changed. Only state variables and constants can be changed."
+      ]
+    ];
+
+    const file = new loc.File(utils.resourcePath('api/sed/variables_initialised_using_variables.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const model = document.model(0);
+
+    model.addChange(new loc.SedChangeAttribute('main', 'k', '5.0'));
+    model.addChange(new loc.SedChangeAttribute('main', 'unknown', '7.0'));
+
+    const instance = document.instantiate();
+
+    assertIssues(loc, instance, expectedInstantiationIssues);
+
+    assert.ok(instance.run() > 0.0);
+    assertIssues(loc, instance, expectedRunIssues);
+
+    const instanceTask = instance.tasks[0];
+
+    assert.strictEqual(instanceTask.stateName(0), 'main/x');
+    assert.strictEqual(instanceTask.state(0)[0], 5.0);
+
+    // Removing our model change that cannot be applied and running our instance again should not report any issues.
+
+    model.removeChange(model.changes[1]);
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    assert.strictEqual(instanceTask.state(0)[0], 5.0);
+
+    // Adding another model change that cannot be applied and running our instance again should report it.
+
+    model.addChange(new loc.SedChangeAttribute('main', 'cc', '9.0'));
+
+    assert.ok(instance.run() > 0.0);
+    assertIssues(loc, instance, expectedOtherRunIssues);
+
+    assert.strictEqual(instanceTask.state(0)[0], 5.0);
+
+    // Removing that model change and running our instance again should not report any issues.
+
+    model.removeChange(model.changes[1]);
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    assert.strictEqual(instanceTask.state(0)[0], 5.0);
+  });
+
   test('Run while asynchronous run in progress', () => {
     // Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to
     //       complete before running the instance again.

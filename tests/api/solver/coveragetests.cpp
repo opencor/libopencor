@@ -25,28 +25,50 @@ limitations under the License.
 
 TEST(CoverageSolverTest, odeChanges)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+    static const libOpenCOR::ExpectedIssues EXPECTED_INSTANTIATION_ISSUES {{
         {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the variable of integration 'time' in component 'environment' cannot be changed. Only state variables and constants can be changed."},
         {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the variable 'X' in component 'membrane' could not be found and therefore could not be changed."},
         {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the computed constant 'E_Na' in component 'sodium_channel' cannot be changed. Only state variables and constants can be changed."},
         {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed."},
+    }};
+    static const libOpenCOR::ExpectedIssues EXPECTED_RUN_ISSUES {{
+        {libOpenCOR::Issue::Type::WARNING, "Task | Change attribute: the variable of integration 'time' in component 'environment' cannot be changed. Only state variables and constants can be changed."},
+        {libOpenCOR::Issue::Type::WARNING, "Task | Change attribute: the variable 'X' in component 'membrane' could not be found and therefore could not be changed."},
+        {libOpenCOR::Issue::Type::WARNING, "Task | Change attribute: the computed constant 'E_Na' in component 'sodium_channel' cannot be changed. Only state variables and constants can be changed."},
+        {libOpenCOR::Issue::Type::WARNING, "Task | Change attribute: the algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode_sed_changes.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};
     auto instance {document->instantiate()};
 
-    instance->run();
+    EXPECT_EQ_ISSUES(instance, EXPECTED_INSTANTIATION_ISSUES);
 
-    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+    // Running our instance should report the same issues, but our changes that could not be applied should have been
+    // ignored rather than prevent our instance from being run, i.e. our change that could be applied should have been
+    // applied.
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_RUN_ISSUES);
+
+    const auto &instanceTask {instance->tasks()[0]};
+
+    EXPECT_EQ(instanceTask->stateName(0), "membrane/V");
+    EXPECT_EQ(instanceTask->state(0)[0], 3.0);
+
+    // Running our instance again should report the same issues (rather than accumulate them).
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_RUN_ISSUES);
 
     // Instantiating our document again should report the same issues (rather than accumulate them).
 
     auto otherInstance {document->instantiate()};
 
-    otherInstance->run();
+    EXPECT_EQ_ISSUES(otherInstance, EXPECTED_INSTANTIATION_ISSUES);
 
-    EXPECT_EQ_ISSUES(otherInstance, EXPECTED_ISSUES);
+    EXPECT_GT(otherInstance->run(), 0.0);
+    EXPECT_EQ_ISSUES(otherInstance, EXPECTED_RUN_ISSUES);
 }
 
 TEST(CoverageSolverTest, algebraicChanges)

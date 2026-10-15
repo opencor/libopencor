@@ -921,6 +921,78 @@ def test_change_model_after_stop_run():
     assert instance_task.state(0)[0] == NUMBER_OF_RUNS - 1
 
 
+def test_model_changes_that_cannot_be_applied():
+    # Note: model changes that cannot be applied are reported and ignored, but they don't prevent an instance from
+    #       being run, whether they are present when the instance is created or added afterwards.
+
+    expected_instantiation_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "Task instance | Change attribute: the variable 'unknown' in component 'main' could not be found and therefore could not be changed.",
+        ],
+    ]
+    expected_run_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "Task | Change attribute: the variable 'unknown' in component 'main' could not be found and therefore could not be changed.",
+        ],
+    ]
+    expected_other_run_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "Task | Change attribute: the computed constant 'cc' in component 'main' cannot be changed. Only state variables and constants can be changed.",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path("api/sed/variables_initialised_using_variables.cellml")
+    )
+    document = loc.SedDocument(file)
+    model = document.model(0)
+
+    model.add_change(loc.SedChangeAttribute("main", "k", "5.0"))
+    model.add_change(loc.SedChangeAttribute("main", "unknown", "7.0"))
+
+    instance = document.instantiate()
+
+    assert_issues(instance, expected_instantiation_issues)
+
+    assert instance.run() > 0.0
+    assert_issues(instance, expected_run_issues)
+
+    instance_task = instance.tasks[0]
+
+    assert instance_task.state_name(0) == "main/x"
+    assert instance_task.state(0)[0] == 5.0
+
+    # Removing our model change that cannot be applied and running our instance again should not report any issues.
+
+    model.remove_change(model.changes[1])
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    assert instance_task.state(0)[0] == 5.0
+
+    # Adding another model change that cannot be applied and running our instance again should report it.
+
+    model.add_change(loc.SedChangeAttribute("main", "cc", "9.0"))
+
+    assert instance.run() > 0.0
+    assert_issues(instance, expected_other_run_issues)
+
+    assert instance_task.state(0)[0] == 5.0
+
+    # Removing that model change and running our instance again should not report any issues.
+
+    model.remove_change(model.changes[1])
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+    assert instance_task.state(0)[0] == 5.0
+
+
 def test_run_while_asynchronous_run_in_progress():
     # Note: running an instance while it is already being run asynchronously should wait for the asynchronous run to
     #       complete before running the instance again.

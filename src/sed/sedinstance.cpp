@@ -59,6 +59,8 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
         }
 
         // Create an instance of all the tasks, if they are all valid.
+        // Note: a task instance that has some errors cannot be run (see prepareRun()), hence its issues are reported
+        //       and kept track of (see below).
 
         if (tasksValid) {
             mTasks.reserve(tasks.size());
@@ -68,7 +70,7 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
 
                 mTasks.push_back(taskInstance);
 
-                if (taskInstance->hasIssues()) {
+                if (taskInstance->hasErrors()) {
                     addIssues(taskInstance, "Task instance");
                 }
             }
@@ -83,6 +85,20 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
     mTasksIssues = mIssues;
     mTasksErrors = mErrors;
     mTasksWarnings = mWarnings;
+
+    // Report the issues of the task instances that have no errors, i.e. the warnings about the changes that could not
+    // be applied to their model (see SedChangeAttribute::Impl::apply()), and reset them so that those task instances
+    // can be run.
+    // Note: those warnings are not kept track of since the changes of a task instance are retrieved again every time
+    //       it is run, at which point those warnings get reported again, if still relevant (see prepareRun()).
+
+    for (const auto &task : mTasks) {
+        if (!task->hasErrors()) {
+            addIssues(task, "Task instance");
+
+            task->pimpl()->removeAllIssues();
+        }
+    }
 }
 
 SedInstance::Status SedInstance::Impl::status() const
@@ -153,15 +169,20 @@ void SedInstance::Impl::prepareRun()
 
         for (const auto &task : mTasks) {
             if (!task->hasIssues()) {
-                if (task->pimpl()->prepareRun()) {
-                    mTasksToRun.push_back(task);
-                } else {
+                const auto taskPrepared {task->pimpl()->prepareRun()};
+
+                // Report the issues of the task, if any (i.e. the errors about its simulation or the warnings about the
+                // changes that could not be applied to its model), and reset them so that they are not reported again
+                // should the instance be run again and so that warnings don't prevent the task from being run.
+
+                if (task->hasIssues()) {
                     addIssues(task, "Task");
 
-                    // Reset the issues of the task so that they are not reported again should the instance be run
-                    // again.
-
                     task->pimpl()->removeAllIssues();
+                }
+
+                if (taskPrepared) {
+                    mTasksToRun.push_back(task);
                 }
             }
         }
