@@ -139,6 +139,33 @@ test.describe('Sed serialise tests', () => {
     assert.strictEqual(document.serialise(), cvodeExpectedSerialisation('cellml_2.cellml'));
   });
 
+  test('Relative local CellML file in directory without base path', () => {
+    // A relative file name is serialised as a relative model source, so its directory separators must be forward
+    // slashes (i.e. not backslashes on Windows).
+
+    const file = new loc.File('some/path/cellml_2.cellml');
+
+    file.setContents(utils.fileContents(utils.resourcePath('cellml_2.cellml')));
+
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation('some/path/cellml_2.cellml'));
+
+    // Load the SED-ML file back.
+
+    const sedmlFile = new loc.File('my_model.sedml');
+
+    sedmlFile.setContents(new TextEncoder().encode(document.serialise()));
+
+    const sedmlDocument = new loc.SedDocument(sedmlFile);
+
+    assert.strictEqual(sedmlDocument.hasIssues, false);
+    assert.strictEqual(sedmlDocument.models.length, 1);
+    assert.strictEqual(sedmlDocument.models[0].file.isAliasOf(file), true);
+
+    loc.FileManager.instance().unmanage(sedmlFile);
+  });
+
   test('Local CellML file with percent signs', () => {
     // A model source is a URI reference, so the percent signs in the file name of a local model must be percent-encoded
     // for the model source to refer to that model when the SED-ML file is loaded back.

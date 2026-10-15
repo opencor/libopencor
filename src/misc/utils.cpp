@@ -949,6 +949,15 @@ std::string urlPath(const std::string &pPath)
 #endif
     }
 
+#ifdef BUILDING_USING_MSVC
+    // A relative file name is used as is, but its backslashes must become forward slashes since it is used as a
+    // relative URI reference (e.g., "some\path\model.cellml" must become "some/path/model.cellml").
+
+    if (isLocalPath) {
+        return forwardSlashPath(path);
+    }
+#endif
+
     return path;
 }
 
