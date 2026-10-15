@@ -344,7 +344,7 @@ function(configure_target TARGET)
     # Note: we also get duplicate objects when linking the target on Windows, but for some reasons to use /ignore:4006
     #       doesn't work...!?
 
-    if(BUILDING_USING_CLANG AND NOT LIBOPENCOR_CODE_ANALYSIS)
+    if(APPLE)
         add_linker_flags(${TARGET} -Wl,-no_warn_duplicate_libraries)
     endif()
 

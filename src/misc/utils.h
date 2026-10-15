@@ -87,7 +87,7 @@ std::string LIBOPENCOR_UNIT_TESTING_EXPORT percentEncodeNonXmlCharacters(const s
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT encodeUrl(const std::string &pUrl);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT decodeUrl(const std::string &pUrl, bool pDecodeReservedCharacters = true);
 
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT forwardSlashPath(const std::string &pPath);
 #endif
 

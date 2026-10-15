@@ -165,7 +165,7 @@ void SedModel::Impl::serialise(xmlNodePtr pNode) const
 
     auto source {mBasePath.empty() ?
                      urlPath(mFile->path()) :
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
                      forwardSlashPath(relativePath(mFile->path(), mBasePath))};
 #else
                      relativePath(mFile->path(), mBasePath)};

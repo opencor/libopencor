@@ -265,7 +265,7 @@ TEST(UtilsTest, retrieveFileInfo)
     std::tie(isLocalFile, fileNameOrUrl) = libOpenCOR::retrieveFileInfo("https://EXAMPLE.com\\A");
 
     EXPECT_FALSE(isLocalFile);
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     EXPECT_EQ(fileNameOrUrl, "https://example.com/A");
 #else
     EXPECT_EQ(fileNameOrUrl, "https://example.com\\A");
@@ -284,7 +284,7 @@ TEST(UtilsTest, stringToPathAndPathToString)
         EXPECT_EQ(libOpenCOR::pathToString(libOpenCOR::stringToPath(fileName)), fileName);
     }
 
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     // On Windows, a path may contain lone surrogates, which can be converted to a file name and back without being
     // altered.
 
@@ -696,7 +696,7 @@ TEST(UtilsTest, canonicalUrl)
     EXPECT_EQ(libOpenCOR::canonicalUrl("https://example.com#a/../b"), "https://example.com#a/../b");
     EXPECT_EQ(libOpenCOR::canonicalUrl("http://user@example.com:8080/a/../model.cellml"), "http://user@example.com:8080/model.cellml");
     EXPECT_EQ(libOpenCOR::canonicalUrl("example.com/a/../model.cellml"), "example.com/model.cellml");
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     EXPECT_EQ(libOpenCOR::canonicalUrl(R"(https://example.com\a\..\model.cellml)"), "https://example.com/model.cellml");
 #endif
 }

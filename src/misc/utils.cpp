@@ -424,7 +424,7 @@ std::string decodeUrl(const std::string &pUrl, bool pDecodeReservedCharacters)
     return res;
 }
 
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
 std::string forwardSlashPath(const std::string &pPath)
 {
     static constexpr auto BACKSLASH {"\\\\"};
@@ -435,7 +435,7 @@ std::string forwardSlashPath(const std::string &pPath)
 }
 #endif
 
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
 namespace {
 
 // Conversion between a UTF-8 std::string and a UTF-16 std::wstring, to be used instead of the one done by
@@ -579,7 +579,7 @@ std::wstring stringToUtf16(const std::string &pString)
 
 std::filesystem::path stringToPath(const std::string &pString)
 {
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     return stringToUtf16(pString);
 #else
     return std::u8string {pString.begin(), pString.end()};
@@ -590,7 +590,7 @@ std::string pathToString(const std::filesystem::path &pPath)
 {
     auto path {pPath};
 
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     return utf16ToUtf8(path.make_preferred().native());
 #else
     return path.make_preferred().string();
@@ -717,7 +717,7 @@ std::string canonicalUrl(const std::string &pUrl)
     static constexpr auto DOT {"."};
     static constexpr auto DOT_DOT {".."};
 
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     auto url {forwardSlashPath(pUrl)};
 #else
     const auto &url {pUrl};
@@ -940,7 +940,7 @@ std::string urlPath(const std::string &pPath)
 
     if (isLocalPath && stringToPath(path).is_absolute()) {
         static const std::string FILE_SCHEME {"file://"};
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
         static constexpr auto FORWARD_SLASH {"/"};
 
         return FILE_SCHEME + FORWARD_SLASH + forwardSlashPath(path);
@@ -949,7 +949,7 @@ std::string urlPath(const std::string &pPath)
 #endif
     }
 
-#ifdef BUILDING_USING_MSVC
+#ifdef BUILDING_ON_WINDOWS
     // A relative file name is used as is, but its backslashes must become forward slashes since it is used as a
     // relative URI reference (e.g., "some\path\model.cellml" must become "some/path/model.cellml").
 
