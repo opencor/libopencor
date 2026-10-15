@@ -624,15 +624,19 @@ bool SedInstanceTask::Impl::prepareRun()
         mNumberOfSteps = 1;
     }
 
-    // Retrieve our changes.
-
-    retrieveChanges();
-
     // (Re)allocate our results, if needed.
     // Note: our results include our initial point, hence a differential model has one more result than its number of
     //       steps.
 
     allocateResults(mDifferentialModel ? mNumberOfSteps + 1 : 1);
+
+    // Retrieve our changes.
+    // Note: this must be done after (re)allocating our results. Indeed, retrieving our changes may result in some
+    //       warnings (e.g., a change that cannot be applied) and should the (re)allocation of our results then throw an
+    //       exception, those warnings would never be reported nor reset (see SedInstance::Impl::prepareRun()), which
+    //       would prevent us from ever being run again.
+
+    retrieveChanges();
 
     // Set our total number of steps.
 
