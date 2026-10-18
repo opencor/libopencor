@@ -44,6 +44,32 @@ TEST(InstanceSedTest, noFile)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
+TEST(InstanceSedTest, emptyModel)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model: the CellML file is empty."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/empty.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
+TEST(InstanceSedTest, cellmlFileWithInvalidImports)
+{
+    static const std::string IMPORTER_ERROR_START {"Task | Model | CellML | Importer: "};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_invalid_imports.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    GTEST_ASSERT_EQ(instance->issueCount(), 1U);
+    EXPECT_EQ(instance->issue(0)->type(), libOpenCOR::Issue::Type::ERROR);
+    EXPECT_EQ(instance->issue(0)->description().substr(0, IMPORTER_ERROR_START.size()), IMPORTER_ERROR_START);
+}
+
 TEST(InstanceSedTest, invalidCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{

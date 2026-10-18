@@ -40,6 +40,35 @@ def test_no_file():
     assert_issues(instance, expected_issues)
 
 
+def test_empty_model():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | Model: the CellML file is empty.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/empty.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert_issues(instance, expected_issues)
+
+
+def test_cellml_file_with_invalid_imports():
+    importer_error_start = "Task | Model | CellML | Importer: "
+
+    file = loc.File(
+        utils.resource_path("support/cellml/model_with_invalid_imports.cellml")
+    )
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert instance.issue_count == 1
+    assert instance.issues[0].type == loc.Issue.Type.Error
+    assert instance.issues[0].description.startswith(importer_error_start)
+
+
 def test_invalid_cellml_file():
     expected_issues = [
         [

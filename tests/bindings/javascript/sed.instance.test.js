@@ -50,6 +50,32 @@ test.describe('Sed instance tests', () => {
     ]);
   });
 
+  test('Empty model', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/empty.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assertIssues(loc, instance, [[loc.Issue.Type.ERROR, 'Task | Model: the CellML file is empty.']]);
+  });
+
+  test('CellML file with invalid imports', () => {
+    const IMPORTER_ERROR_START = 'Task | Model | CellML | Importer: ';
+
+    const file = new loc.File(utils.resourcePath('support/cellml/model_with_invalid_imports.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.issueCount, 1);
+    assert.strictEqual(instance.issue(0).type.value, loc.Issue.Type.ERROR.value);
+    assert.strictEqual(instance.issue(0).description.startsWith(IMPORTER_ERROR_START), true);
+  });
+
   test('Invalid CellML file', () => {
     const file = new loc.File(utils.resourcePath('error.cellml'));
 
