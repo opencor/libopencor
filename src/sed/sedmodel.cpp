@@ -47,7 +47,19 @@ bool SedModel::Impl::isValid()
 
     // Make sure that the CellML file is valid.
 
-    switch (mFile->pimpl()->mCellmlFile->type()) {
+    const auto &cellmlFile {mFile->pimpl()->mCellmlFile};
+
+    switch (cellmlFile->type()) {
+    case libcellml::AnalyserModel::Type::UNKNOWN:
+        // The model is unknown which either means that it doesn't contain any variables (i.e. it is empty as far as we
+        // are concerned) or its imports couldn't be resolved (in which case the CellML file's issues already tell us
+        // what is wrong).
+
+        if (!cellmlFile->hasErrors()) {
+            addError("The CellML file is empty.");
+        }
+
+        break;
     case libcellml::AnalyserModel::Type::INVALID:
         addError("The CellML file is invalid.");
 
@@ -64,15 +76,14 @@ bool SedModel::Impl::isValid()
         addError("The CellML file is unsuitably constrained.");
 
         break;
-    default: // libcellml::AnalyserModel::Type::UNKNOWN (we should never get this type),
-             // libcellml::AnalyserModel::Type::ALGEBRAIC,
+    default: // libcellml::AnalyserModel::Type::ALGEBRAIC,
              // libcellml::AnalyserModel::Type::DAE,
              // libcellml::AnalyserModel::Type::NLA, or
              // libcellml::AnalyserModel::Type::ODE.
         break;
     }
 
-    addIssues(mFile->pimpl()->mCellmlFile, "CellML");
+    addIssues(cellmlFile, "CellML");
 
     return !hasErrors();
 }
