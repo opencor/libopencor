@@ -372,19 +372,28 @@ if(EMSCRIPTEN)
     # Note #3: for linking, we use -O2 (rather than -O3) since our compressed .wasm file is then smaller with no loss of
     #          performance (and it links faster), -flto to use the LTO version of Emscripten's system libraries and to
     #          optimise LLVM, which we build as LLVM bitcode (see src/3rdparty/LLVM/CMakeLists.txt; our other object
-    #          files are not LTO ones), -pthread to enable native threading support, -sASSERTIONS=0 to disable
-    #          assertions (they are not needed in production), -sCROSS_ORIGIN=1 to support our .js file being loaded
-    #          from another origin than that of the Web page (see Note #5), -sEXPORT_ES6=1 to export ES6 modules,
-    #          -sEXPORTED_FUNCTIONS to export the functions we need (i.e. those needed by the WebAssembly modules that
-    #          we generate for our models, see initialiseWorkerWasmJS()), -sEXPORTED_RUNTIME_METHODS to export the
-    #          runtime methods we need, -sINITIAL_MEMORY=2GB to have enough memory for "big" models, -sMODULARIZE=1 to
-    #          generate a module factory function, -sSTACK_SIZE=8MB to reserve a reasonable amount of memory for the
-    #          stack of each thread (which is needed for "big" models), --bind to generate the necessary Embind
-    #          bindings, and --emit-tsd to generate a TypeScript type definitions file.
-    # Note #4: for linking, we used to have -sALLOW_MEMORY_GROWTH=1, -sINITIAL_MEMORY=256MB, and -sMAXIMUM_MEMORY=2GB,
-    #          but we now support threading, which means that our memory is shared, and to allow shared memory to grow
-    #          would make JavaScript's accesses to it (e.g., through HEAPU8) slower. So, now, we use
-    #          -sINITIAL_MEMORY=2GB and don't allow memory growth.
+    #          files are not LTO ones), -pthread to enable native threading support, -Wno-pthreads-mem-growth to silence
+    #          Emscripten's warning about threading and memory growth (see Note #4), -sALLOW_MEMORY_GROWTH=1 to let our
+    #          memory grow on demand (see Note #4), -sASSERTIONS=0 to disable assertions (they are not needed in
+    #          production), -sCROSS_ORIGIN=1 to support our .js file being loaded from another origin than that of the
+    #          Web page (see Note #5), -sEXPORT_ES6=1 to export ES6 modules, -sEXPORTED_FUNCTIONS to export the
+    #          functions we need (i.e. those needed by the WebAssembly modules that we generate for our models, see
+    #          initialiseWorkerWasmJS()), -sEXPORTED_RUNTIME_METHODS to export the runtime methods we need,
+    #          -sMAXIMUM_MEMORY=2GB to let our memory grow up to 2GB (see Note #4), -sMODULARIZE=1 to generate a module
+    #          factory function, -sSTACK_SIZE=8MB to reserve a reasonable amount of memory for the stack of each thread
+    #          (which is needed for "big" models), --bind to generate the necessary Embind bindings, and --emit-tsd to
+    #          generate a TypeScript type definitions file.
+    # Note #4: our memory starts small (16MB, which is Emscripten's default when, like here, our memory is imported) and
+    #          grows on demand, up to 2GB. Since we support threading, our memory is shared, which means that another
+    #          thread may grow it, so Emscripten precedes each of our JavaScript code's accesses to it (e.g., through
+    #          HEAPU8 in an EM_ASM() block) with a check of whether it has grown. That check makes those accesses slower
+    #          (about 15ns each), hence Emscripten's warning, but it only affects calls that cross the
+    #          JavaScript/WebAssembly boundary (e.g., a call that passes or returns a string), not our WebAssembly code
+    #          (e.g., the simulation of a model). We don't use -sGROWABLE_ARRAYBUFFERS=1|2, which would replace that
+    #          check with a growable SharedArrayBuffer since our results (see toFloat64ArrayJS()) would then be views
+    #          over a growable SharedArrayBuffer, which some Web APIs reject (e.g., structuredClone()). We also don't
+    #          use -sMAXIMUM_MEMORY=4GB since our EM_JS() functions would then get a pointer of 2GB or more as a
+    #          negative number and Embind calls would be slower (since pointers would need to be made unsigned).
     # Note #5: a Web browser only creates a worker (and therefore a thread) from a script that has the same origin as
     #          the Web page, so without -sCROSS_ORIGIN=1, a thread couldn't be created if our .js file was loaded from
     #          another origin (e.g., a CDN), i.e. startRun() would throw an error (Chrome) or never complete (Firefox).
@@ -404,14 +413,16 @@ if(EMSCRIPTEN)
                         -O2
                         -flto
                         -pthread
+                        -sALLOW_MEMORY_GROWTH=1
                         -sASSERTIONS=0
                         -sCROSS_ORIGIN=1
                         -sEXPORT_ES6=1
                         -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_nlaSolverAddress,_wasmNlaSolve,_pow,_sqrt,_fabs,_exp,_exp2,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh]
                         -sEXPORTED_RUNTIME_METHODS=HEAPU8
-                        -sINITIAL_MEMORY=2GB
+                        -sMAXIMUM_MEMORY=2GB
                         -sMODULARIZE=1
                         -sSTACK_SIZE=8MB
+                        -Wno-pthreads-mem-growth
                         --bind
                         --emit-tsd ${DTS_FILE})
 

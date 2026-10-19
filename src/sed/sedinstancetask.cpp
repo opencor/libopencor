@@ -43,9 +43,9 @@ EM_JS(intptr_t, toFloat64ArrayJS, (const void* data, size_t size), {
     }
 
     return Emval.toHandle(new Float64Array(HEAPU8.subarray(data, data + 8 * size).buffer, data, size));
-    // Note: we use HEAPU8.subarray() to create a view over the WASM heap's Float64Array buffer because it is safer than
-    //       accessing HEAPU8.buffer directly in case the WASM heap was ever to grow (we don't allow this to happen, but
-    //       it is still safer to use HEAPU8.subarray()) since it creates a view with the correct byte offset.
+    // Note: our memory can grow (see src/CMakeLists.txt), but HEAPU8 is always up to date when we access it and our
+    //       memory is shared, i.e. backed by a SharedArrayBuffer, which never gets detached when our memory grows. So,
+    //       our view remains valid even after our memory has grown (as long as our results don't get reallocated).
 }); // clang-format on
 
 static emscripten::val toFloat64Array(std::span<const double> data)

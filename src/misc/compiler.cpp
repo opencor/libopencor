@@ -342,7 +342,7 @@ std::string patchWasmSharedMemory(UnsignedChars &pWasmModule)
                     // Memory import: patch its flags to mark it as shared and give it a maximum size, if it doesn't
                     // already have one. That maximum size must be at least that of the memory of our main WebAssembly
                     // module (i.e. the memory that we import), which we retrieve at runtime rather than hard-code it
-                    // since it depends on -sINITIAL_MEMORY, etc. (see src/CMakeLists.txt).
+                    // since it depends on -sMAXIMUM_MEMORY, etc. (see src/CMakeLists.txt).
                     // Note: LLVM currently emits a 32-bit, non-shared memory import without a maximum size (i.e. flags
                     //       0x00), but we handle a memory import with a maximum size (i.e. flags 0x01) and/or that is
                     //       already shared (i.e. flags 0x03) in case a future version of LLVM does so. Any other
