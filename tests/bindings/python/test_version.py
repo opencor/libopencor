@@ -56,8 +56,8 @@ def test_libopencor():
 
 
 def test_libcellml():
-    assert loc.libcellml_version() == 0x000701
-    assert loc.libcellml_version_string() == "0.7.1"
+    assert loc.libcellml_version() == 0x000702
+    assert loc.libcellml_version_string() == "0.7.2"
 
     # The version is an integer and the version string is a string.
     # Note: this has no C++ equivalent since C++ is statically typed.
