@@ -61,8 +61,8 @@ TEST(VersionTest, libOpenCOR)
 
 TEST(VersionTest, libCellML)
 {
-    EXPECT_EQ(0x000701U, libOpenCOR::libcellmlVersion());
-    EXPECT_EQ("0.7.1", libOpenCOR::libcellmlVersionString());
+    EXPECT_EQ(0x000702U, libOpenCOR::libcellmlVersion());
+    EXPECT_EQ("0.7.2", libOpenCOR::libcellmlVersionString());
 }
 
 TEST(VersionTest, libCOMBINE)

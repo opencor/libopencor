@@ -58,8 +58,8 @@ test.describe('Version tests', () => {
   });
 
   test('libCellML', () => {
-    assert.strictEqual(loc.libcellmlVersion(), 0x000701);
-    assert.strictEqual(loc.libcellmlVersionString(), '0.7.1');
+    assert.strictEqual(loc.libcellmlVersion(), 0x000702);
+    assert.strictEqual(loc.libcellmlVersionString(), '0.7.2');
 
     // The version is a number and the version string is a string.
     // Note: this has no C++ equivalent since C++ is statically typed.
