@@ -138,7 +138,7 @@ if(LIBOPENCOR_PREBUILT_LLVM)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         b0180baf919d8953ffa673eb3e0f6f11d6bfcd2a)
+                         6155cad48ecc59cf37d8b7dd8c968ae816a7fefe)
     else()
         if(WIN32)
             if(RELEASE_MODE)
