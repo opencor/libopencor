@@ -125,7 +125,7 @@ jobs:
         with:
           cache_key: webassembly
       - name: Install Emscripten
-        run: brew install emscripten
+        uses: emscripten-core/setup-emsdk@v16
       - name: Configure libOpenCOR (for a specific third-party library)
         if: ${{ inputs.third_party_library_name != 'ALL' }}
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=Release -DJAVASCRIPT_BINDINGS=ON -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF
