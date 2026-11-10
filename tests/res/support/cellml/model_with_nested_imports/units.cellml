@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="units" xmlns="http://www.cellml.org/cellml/2.0#">
+    <units name="per_second">
+        <unit units="second" exponent="-1"/>
+    </units>
+</model>

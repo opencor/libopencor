@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="model" xmlns="http://www.cellml.org/cellml/2.0#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <import xlink:href="components/component.cellml">
+        <component component_ref="decay" name="decay"/>
+    </import>
+    <component name="environment">
+        <variable name="time" units="second" interface="public"/>
+    </component>
+    <connection component_1="environment" component_2="decay">
+        <map_variables variable_1="time" variable_2="time"/>
+    </connection>
+</model>
