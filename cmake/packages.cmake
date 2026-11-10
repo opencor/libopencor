@@ -435,14 +435,17 @@ if(CMAKE_C_COMPILER_LAUNCHER AND CMAKE_CXX_COMPILER_LAUNCHER)
 endif()
 
 if(EMSCRIPTEN)
-    # Note: we are using the same CMake variables that we used to build libOpenCOR so that we can build our third-party
-    #       libraries in the same way that we built libOpenCOR.
+    # Note #1: we are using the same CMake variables that we used to build libOpenCOR, so that we can build our
+    #          third-party libraries in the same way that we built libOpenCOR.
+    # Note #2: with Emscripten 7, libc++ no longer includes some headers indirectly, but some third-party libraries
+    #          may use something from them without including them (e.g., libCellML uses std::strtod() without including
+    #          <cstdlib> and libSBML uses std::nothrow without including <new>), so we force their inclusion.
 
     list(APPEND CMAKE_ARGS
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
         -DCMAKE_CROSSCOMPILING_EMULATOR=${CMAKE_CROSSCOMPILING_EMULATOR}
         -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
-        -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+        -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}\ -include\ cstdlib\ -include\ new
         -DCMAKE_EXE_LINKER_FLAGS=${CMAKE_EXE_LINKER_FLAGS}
         -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
     )

@@ -24,7 +24,7 @@ if(LIBOPENCOR_PREBUILT_LIBXML2)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         758a5a306b2d360e5563e1a72064e2c2ac1fee58)
+                         f67b580d4d6e20fdbf25c1fef6a0187683c8caf2)
     else()
         if(WIN32)
             if(RELEASE_MODE)
