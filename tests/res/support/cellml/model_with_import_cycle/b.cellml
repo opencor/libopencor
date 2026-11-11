@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="b" xmlns="http://www.cellml.org/cellml/2.0#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <import xlink:href="a.cellml">
+        <component component_ref="a" name="a"/>
+    </import>
+    <component name="b"/>
+    <encapsulation>
+        <component_ref component="b">
+            <component_ref component="a"/>
+        </component_ref>
+    </encapsulation>
+</model>

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="model" xmlns="http://www.cellml.org/cellml/2.0#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <import xlink:href="../model_with_nested_imports/units.cellml">
+        <units units_ref="per_second" name="per_second"/>
+    </import>
+    <import xlink:href="../model_with_nested_imports/units.cellml">
+        <units units_ref="per_second" name="other_per_second"/>
+    </import>
+    <import xlink:href="../model_with_nested_imports/components/component.cellml">
+        <component component_ref="decay" name="decay"/>
+    </import>
+    <import xlink:href="other_component.cellml">
+        <component component_ref="other_decay" name="other_decay"/>
+    </import>
+    <import xlink:href="https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/support/cellml/model_with_valid_imports/parameters.cellml">
+        <component component_ref="parameters" name="parameters"/>
+    </import>
+    <component name="environment">
+        <variable name="time" units="second" interface="public"/>
+        <variable name="k" units="per_second" initial_value="3"/>
+        <variable name="other_k" units="other_per_second" initial_value="3"/>
+    </component>
+    <connection component_1="environment" component_2="decay">
+        <map_variables variable_1="time" variable_2="time"/>
+    </connection>
+    <connection component_1="environment" component_2="other_decay">
+        <map_variables variable_1="time" variable_2="time"/>
+    </connection>
+</model>

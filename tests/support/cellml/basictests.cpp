@@ -131,6 +131,83 @@ TEST(BasicCellmlTest, modelWithManagedImportsWithNoContents)
     EXPECT_EQ(cellmlFile->type(), libcellml::AnalyserModel::Type::ODE);
 }
 
+TEST(BasicCellmlTest, modelWithVariousImports)
+{
+    // A model that imports:
+    //  - some units from a file in another directory, i.e. "../model_with_nested_imports/units.cellml", and this twice
+    //    (using two different import elements);
+    //  - a component from a file in another directory, which itself imports some units from the same file as above,
+    //    albeit using a different URL, i.e. "../units.cellml";
+    //  - a component from a file in the same directory, which itself imports some units from the same file as above,
+    //    using the same URL as above; and
+    //  - a component from a remote file, using an absolute URL.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_various_imports/model.cellml"))};
+    auto cellmlFile {libOpenCOR::CellmlFile::create(file)};
+
+    EXPECT_FALSE(cellmlFile->hasIssues());
+    EXPECT_EQ(cellmlFile->type(), libcellml::AnalyserModel::Type::ODE);
+}
+
+TEST(BasicCellmlTest, modelWithUnsupportedSchemeImport)
+{
+    // We cannot retrieve a file using a scheme other than "http", "https", or "file".
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_unsupported_scheme_import.cellml"))};
+    auto cellmlFile {libOpenCOR::CellmlFile::create(file)};
+
+    GTEST_ASSERT_EQ(cellmlFile->issueCount(), 1U);
+    EXPECT_EQ(cellmlFile->issue(0)->type(), libOpenCOR::Issue::Type::ERROR);
+    EXPECT_TRUE(cellmlFile->issue(0)->description().ends_with("urn:miriam:biomodels.db:BIOMD0000000012' failed: the file could not be opened."));
+}
+
+TEST(BasicCellmlTest, modelWithInvalidXmlImport)
+{
+    // We don't add an imported model that is not valid XML to the library of the importer, so libCellML reports it.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_invalid_xml_import.cellml"))};
+    auto cellmlFile {libOpenCOR::CellmlFile::create(file)};
+
+    GTEST_ASSERT_EQ(cellmlFile->issueCount(), 1U);
+    EXPECT_EQ(cellmlFile->issue(0)->type(), libOpenCOR::Issue::Type::ERROR);
+    EXPECT_TRUE(cellmlFile->issue(0)->description().ends_with("unknown_file.txt' failed: the file is not valid XML."));
+}
+
+TEST(BasicCellmlTest, modelWithInvalidCellmlImport)
+{
+    // An imported model that is valid XML, but not valid CellML (it has an unknown element), is still added to the
+    // library of the importer (and, like libCellML, we don't report an issue for it).
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_invalid_cellml_import/model.cellml"))};
+    auto cellmlFile {libOpenCOR::CellmlFile::create(file)};
+
+    EXPECT_FALSE(cellmlFile->hasIssues());
+}
+
+TEST(BasicCellmlTest, modelWithNullCharacterImport)
+{
+    // A percent-encoded null character must not result in "units.cellml" being imported (see decodeUrl()).
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_null_character_import.cellml"))};
+    auto cellmlFile {libOpenCOR::CellmlFile::create(file)};
+
+    GTEST_ASSERT_EQ(cellmlFile->issueCount(), 1U);
+    EXPECT_EQ(cellmlFile->issue(0)->type(), libOpenCOR::Issue::Type::ERROR);
+    EXPECT_TRUE(cellmlFile->issue(0)->description().ends_with("units.cellml%00.txt' failed: the file could not be opened."));
+}
+
+TEST(BasicCellmlTest, modelWithImportCycle)
+{
+    // We must not end up in an infinite loop when retrieving the imported models, and libCellML reports the cycle.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_import_cycle/a.cellml"))};
+    auto cellmlFile {libOpenCOR::CellmlFile::create(file)};
+
+    GTEST_ASSERT_EQ(cellmlFile->issueCount(), 1U);
+    EXPECT_EQ(cellmlFile->issue(0)->type(), libOpenCOR::Issue::Type::ERROR);
+    EXPECT_TRUE(cellmlFile->issue(0)->description().starts_with("Importer: cyclic dependencies were found when attempting to resolve a component in the model 'a'."));
+}
+
 TEST(BasicCellmlTest, modelWithInvalidImports)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_invalid_imports.cellml"));

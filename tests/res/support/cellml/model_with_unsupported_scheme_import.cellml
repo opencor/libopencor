@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="model" xmlns="http://www.cellml.org/cellml/2.0#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <import xlink:href="urn:miriam:biomodels.db:BIOMD0000000012">
+        <component component_ref="component" name="component"/>
+    </import>
+</model>
