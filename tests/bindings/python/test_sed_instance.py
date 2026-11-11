@@ -159,6 +159,44 @@ def test_combine_archive_with_cellml_file_with_imports():
         assert math.isclose(state[i], math.exp(-voi[i]), abs_tol=1e-5)
 
 
+def test_hh52_with_imports():
+    with_imports_file = loc.File(utils.resource_path("api/file/hh52_with_imports.omex"))
+    with_imports_document = loc.SedDocument(with_imports_file)
+    with_imports_instance = with_imports_document.instantiate()
+
+    without_imports_file = loc.File(
+        utils.resource_path("api/file/hh52_without_imports.omex")
+    )
+    without_imports_document = loc.SedDocument(without_imports_file)
+    without_imports_instance = without_imports_document.instantiate()
+
+    assert not with_imports_instance.has_issues
+    assert not without_imports_instance.has_issues
+
+    with_imports_instance.run()
+    without_imports_instance.run()
+
+    assert not with_imports_instance.has_issues
+    assert not without_imports_instance.has_issues
+
+    with_imports_task = with_imports_instance.tasks[0]
+    without_imports_task = without_imports_instance.tasks[0]
+
+    assert len(with_imports_task.voi) > 1
+    assert len(with_imports_task.voi) == len(without_imports_task.voi)
+    assert with_imports_task.state_count == without_imports_task.state_count
+
+    for i in range(len(with_imports_task.voi)):
+        assert math.isclose(with_imports_task.voi[i], without_imports_task.voi[i])
+
+    for i in range(with_imports_task.state_count):
+        for j in range(len(with_imports_task.voi)):
+            assert math.isclose(
+                with_imports_task.state(i)[j],
+                without_imports_task.state(i)[j],
+            )
+
+
 def test_invalid_cellml_file():
     expected_issues = [
         [

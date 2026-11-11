@@ -139,6 +139,48 @@ test.describe('Sed instance tests', () => {
     }
   });
 
+  test('HH52 with imports', () => {
+    const withImportsFile = new loc.File(utils.resourcePath('api/file/hh52_with_imports.omex'));
+
+    withImportsFile.setContents(utils.fileContents(withImportsFile.path));
+
+    const withImportsDocument = new loc.SedDocument(withImportsFile);
+    const withImportsInstance = withImportsDocument.instantiate();
+
+    const withoutImportsFile = new loc.File(utils.resourcePath('api/file/hh52_without_imports.omex'));
+
+    withoutImportsFile.setContents(utils.fileContents(withoutImportsFile.path));
+
+    const withoutImportsDocument = new loc.SedDocument(withoutImportsFile);
+    const withoutImportsInstance = withoutImportsDocument.instantiate();
+
+    assert.strictEqual(withImportsInstance.hasIssues, false);
+    assert.strictEqual(withoutImportsInstance.hasIssues, false);
+
+    withImportsInstance.run();
+    withoutImportsInstance.run();
+
+    assert.strictEqual(withImportsInstance.hasIssues, false);
+    assert.strictEqual(withoutImportsInstance.hasIssues, false);
+
+    const withImportsTask = withImportsInstance.tasks[0];
+    const withoutImportsTask = withoutImportsInstance.tasks[0];
+
+    assert.ok(withImportsTask.voi.length > 1);
+    assert.strictEqual(withImportsTask.voi.length, withoutImportsTask.voi.length);
+    assert.strictEqual(withImportsTask.stateCount, withoutImportsTask.stateCount);
+
+    for (let i = 0; i < withImportsTask.voi.length; ++i) {
+      assert.strictEqual(withImportsTask.voi[i], withoutImportsTask.voi[i]);
+    }
+
+    for (let i = 0; i < withImportsTask.stateCount; ++i) {
+      for (let j = 0; j < withImportsTask.voi.length; ++j) {
+        assert.strictEqual(withImportsTask.state(i)[j], withoutImportsTask.state(i)[j]);
+      }
+    }
+  });
+
   test('Invalid CellML file', () => {
     const file = new loc.File(utils.resourcePath('error.cellml'));
 

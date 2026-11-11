@@ -166,6 +166,43 @@ TEST(InstanceSedTest, combineArchiveWithCellmlFileWithImports)
     }
 }
 
+TEST(InstanceSedTest, hh52WithImports)
+{
+    auto withImportsFile {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/hh52_with_imports.omex"))};
+    auto withImportsDocument {libOpenCOR::SedDocument::create(withImportsFile)};
+    auto withImportsInstance {withImportsDocument->instantiate()};
+
+    auto withoutImportsFile {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/hh52_without_imports.omex"))};
+    auto withoutImportsDocument {libOpenCOR::SedDocument::create(withoutImportsFile)};
+    auto withoutImportsInstance {withoutImportsDocument->instantiate()};
+
+    EXPECT_FALSE(withImportsInstance->hasIssues());
+    EXPECT_FALSE(withoutImportsInstance->hasIssues());
+
+    withImportsInstance->run();
+    withoutImportsInstance->run();
+
+    EXPECT_FALSE(withImportsInstance->hasIssues());
+    EXPECT_FALSE(withoutImportsInstance->hasIssues());
+
+    const auto &withImportsTask {withImportsInstance->tasks()[0]};
+    const auto &withoutImportsTask {withoutImportsInstance->tasks()[0]};
+
+    GTEST_ASSERT_GT(withImportsTask->voi().size(), 1U);
+    GTEST_ASSERT_EQ(withImportsTask->voi().size(), withoutImportsTask->voi().size());
+    GTEST_ASSERT_EQ(withImportsTask->stateCount(), withoutImportsTask->stateCount());
+
+    for (size_t i {0}; i < withImportsTask->voi().size(); ++i) {
+        EXPECT_DOUBLE_EQ(withImportsTask->voi()[i], withoutImportsTask->voi()[i]);
+    }
+
+    for (size_t i {0}; i < withImportsTask->stateCount(); ++i) {
+        for (size_t j {0}; j < withImportsTask->voi().size(); ++j) {
+            EXPECT_DOUBLE_EQ(withImportsTask->state(i)[j], withoutImportsTask->state(i)[j]);
+        }
+    }
+}
+
 TEST(InstanceSedTest, invalidCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
