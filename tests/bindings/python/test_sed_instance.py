@@ -69,6 +69,71 @@ def test_cellml_file_with_invalid_imports():
     assert instance.issues[0].description.startswith(importer_error_start)
 
 
+def test_cellml_file_with_imports():
+    # Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+
+    file = loc.File(
+        utils.resource_path("support/cellml/model_with_nested_imports/model.cellml")
+    )
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+    state = instance_task.state(0)
+
+    assert len(voi) > 1
+
+    for i in range(len(voi)):
+        assert math.isclose(state[i], math.exp(-voi[i]), abs_tol=1e-5)
+
+
+def test_cellml_file_with_in_memory_imports():
+    # Note #1: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+    # Note #2: the imported files are only available in memory, so they must be available before the contents of the
+    #          importing file are set.
+
+    base_url = "https://example.com/model_with_nested_imports/"
+    files = []
+
+    for file_name in ["units.cellml", "components/component.cellml", "model.cellml"]:
+        file = loc.File(base_url + file_name, False)
+
+        file.contents = utils.text_to_list(
+            utils.text_file_contents(
+                utils.resource_path(
+                    "support/cellml/model_with_nested_imports/" + file_name
+                )
+            )
+        )
+
+        files.append(file)
+
+    document = loc.SedDocument(files[-1])
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+    state = instance_task.state(0)
+
+    assert len(voi) > 1
+
+    for i in range(len(voi)):
+        assert math.isclose(state[i], math.exp(-voi[i]), abs_tol=1e-5)
+
+
 def test_combine_archive_with_cellml_file_with_imports():
     # Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
 

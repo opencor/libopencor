@@ -76,6 +76,42 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.issue(0).description.startsWith(IMPORTER_ERROR_START), true);
   });
 
+  test('CellML file with in-memory imports', () => {
+    // Note #1: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+    // Note #2: the imported files are only available in memory, so they must be available before the contents of the
+    //          importing file are set.
+
+    const baseUrl = 'https://example.com/model_with_nested_imports/';
+    const files = [];
+
+    for (const fileName of ['units.cellml', 'components/component.cellml', 'model.cellml']) {
+      const file = new loc.File(baseUrl + fileName);
+
+      file.setContents(utils.fileContents(utils.resourcePath(`support/cellml/model_with_nested_imports/${fileName}`)));
+
+      files.push(file);
+    }
+
+    const document = new loc.SedDocument(files[files.length - 1]);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+    const voi = instanceTask.voi;
+    const state = instanceTask.state(0);
+
+    assert.ok(voi.length > 1);
+
+    for (let i = 0; i < voi.length; ++i) {
+      assert.ok(Math.abs(state[i] - Math.exp(-voi[i])) < 1e-5);
+    }
+  });
+
   test('COMBINE archive with CellML file with imports', () => {
     // Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
 

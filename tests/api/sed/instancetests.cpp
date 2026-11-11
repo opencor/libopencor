@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "utils.h"
+
 #include "tests/utils.h"
 
 #include <libopencor>
@@ -68,6 +70,73 @@ TEST(InstanceSedTest, cellmlFileWithInvalidImports)
     GTEST_ASSERT_EQ(instance->issueCount(), 1U);
     EXPECT_EQ(instance->issue(0)->type(), libOpenCOR::Issue::Type::ERROR);
     EXPECT_EQ(instance->issue(0)->description().substr(0, IMPORTER_ERROR_START.size()), IMPORTER_ERROR_START);
+}
+
+TEST(InstanceSedTest, cellmlFileWithImports)
+{
+    // Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+
+    static constexpr auto ABS_TOL {1e-5};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_nested_imports/model.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto &voi {instanceTask->voi()};
+    const auto &state {instanceTask->state(0)};
+
+    GTEST_ASSERT_GT(voi.size(), 1U);
+
+    for (size_t i {0}; i < voi.size(); ++i) {
+        EXPECT_NEAR(state[i], std::exp(-voi[i]), ABS_TOL);
+    }
+}
+
+TEST(InstanceSedTest, cellmlFileWithInMemoryImports)
+{
+    // Note #1: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+    // Note #2: the imported files are only available in memory, so they must be available before the contents of the
+    //          importing file are set.
+
+    static constexpr auto ABS_TOL {1e-5};
+    static const std::string BASE_URL {"https://example.com/model_with_nested_imports/"};
+    static const std::vector<std::string> FILE_NAMES {"units.cellml", "components/component.cellml", "model.cellml"};
+
+    libOpenCOR::FilePtrs files;
+
+    for (const auto &fileName : FILE_NAMES) {
+        auto file {libOpenCOR::File::create(BASE_URL + fileName, false)};
+
+        file->setContents(libOpenCOR::fileContents(libOpenCOR::resourcePath("support/cellml/model_with_nested_imports/" + fileName)));
+
+        files.push_back(file);
+    }
+
+    auto document {libOpenCOR::SedDocument::create(files.back())};
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto &voi {instanceTask->voi()};
+    const auto &state {instanceTask->state(0)};
+
+    GTEST_ASSERT_GT(voi.size(), 1U);
+
+    for (size_t i {0}; i < voi.size(); ++i) {
+        EXPECT_NEAR(state[i], std::exp(-voi[i]), ABS_TOL);
+    }
 }
 
 TEST(InstanceSedTest, combineArchiveWithCellmlFileWithImports)
