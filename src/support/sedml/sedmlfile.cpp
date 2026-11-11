@@ -53,47 +53,10 @@ limitations under the License.
 namespace libOpenCOR {
 
 SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
-    : mIsLocalLocation(pFile->url().empty())
+    : mLocation(fileLocation(pFile->url().empty(), pFile->url().empty() ? pFile->fileName() : pFile->url()))
     , mDocument(pDocument)
     , mContents(toString(pFile->contents()))
 {
-    // Determine the location of the SED-ML file, i.e. what a relative model source is relative to.
-    // Note: for a remote SED-ML file, we must not use std::filesystem::path since its separators are platform specific
-    //       (e.g., "https://example.com/dir" would become "https:\\example.com\dir" on Windows) and since the query
-    //       and/or fragment of the URL, if any, may contain forward slashes.
-
-    const auto &url {pFile->url()};
-
-    if (mIsLocalLocation) {
-        mFileName = pFile->fileName();
-        mLocation = pathToString(stringToPath(mFileName).parent_path());
-
-        if (!mLocation.empty()) {
-            mLocation += "/";
-        }
-    } else {
-        // Note #1: the URL may have no path (e.g., "https://example.com?a=b"), in which case its location is its root
-        //          (e.g., "https://example.com/").
-        // Note #2: we also keep track of the scheme (e.g., "https:") and origin (e.g., "https://example.com") of the
-        //          URL, as well as of the URL without its query and fragment (e.g.,
-        //          "https://example.com/dir/file.sedml") and without its fragment (e.g.,
-        //          "https://example.com/dir/file.sedml?a=b"), which a network-path, an absolute-path, a query-only, and
-        //          a fragment-only model source, respectively, are relative to (see populateDocument()).
-
-        static constexpr std::string_view SCHEME_SEPARATOR {"://"};
-
-        mUrlWithoutQueryAndFragment = url.substr(0, url.find_first_of("?#"));
-        mUrlWithoutFragment = url.substr(0, url.find('#'));
-
-        auto schemeSeparatorPos {mUrlWithoutQueryAndFragment.find(SCHEME_SEPARATOR)};
-        auto pathPos {mUrlWithoutQueryAndFragment.find('/', schemeSeparatorPos + SCHEME_SEPARATOR.size())};
-
-        mLocation = (pathPos == std::string::npos) ?
-                        mUrlWithoutQueryAndFragment + "/" :
-                        mUrlWithoutQueryAndFragment.substr(0, mUrlWithoutQueryAndFragment.rfind('/') + 1);
-        mUrlScheme = mUrlWithoutQueryAndFragment.substr(0, schemeSeparatorPos + 1);
-        mUrlOrigin = mUrlWithoutQueryAndFragment.substr(0, pathPos);
-    }
 }
 
 SedmlFile::Impl::~Impl()
@@ -387,39 +350,13 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
     for (unsigned int i {0}; i < mDocument->getNumModels(); ++i) {
         auto source {mDocument->getModel(i)->getSource()};
 
-        // Note #1: a relative model source is relative to the SED-ML file, not to the current working directory, so we
-        //          only canonicalise it once we have resolved it against the location of the SED-ML file (see
-        //          FileManager::file() and File::create()).
-        // Note #2: a model source is a URI reference (see https://www.rfc-editor.org/rfc/rfc3986#section-4.1), so it
-        //          may be percent-encoded (e.g., "my%20model.cellml"). If the SED-ML file is a local file and the model
-        //          source is a file name (i.e. neither a URL nor a "file" URL, which path is decoded by
-        //          retrieveFileInfo()) then we must decode the model source to get the file name of the model. We must,
-        //          however, do this after having checked whether the model source is relative since a percent-encoded
-        //          forward slash (i.e. "%2F") must not make a relative model source absolute. If the SED-ML file is a
-        //          remote file then a relative model source is decoded as part of the URL of the model (see
-        //          retrieveFileInfo()).
-        // Note #3: if the SED-ML file is a remote file then a model source that is a file name is never a local file
-        //          name, but a reference that is relative to the URL of the SED-ML file, i.e. a network-path reference
-        //          (e.g., "//example.org/models/model.cellml") is relative to its scheme, an absolute-path reference
-        //          (e.g., "/models/model.cellml") to its origin, a query-only reference (e.g., "?model=1") to its URL
-        //          without its query and fragment, a fragment-only reference (e.g., "#model") to its URL without its
-        //          fragment, and a relative-path reference (e.g., "../models/model.cellml") to its location (see
-        //          https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2).
-        // Note #4: a model source with a scheme other than "http", "https", or "file" (e.g.,
-        //          "urn:miriam:biomodels.db:BIOMD0000000012") is an absolute URI (see
-        //          https://www.rfc-editor.org/rfc/rfc3986#section-4.3), not a reference that is relative to the SED-ML
-        //          file. We cannot retrieve such a model, so we ignore it.
-        // Note #5: if the SED-ML file is a local file and the model source is a file name then the query and fragment
-        //          of the model source (e.g., "?a=b" and "#c" in "model.cellml?a=b#c") are not part of its path, so we
-        //          ignore them (see retrieveFileInfo()). A query-only or fragment-only model source (e.g., "?model=1"
-        //          or "#model") therefore refers to the SED-ML file itself (see
-        //          https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2).
+        // Note: a model source is a URI reference that is relative to the SED-ML file (see resolveUriReference()). A
+        //       model source with a scheme other than "http", "https", or "file" (e.g.,
+        //       "urn:miriam:biomodels.db:BIOMD0000000012") cannot be retrieved, so we ignore it.
 
-        auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(source, false)};
-        auto isRelativeFileName {isLocalFile && !stringToPath(fileNameOrUrl).has_root_directory()};
-        auto isFileName {isLocalFile && (fileNameOrUrl == source)};
+        auto resolvedSource {resolveUriReference(mLocation, source)};
 
-        if (isFileName && hasScheme(source)) {
+        if (!resolvedSource.has_value()) {
             std::string warning;
 
             warning.reserve(source.size() + 64); // NOLINT
@@ -433,29 +370,8 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
             continue;
         }
 
-        if (mIsLocalLocation && isFileName) {
-            fileNameOrUrl = decodeUrl(fileNameOrUrl.substr(0, fileNameOrUrl.find_first_of("?#")));
-        }
+        const auto &modelSource {*resolvedSource};
 
-        std::string modelSource;
-
-        if (!mIsLocalLocation && isFileName) {
-            if (source.starts_with("//")) {
-                modelSource = mUrlScheme + source;
-            } else if (source.starts_with('/')) {
-                modelSource = mUrlOrigin + source;
-            } else if (source.starts_with('?')) {
-                modelSource = mUrlWithoutQueryAndFragment + source;
-            } else if (source.starts_with('#')) {
-                modelSource = mUrlWithoutFragment + source;
-            } else {
-                modelSource = mLocation + source;
-            }
-        } else if (mIsLocalLocation && isFileName && fileNameOrUrl.empty()) {
-            modelSource = mFileName;
-        } else {
-            modelSource = isRelativeFileName ? mLocation + fileNameOrUrl : fileNameOrUrl;
-        }
 #ifdef __EMSCRIPTEN__
         const auto &file {fileManager.fileFromFileNameOrUrl(modelSource)};
 #else

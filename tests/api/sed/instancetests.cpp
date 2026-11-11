@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "utils.h"
+
 #include "tests/utils.h"
 
 #include <libopencor>
@@ -68,6 +70,137 @@ TEST(InstanceSedTest, cellmlFileWithInvalidImports)
     GTEST_ASSERT_EQ(instance->issueCount(), 1U);
     EXPECT_EQ(instance->issue(0)->type(), libOpenCOR::Issue::Type::ERROR);
     EXPECT_EQ(instance->issue(0)->description().substr(0, IMPORTER_ERROR_START.size()), IMPORTER_ERROR_START);
+}
+
+TEST(InstanceSedTest, cellmlFileWithImports)
+{
+    // Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+
+    static constexpr auto ABS_TOL {1e-5};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_nested_imports/model.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto &voi {instanceTask->voi()};
+    const auto &state {instanceTask->state(0)};
+
+    GTEST_ASSERT_GT(voi.size(), 1U);
+
+    for (size_t i {0}; i < voi.size(); ++i) {
+        EXPECT_NEAR(state[i], std::exp(-voi[i]), ABS_TOL);
+    }
+}
+
+TEST(InstanceSedTest, cellmlFileWithInMemoryImports)
+{
+    // Note #1: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+    // Note #2: the imported files are only available in memory, so they must be available before the contents of the
+    //          importing file are set.
+
+    static constexpr auto ABS_TOL {1e-5};
+    static const std::string BASE_URL {"https://example.com/model_with_nested_imports/"};
+    static const std::vector<std::string> FILE_NAMES {"units.cellml", "components/component.cellml", "model.cellml"};
+
+    libOpenCOR::FilePtrs files;
+
+    for (const auto &fileName : FILE_NAMES) {
+        auto file {libOpenCOR::File::create(BASE_URL + fileName, false)};
+
+        file->setContents(libOpenCOR::fileContents(libOpenCOR::resourcePath("support/cellml/model_with_nested_imports/" + fileName)));
+
+        files.push_back(file);
+    }
+
+    auto document {libOpenCOR::SedDocument::create(files.back())};
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto &voi {instanceTask->voi()};
+    const auto &state {instanceTask->state(0)};
+
+    GTEST_ASSERT_GT(voi.size(), 1U);
+
+    for (size_t i {0}; i < voi.size(); ++i) {
+        EXPECT_NEAR(state[i], std::exp(-voi[i]), ABS_TOL);
+    }
+}
+
+TEST(InstanceSedTest, combineArchiveWithCellmlFileWithImports)
+{
+    // Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+
+    static constexpr auto ABS_TOL {1e-5};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/combine/model_with_nested_imports.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto &voi {instanceTask->voi()};
+    const auto &state {instanceTask->state(0)};
+
+    GTEST_ASSERT_GT(voi.size(), 1U);
+
+    for (size_t i {0}; i < voi.size(); ++i) {
+        EXPECT_NEAR(state[i], std::exp(-voi[i]), ABS_TOL);
+    }
+}
+
+TEST(InstanceSedTest, hh52WithImports)
+{
+    auto withImportsFile {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/hh52_with_imports.omex"))};
+    auto withImportsDocument {libOpenCOR::SedDocument::create(withImportsFile)};
+    auto withImportsInstance {withImportsDocument->instantiate()};
+
+    auto withoutImportsFile {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/hh52_without_imports.omex"))};
+    auto withoutImportsDocument {libOpenCOR::SedDocument::create(withoutImportsFile)};
+    auto withoutImportsInstance {withoutImportsDocument->instantiate()};
+
+    EXPECT_FALSE(withImportsInstance->hasIssues());
+    EXPECT_FALSE(withoutImportsInstance->hasIssues());
+
+    withImportsInstance->run();
+    withoutImportsInstance->run();
+
+    EXPECT_FALSE(withImportsInstance->hasIssues());
+    EXPECT_FALSE(withoutImportsInstance->hasIssues());
+
+    const auto &withImportsTask {withImportsInstance->tasks()[0]};
+    const auto &withoutImportsTask {withoutImportsInstance->tasks()[0]};
+
+    GTEST_ASSERT_GT(withImportsTask->voi().size(), 1U);
+    GTEST_ASSERT_EQ(withImportsTask->voi().size(), withoutImportsTask->voi().size());
+    GTEST_ASSERT_EQ(withImportsTask->stateCount(), withoutImportsTask->stateCount());
+
+    for (size_t i {0}; i < withImportsTask->voi().size(); ++i) {
+        EXPECT_DOUBLE_EQ(withImportsTask->voi()[i], withoutImportsTask->voi()[i]);
+    }
+
+    for (size_t i {0}; i < withImportsTask->stateCount(); ++i) {
+        for (size_t j {0}; j < withImportsTask->voi().size(); ++j) {
+            EXPECT_DOUBLE_EQ(withImportsTask->state(i)[j], withoutImportsTask->state(i)[j]);
+        }
+    }
 }
 
 TEST(InstanceSedTest, invalidCellmlFile)
@@ -345,18 +478,18 @@ TEST(InstanceSedTest, stopRunResultsHaveNans)
 
     const auto &instanceTask {instance->tasks()[0]};
     const auto &voi {instanceTask->voi()};
-    const auto &state0 {instanceTask->state(0)};
+    const auto &state {instanceTask->state(0)};
 
-    EXPECT_EQ(voi.size(), state0.size());
+    EXPECT_EQ(voi.size(), state.size());
     EXPECT_EQ(voi.size(), SIMULATION_PROPERTY + 1);
 
     EXPECT_FALSE(std::isnan(voi[0]));
-    EXPECT_FALSE(std::isnan(state0[0]));
+    EXPECT_FALSE(std::isnan(state[0]));
 
     size_t nanIndex {voi.size()};
 
     for (size_t i {1}; i < voi.size(); ++i) {
-        if (std::isnan(state0[i])) {
+        if (std::isnan(state[i])) {
             nanIndex = i;
 
             break;

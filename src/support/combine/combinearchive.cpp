@@ -74,6 +74,9 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
     FilePtr cellmlFile;
     FilePtr sedmlFile;
     std::unordered_map<std::string, size_t> fileIndexes;
+    Strings fileFormats;
+
+    fileFormats.reserve(fileCount);
 
     for (int i {0}; i < mArchive->getNumEntries(); ++i) {
         const auto *entry {mArchive->getEntry(i)};
@@ -181,25 +184,36 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
             contents = mArchive->extractEntryToBuffer(location);
         }
 
+        // Note: we only set the contents of the file for now, i.e. we don't check its type yet (see below).
+
         auto file {File::create(fileNameOrUrl)};
 
-        file->setContents(contents);
+        file->pimpl()->setContents(contents);
 
         mFiles.push_back(file);
         mFileNames.push_back(location);
+        fileFormats.push_back(entry->getFormat());
 
         if (entry->getMaster()) {
             mMasterFile = file;
         }
+    }
 
-        // Determine the type of the file using its contents or, if they are not recognised (e.g., malformed XML), using
-        // the format specified in the manifest. This means that a broken SED-ML file is still considered to be a SED-ML
-        // file and, as such, cannot be silently ignored in favour of a CellML file.
+    // Determine the type of each file using its contents or, if they are not recognised (e.g., malformed XML), using
+    // the format specified in the manifest. This means that a broken SED-ML file is still considered to be a SED-ML
+    // file and, as such, cannot be silently ignored in favour of a CellML file.
+    // Note: we do this only once the contents of all the files have been set since a CellML file may import another
+    //       CellML file from the COMBINE archive, and that file may come after it in the manifest.
+
+    for (size_t i {0}; i < mFiles.size(); ++i) {
+        const auto &file {mFiles[i]};
+
+        file->pimpl()->checkType(file, true);
 
         auto fileType {file->type()};
 
         if (fileType == File::Type::UNKNOWN_FILE) {
-            const auto &format {entry->getFormat()};
+            const auto &format {fileFormats[i]};
 
             if (isCellmlFormat(format)) {
                 fileType = File::Type::CELLML_FILE;

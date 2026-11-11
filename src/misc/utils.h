@@ -26,6 +26,7 @@ limitations under the License.
 #    include <cassert>
 #endif
 #include <filesystem>
+#include <optional>
 #include <unordered_map>
 #include <libcellml>
 
@@ -100,6 +101,20 @@ std::tuple<bool, std::string> LIBOPENCOR_UNIT_TESTING_EXPORT retrieveFileInfo(co
 std::string relativePath(const std::string &pPath, const std::string &pBasePath);
 std::string urlPath(const std::string &pPath);
 bool LIBOPENCOR_UNIT_TESTING_EXPORT hasScheme(const std::string &pUriReference);
+
+struct FileLocation
+{
+    bool isLocal {true};
+    std::string fileName;
+    std::string location;
+    std::string urlScheme;
+    std::string urlOrigin;
+    std::string urlWithoutQueryAndFragment;
+    std::string urlWithoutFragment;
+};
+
+FileLocation fileLocation(bool pIsLocalFile, const std::string &pFileNameOrUrl);
+std::optional<std::string> resolveUriReference(const FileLocation &pFileLocation, const std::string &pUriReference);
 
 #ifndef __EMSCRIPTEN__
 std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);

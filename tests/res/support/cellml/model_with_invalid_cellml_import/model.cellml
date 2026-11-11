@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="model" xmlns="http://www.cellml.org/cellml/2.0#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <import xlink:href="units.cellml">
+        <units units_ref="per_second" name="per_second"/>
+    </import>
+    <component name="component">
+        <variable name="k" units="per_second" initial_value="3"/>
+    </component>
+</model>

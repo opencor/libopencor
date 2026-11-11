@@ -34,6 +34,8 @@ public:
 
     explicit Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict);
 
+    void resolveImports(const FilePtr &pFile, bool pStrict);
+
     void populateDocument(const SedDocumentPtr &pDocument) const;
 
     libcellml::AnalyserModel::Type type() const;

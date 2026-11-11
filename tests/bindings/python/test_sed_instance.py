@@ -69,6 +69,134 @@ def test_cellml_file_with_invalid_imports():
     assert instance.issues[0].description.startswith(importer_error_start)
 
 
+def test_cellml_file_with_imports():
+    # Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+
+    file = loc.File(
+        utils.resource_path("support/cellml/model_with_nested_imports/model.cellml")
+    )
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+    state = instance_task.state(0)
+
+    assert len(voi) > 1
+
+    for i in range(len(voi)):
+        assert math.isclose(state[i], math.exp(-voi[i]), abs_tol=1e-5)
+
+
+def test_cellml_file_with_in_memory_imports():
+    # Note #1: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+    # Note #2: the imported files are only available in memory, so they must be available before the contents of the
+    #          importing file are set.
+
+    base_url = "https://example.com/model_with_nested_imports/"
+    files = []
+
+    for file_name in ["units.cellml", "components/component.cellml", "model.cellml"]:
+        file = loc.File(base_url + file_name, False)
+
+        file.contents = utils.text_to_list(
+            utils.text_file_contents(
+                utils.resource_path(
+                    "support/cellml/model_with_nested_imports/" + file_name
+                )
+            )
+        )
+
+        files.append(file)
+
+    document = loc.SedDocument(files[-1])
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+    state = instance_task.state(0)
+
+    assert len(voi) > 1
+
+    for i in range(len(voi)):
+        assert math.isclose(state[i], math.exp(-voi[i]), abs_tol=1e-5)
+
+
+def test_combine_archive_with_cellml_file_with_imports():
+    # Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+
+    file = loc.File(
+        utils.resource_path("support/combine/model_with_nested_imports.omex")
+    )
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+    state = instance_task.state(0)
+
+    assert len(voi) > 1
+
+    for i in range(len(voi)):
+        assert math.isclose(state[i], math.exp(-voi[i]), abs_tol=1e-5)
+
+
+def test_hh52_with_imports():
+    with_imports_file = loc.File(utils.resource_path("api/file/hh52_with_imports.omex"))
+    with_imports_document = loc.SedDocument(with_imports_file)
+    with_imports_instance = with_imports_document.instantiate()
+
+    without_imports_file = loc.File(
+        utils.resource_path("api/file/hh52_without_imports.omex")
+    )
+    without_imports_document = loc.SedDocument(without_imports_file)
+    without_imports_instance = without_imports_document.instantiate()
+
+    assert not with_imports_instance.has_issues
+    assert not without_imports_instance.has_issues
+
+    with_imports_instance.run()
+    without_imports_instance.run()
+
+    assert not with_imports_instance.has_issues
+    assert not without_imports_instance.has_issues
+
+    with_imports_task = with_imports_instance.tasks[0]
+    without_imports_task = without_imports_instance.tasks[0]
+
+    assert len(with_imports_task.voi) > 1
+    assert len(with_imports_task.voi) == len(without_imports_task.voi)
+    assert with_imports_task.state_count == without_imports_task.state_count
+
+    for i in range(len(with_imports_task.voi)):
+        assert math.isclose(with_imports_task.voi[i], without_imports_task.voi[i])
+
+    for i in range(with_imports_task.state_count):
+        for j in range(len(with_imports_task.voi)):
+            assert math.isclose(
+                with_imports_task.state(i)[j],
+                without_imports_task.state(i)[j],
+            )
+
+
 def test_invalid_cellml_file():
     expected_issues = [
         [
@@ -353,18 +481,18 @@ def test_stop_run_results_have_nans():
 
     instance_task = instance.tasks[0]
     voi = instance_task.voi
-    state0 = instance_task.state(0)
+    state = instance_task.state(0)
 
-    assert len(voi) == len(state0)
+    assert len(voi) == len(state)
     assert len(voi) == SIMULATION_PROPERTY + 1
 
     assert not math.isnan(voi[0])
-    assert not math.isnan(state0[0])
+    assert not math.isnan(state[0])
 
     nan_index = len(voi)
 
     for i in range(1, len(voi)):
-        if math.isnan(state0[i]):
+        if math.isnan(state[i]):
             nan_index = i
 
             break

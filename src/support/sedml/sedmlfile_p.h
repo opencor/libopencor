@@ -36,13 +36,7 @@ struct NlaSolverInfo
 class SedmlFile::Impl: public Logger::Impl
 {
 public:
-    std::string mFileName;
-    std::string mLocation;
-    std::string mUrlScheme;
-    std::string mUrlOrigin;
-    std::string mUrlWithoutQueryAndFragment;
-    std::string mUrlWithoutFragment;
-    bool mIsLocalLocation;
+    FileLocation mLocation;
     libsedml::SedDocument *mDocument;
     std::string mContents;
 

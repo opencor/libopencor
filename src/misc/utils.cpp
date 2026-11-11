@@ -983,6 +983,119 @@ bool hasScheme(const std::string &pUriReference)
     });
 }
 
+FileLocation fileLocation(bool pIsLocalFile, const std::string &pFileNameOrUrl)
+{
+    // Determine the location of a file, i.e. what a relative URI reference in that file is relative to.
+    // Note: for a remote file, we must not use std::filesystem::path since its separators are platform specific (e.g.,
+    //       "https://example.com/dir" would become "https:\\example.com\dir" on Windows) and since the query and/or
+    //       fragment of the URL, if any, may contain forward slashes.
+
+    FileLocation res;
+
+    res.isLocal = pIsLocalFile;
+
+    if (pIsLocalFile) {
+        res.fileName = pFileNameOrUrl;
+        res.location = pathToString(stringToPath(pFileNameOrUrl).parent_path());
+
+        if (!res.location.empty()) {
+            res.location += "/";
+        }
+    } else {
+        // Note #1: the URL may have no path (e.g., "https://example.com?a=b"), in which case its location is its root
+        //          (e.g., "https://example.com/").
+        // Note #2: we also keep track of the scheme (e.g., "https:") and origin (e.g., "https://example.com") of the
+        //          URL, as well as of the URL without its query and fragment (e.g., "https://example.com/dir/file.xml")
+        //          and without its fragment (e.g., "https://example.com/dir/file.xml?a=b"), which a network-path, an
+        //          absolute-path, a query-only, and a fragment-only URI reference, respectively, are relative to (see
+        //          resolveUriReference()).
+
+        static constexpr std::string_view SCHEME_SEPARATOR {"://"};
+
+        res.urlWithoutQueryAndFragment = pFileNameOrUrl.substr(0, pFileNameOrUrl.find_first_of("?#"));
+        res.urlWithoutFragment = pFileNameOrUrl.substr(0, pFileNameOrUrl.find('#'));
+
+        auto schemeSeparatorPos {res.urlWithoutQueryAndFragment.find(SCHEME_SEPARATOR)};
+        auto pathPos {res.urlWithoutQueryAndFragment.find('/', schemeSeparatorPos + SCHEME_SEPARATOR.size())};
+
+        res.location = (pathPos == std::string::npos) ?
+                           res.urlWithoutQueryAndFragment + "/" :
+                           res.urlWithoutQueryAndFragment.substr(0, res.urlWithoutQueryAndFragment.rfind('/') + 1);
+        res.urlScheme = res.urlWithoutQueryAndFragment.substr(0, schemeSeparatorPos + 1);
+        res.urlOrigin = res.urlWithoutQueryAndFragment.substr(0, pathPos);
+    }
+
+    return res;
+}
+
+std::optional<std::string> resolveUriReference(const FileLocation &pFileLocation, const std::string &pUriReference)
+{
+    // Resolve the given URI reference against the given file location.
+    // Note #1: a relative URI reference is relative to the file, not to the current working directory, so we only
+    //          canonicalise it once we have resolved it against the location of the file (see FileManager::file() and
+    //          File::create()).
+    // Note #2: a URI reference (see https://www.rfc-editor.org/rfc/rfc3986#section-4.1) may be percent-encoded (e.g.,
+    //          "my%20model.cellml"). If the file is a local file and the URI reference is a file name (i.e. neither a
+    //          URL nor a "file" URL, which path is decoded by retrieveFileInfo()) then we must decode the URI reference
+    //          to get the corresponding file name. We must, however, do this after having checked whether the URI
+    //          reference is relative since a percent-encoded forward slash (i.e. "%2F") must not make a relative URI
+    //          reference absolute. If the file is a remote file then a relative URI reference is decoded as part of
+    //          the resolved URL (see retrieveFileInfo()).
+    // Note #3: if the file is a remote file then a URI reference that is a file name is never a local file name, but a
+    //          reference that is relative to the URL of the file, i.e. a network-path reference (e.g.,
+    //          "//example.org/models/model.cellml") is relative to its scheme, an absolute-path reference (e.g.,
+    //          "/models/model.cellml") to its origin, a query-only reference (e.g., "?model=1") to its URL without its
+    //          query and fragment, a fragment-only reference (e.g., "#model") to its URL without its fragment, and a
+    //          relative-path reference (e.g., "../models/model.cellml") to its location (see
+    //          https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2).
+    // Note #4: a URI reference with a scheme other than "http", "https", or "file" (e.g.,
+    //          "urn:miriam:biomodels.db:BIOMD0000000012") is an absolute URI (see
+    //          https://www.rfc-editor.org/rfc/rfc3986#section-4.3), not a reference that is relative to the file. We
+    //          cannot retrieve such a file, so we return no resolved URI reference.
+    // Note #5: if the file is a local file and the URI reference is a file name then the query and fragment of the URI
+    //          reference (e.g., "?a=b" and "#c" in "model.cellml?a=b#c") are not part of its path, so we ignore them
+    //          (see retrieveFileInfo()). A query-only or fragment-only URI reference (e.g., "?model=1" or "#model")
+    //          therefore refers to the file itself (see https://www.rfc-editor.org/rfc/rfc3986#section-5.2.2).
+
+    auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(pUriReference, false)};
+    auto isRelativeFileName {isLocalFile && !stringToPath(fileNameOrUrl).has_root_directory()};
+    auto isFileName {isLocalFile && (fileNameOrUrl == pUriReference)};
+
+    if (isFileName && hasScheme(pUriReference)) {
+        return std::nullopt;
+    }
+
+    if (pFileLocation.isLocal && isFileName) {
+        fileNameOrUrl = decodeUrl(fileNameOrUrl.substr(0, fileNameOrUrl.find_first_of("?#")));
+    }
+
+    if (!pFileLocation.isLocal && isFileName) {
+        if (pUriReference.starts_with("//")) {
+            return pFileLocation.urlScheme + pUriReference;
+        }
+
+        if (pUriReference.starts_with('/')) {
+            return pFileLocation.urlOrigin + pUriReference;
+        }
+
+        if (pUriReference.starts_with('?')) {
+            return pFileLocation.urlWithoutQueryAndFragment + pUriReference;
+        }
+
+        if (pUriReference.starts_with('#')) {
+            return pFileLocation.urlWithoutFragment + pUriReference;
+        }
+
+        return pFileLocation.location + pUriReference;
+    }
+
+    if (pFileLocation.isLocal && isFileName && fileNameOrUrl.empty()) {
+        return pFileLocation.fileName;
+    }
+
+    return isRelativeFileName ? pFileLocation.location + fileNameOrUrl : fileNameOrUrl;
+}
+
 #ifndef __EMSCRIPTEN__
 namespace {
 

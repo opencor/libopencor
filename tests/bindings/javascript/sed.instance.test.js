@@ -76,6 +76,111 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.issue(0).description.startsWith(IMPORTER_ERROR_START), true);
   });
 
+  test('CellML file with in-memory imports', () => {
+    // Note #1: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+    // Note #2: the imported files are only available in memory, so they must be available before the contents of the
+    //          importing file are set.
+
+    const baseUrl = 'https://example.com/model_with_nested_imports/';
+    const files = [];
+
+    for (const fileName of ['units.cellml', 'components/component.cellml', 'model.cellml']) {
+      const file = new loc.File(baseUrl + fileName);
+
+      file.setContents(utils.fileContents(utils.resourcePath(`support/cellml/model_with_nested_imports/${fileName}`)));
+
+      files.push(file);
+    }
+
+    const document = new loc.SedDocument(files[files.length - 1]);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+    const voi = instanceTask.voi;
+    const state = instanceTask.state(0);
+
+    assert.ok(voi.length > 1);
+
+    for (let i = 0; i < voi.length; ++i) {
+      assert.ok(Math.abs(state[i] - Math.exp(-voi[i])) < 1e-5);
+    }
+  });
+
+  test('COMBINE archive with CellML file with imports', () => {
+    // Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+
+    const file = new loc.File(utils.resourcePath('support/combine/model_with_nested_imports.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+    const voi = instanceTask.voi;
+    const state = instanceTask.state(0);
+
+    assert.ok(voi.length > 1);
+
+    for (let i = 0; i < voi.length; ++i) {
+      assert.ok(Math.abs(state[i] - Math.exp(-voi[i])) < 1e-5);
+    }
+  });
+
+  test('HH52 with imports', () => {
+    const withImportsFile = new loc.File(utils.resourcePath('api/file/hh52_with_imports.omex'));
+
+    withImportsFile.setContents(utils.fileContents(withImportsFile.path));
+
+    const withImportsDocument = new loc.SedDocument(withImportsFile);
+    const withImportsInstance = withImportsDocument.instantiate();
+
+    const withoutImportsFile = new loc.File(utils.resourcePath('api/file/hh52_without_imports.omex'));
+
+    withoutImportsFile.setContents(utils.fileContents(withoutImportsFile.path));
+
+    const withoutImportsDocument = new loc.SedDocument(withoutImportsFile);
+    const withoutImportsInstance = withoutImportsDocument.instantiate();
+
+    assert.strictEqual(withImportsInstance.hasIssues, false);
+    assert.strictEqual(withoutImportsInstance.hasIssues, false);
+
+    withImportsInstance.run();
+    withoutImportsInstance.run();
+
+    assert.strictEqual(withImportsInstance.hasIssues, false);
+    assert.strictEqual(withoutImportsInstance.hasIssues, false);
+
+    const withImportsTask = withImportsInstance.tasks[0];
+    const withoutImportsTask = withoutImportsInstance.tasks[0];
+
+    assert.ok(withImportsTask.voi.length > 1);
+    assert.strictEqual(withImportsTask.voi.length, withoutImportsTask.voi.length);
+    assert.strictEqual(withImportsTask.stateCount, withoutImportsTask.stateCount);
+
+    for (let i = 0; i < withImportsTask.voi.length; ++i) {
+      assert.strictEqual(withImportsTask.voi[i], withoutImportsTask.voi[i]);
+    }
+
+    for (let i = 0; i < withImportsTask.stateCount; ++i) {
+      for (let j = 0; j < withImportsTask.voi.length; ++j) {
+        assert.strictEqual(withImportsTask.state(i)[j], withoutImportsTask.state(i)[j]);
+      }
+    }
+  });
+
   test('Invalid CellML file', () => {
     const file = new loc.File(utils.resourcePath('error.cellml'));
 
@@ -429,18 +534,18 @@ test.describe('Sed instance tests', () => {
 
     const instanceTask = instance.tasks[0];
     const voi = instanceTask.voi;
-    const state0 = instanceTask.state(0);
+    const state = instanceTask.state(0);
 
-    assert.strictEqual(voi.length, state0.length);
+    assert.strictEqual(voi.length, state.length);
     assert.strictEqual(voi.length, SIMULATION_PROPERTY + 1);
 
     assert.strictEqual(Number.isNaN(voi[0]), false);
-    assert.strictEqual(Number.isNaN(state0[0]), false);
+    assert.strictEqual(Number.isNaN(state[0]), false);
 
     let nanIndex = voi.length;
 
     for (let i = 1; i < voi.length; ++i) {
-      if (Number.isNaN(state0[i])) {
+      if (Number.isNaN(state[i])) {
         nanIndex = i;
 
         break;
