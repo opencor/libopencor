@@ -175,13 +175,16 @@ TEST(BasicCellmlTest, modelWithInvalidXmlImport)
 
 TEST(BasicCellmlTest, modelWithInvalidCellmlImport)
 {
-    // An imported model that is valid XML, but not valid CellML (it has an unknown element), is still added to the
-    // library of the importer (and, like libCellML, we don't report an issue for it).
+    // An imported model that is valid XML, but not valid CellML (it has an unknown element), is added to the library of
+    // the importer, so that its imports can be resolved, but its errors are reported.
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_invalid_cellml_import/model.cellml"))};
     auto cellmlFile {libOpenCOR::CellmlFile::create(file)};
 
-    EXPECT_FALSE(cellmlFile->hasIssues());
+    GTEST_ASSERT_EQ(cellmlFile->issueCount(), 1U);
+    EXPECT_EQ(cellmlFile->issue(0)->type(), libOpenCOR::Issue::Type::ERROR);
+    EXPECT_TRUE(cellmlFile->issue(0)->description().starts_with("Importer: the model at '"));
+    EXPECT_TRUE(cellmlFile->issue(0)->description().ends_with("units.cellml' is invalid: Model 'units' has an invalid child element 'unknown_element'."));
 }
 
 TEST(BasicCellmlTest, modelWithNullCharacterImport)

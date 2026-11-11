@@ -186,30 +186,49 @@ struct ImportingModel
 using ImportedFileContentsCache = std::unordered_map<std::string, std::optional<std::string>>;
 
 libcellml::ModelPtr retrieveImportedModel(ImportedFileContentsCache &pCache, bool pIsLocalFile,
-                                          const std::string &pFileNameOrUrl, bool pStrict)
+                                          const std::string &pFileNameOrUrl, bool pStrict, Strings &pErrors)
 {
     // Retrieve and parse an imported model, returning a null pointer if we cannot retrieve its contents or if it is not
     // valid XML (libCellML will report it).
-    // Note: the same file may be imported several times (with different keys), so we only retrieve its contents once.
+    // Note #1: the same file may be imported several times (with different keys), so we only retrieve its contents once
+    //          and report its errors, if any, once.
+    // Note #2: an imported model that has some errors (other than XML ones) is still returned, so that its imports can
+    //          be resolved, but we report its errors since libCellML doesn't (it doesn't parse the models that we have
+    //          retrieved).
 
+    libcellml::ModelPtr res;
     auto contents {pCache.find(pFileNameOrUrl)};
+    auto firstTime {contents == pCache.end()};
 
-    if (contents == pCache.end()) {
+    if (firstTime) {
         contents = pCache.emplace(pFileNameOrUrl, importedFileContents(pIsLocalFile, pFileNameOrUrl)).first;
     }
 
     if (!contents->second.has_value()) {
-        return nullptr;
+        return res;
     }
 
     auto parser {libcellml::Parser::create(pStrict)};
-    auto res {parser->parseModel(*contents->second)};
 
-    return hasXmlError(parser) ? nullptr : res;
+    res = parser->parseModel(*contents->second);
+
+    if (hasXmlError(parser)) {
+        res = nullptr;
+
+        return res;
+    }
+
+    if (firstTime) {
+        for (size_t i {0}; i < parser->errorCount(); ++i) {
+            pErrors.push_back("the model at '" + pFileNameOrUrl + "' is invalid: " + parser->error(i)->description());
+        }
+    }
+
+    return res;
 }
 
 void populateImporterLibrary(const libcellml::ImporterPtr &pImporter, const libcellml::ModelPtr &pModel,
-                             const FileLocation &pLocation, const std::string &pFileNameOrUrl)
+                             const FileLocation &pLocation, const std::string &pFileNameOrUrl, Strings &pErrors)
 {
     // Populate the library of the given importer with the models that are (directly or indirectly) imported by the
     // given model.
@@ -224,8 +243,10 @@ void populateImporterLibrary(const libcellml::ImporterPtr &pImporter, const libc
     //          forward slash) of its URL.
     // Note #3: we keep track of the files that lead to an imported model, so that we don't end up in an infinite loop
     //          in the case of an import cycle (which libCellML will report).
-    // Note #4: we don't report any issue. If we cannot retrieve or parse an imported model then we simply don't add it
-    //          to the library of the importer, and libCellML will report the issue when trying to resolve the imports.
+    // Note #4: if we cannot retrieve an imported model, or if it is not valid XML, then we simply don't add it to the
+    //          library of the importer, and libCellML will report the issue when trying to resolve the imports. On the
+    //          other hand, if an imported model has some other errors then we add it to the library, and report its
+    //          errors, if any, through the given errors.
 
     std::stack<ImportingModel> importingModels;
     ImportedFileContentsCache importedFileContentsCache;
@@ -268,7 +289,7 @@ void populateImporterLibrary(const libcellml::ImporterPtr &pImporter, const libc
 
             // Retrieve the imported model, skipping it if we cannot.
 
-            auto model {retrieveImportedModel(importedFileContentsCache, isLocalFile, fileNameOrUrl, pImporter->isStrict())};
+            auto model {retrieveImportedModel(importedFileContentsCache, isLocalFile, fileNameOrUrl, pImporter->isStrict(), pErrors)};
 
             if (model == nullptr) {
                 continue;
@@ -324,7 +345,13 @@ void CellmlFile::Impl::resolveImports(const FilePtr &pFile, bool pStrict)
     const auto &fileNameOrUrl {isLocalFile ? pFile->fileName() : pFile->url()};
     auto location {fileLocation(isLocalFile, fileNameOrUrl)};
 
-    populateImporterLibrary(importer, mModel, location, fileNameOrUrl);
+    Strings errors;
+
+    populateImporterLibrary(importer, mModel, location, fileNameOrUrl, errors);
+
+    for (const auto &error : errors) {
+        addError("Importer: " + error);
+    }
 
     if (importer->resolveImports(mModel, location.location)) {
         mModel = importer->flattenModel(mModel);
