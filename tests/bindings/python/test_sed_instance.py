@@ -69,6 +69,31 @@ def test_cellml_file_with_invalid_imports():
     assert instance.issues[0].description.startswith(importer_error_start)
 
 
+def test_combine_archive_with_cellml_file_with_imports():
+    # Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+
+    file = loc.File(
+        utils.resource_path("support/combine/model_with_nested_imports.omex")
+    )
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+    state = instance_task.state(0)
+
+    assert len(voi) > 1
+
+    for i in range(len(voi)):
+        assert math.isclose(state[i], math.exp(-voi[i]), abs_tol=1e-5)
+
+
 def test_invalid_cellml_file():
     expected_issues = [
         [
@@ -353,18 +378,18 @@ def test_stop_run_results_have_nans():
 
     instance_task = instance.tasks[0]
     voi = instance_task.voi
-    state0 = instance_task.state(0)
+    state = instance_task.state(0)
 
-    assert len(voi) == len(state0)
+    assert len(voi) == len(state)
     assert len(voi) == SIMULATION_PROPERTY + 1
 
     assert not math.isnan(voi[0])
-    assert not math.isnan(state0[0])
+    assert not math.isnan(state[0])
 
     nan_index = len(voi)
 
     for i in range(1, len(voi)):
-        if math.isnan(state0[i]):
+        if math.isnan(state[i]):
             nan_index = i
 
             break

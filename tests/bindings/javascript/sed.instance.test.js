@@ -76,6 +76,33 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.issue(0).description.startsWith(IMPORTER_ERROR_START), true);
   });
 
+  test('COMBINE archive with CellML file with imports', () => {
+    // Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+
+    const file = new loc.File(utils.resourcePath('support/combine/model_with_nested_imports.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+    const voi = instanceTask.voi;
+    const state = instanceTask.state(0);
+
+    assert.ok(voi.length > 1);
+
+    for (let i = 0; i < voi.length; ++i) {
+      assert.ok(Math.abs(state[i] - Math.exp(-voi[i])) < 1e-5);
+    }
+  });
+
   test('Invalid CellML file', () => {
     const file = new loc.File(utils.resourcePath('error.cellml'));
 
@@ -429,18 +456,18 @@ test.describe('Sed instance tests', () => {
 
     const instanceTask = instance.tasks[0];
     const voi = instanceTask.voi;
-    const state0 = instanceTask.state(0);
+    const state = instanceTask.state(0);
 
-    assert.strictEqual(voi.length, state0.length);
+    assert.strictEqual(voi.length, state.length);
     assert.strictEqual(voi.length, SIMULATION_PROPERTY + 1);
 
     assert.strictEqual(Number.isNaN(voi[0]), false);
-    assert.strictEqual(Number.isNaN(state0[0]), false);
+    assert.strictEqual(Number.isNaN(state[0]), false);
 
     let nanIndex = voi.length;
 
     for (let i = 1; i < voi.length; ++i) {
-      if (Number.isNaN(state0[i])) {
+      if (Number.isNaN(state[i])) {
         nanIndex = i;
 
         break;

@@ -64,6 +64,19 @@ TEST(BasicCellmlTest, modelWithNestedImports)
     EXPECT_EQ(cellmlFile->type(), libcellml::AnalyserModel::Type::ODE);
 }
 
+TEST(BasicCellmlTest, modelWithNestedImportsInCombineArchive)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/combine/model_with_nested_imports.omex"))};
+
+    EXPECT_FALSE(file->hasIssues());
+    EXPECT_EQ(file->childFileCount(), 3U);
+
+    auto cellmlFile {libOpenCOR::CellmlFile::create(file->childFile("model.cellml"))};
+
+    EXPECT_FALSE(cellmlFile->hasIssues());
+    EXPECT_EQ(cellmlFile->type(), libcellml::AnalyserModel::Type::ODE);
+}
+
 TEST(BasicCellmlTest, modelWithInMemoryImports)
 {
     static const std::string BASE_URL {"https://example.com/model_with_nested_imports/"};

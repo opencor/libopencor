@@ -70,6 +70,33 @@ TEST(InstanceSedTest, cellmlFileWithInvalidImports)
     EXPECT_EQ(instance->issue(0)->description().substr(0, IMPORTER_ERROR_START.size()), IMPORTER_ERROR_START);
 }
 
+TEST(InstanceSedTest, combineArchiveWithCellmlFileWithImports)
+{
+    // Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
+
+    static constexpr auto ABS_TOL {1e-5};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/combine/model_with_nested_imports.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto &voi {instanceTask->voi()};
+    const auto &state {instanceTask->state(0)};
+
+    GTEST_ASSERT_GT(voi.size(), 1U);
+
+    for (size_t i {0}; i < voi.size(); ++i) {
+        EXPECT_NEAR(state[i], std::exp(-voi[i]), ABS_TOL);
+    }
+}
+
 TEST(InstanceSedTest, invalidCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
@@ -345,18 +372,18 @@ TEST(InstanceSedTest, stopRunResultsHaveNans)
 
     const auto &instanceTask {instance->tasks()[0]};
     const auto &voi {instanceTask->voi()};
-    const auto &state0 {instanceTask->state(0)};
+    const auto &state {instanceTask->state(0)};
 
-    EXPECT_EQ(voi.size(), state0.size());
+    EXPECT_EQ(voi.size(), state.size());
     EXPECT_EQ(voi.size(), SIMULATION_PROPERTY + 1);
 
     EXPECT_FALSE(std::isnan(voi[0]));
-    EXPECT_FALSE(std::isnan(state0[0]));
+    EXPECT_FALSE(std::isnan(state[0]));
 
     size_t nanIndex {voi.size()};
 
     for (size_t i {1}; i < voi.size(); ++i) {
-        if (std::isnan(state0[i])) {
+        if (std::isnan(state[i])) {
             nanIndex = i;
 
             break;
