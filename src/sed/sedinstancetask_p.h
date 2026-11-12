@@ -24,7 +24,9 @@ limitations under the License.
 #include "libopencor/sedinstancetask.h"
 
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
+#include <cstdint>
 #include <mutex>
 #include <span>
 #include <utility>
@@ -41,6 +43,11 @@ enum InstanceRunControl : unsigned
     INSTANCE_RUN_CONTROL_PAUSE = 1 << 0,
     INSTANCE_RUN_CONTROL_STOP = 1 << 1,
 };
+
+// Number of nanoseconds in a millisecond, our delay being set in milliseconds but kept track of in nanoseconds (see
+// SedInstance::Impl::setDelay()).
+
+static constexpr auto NANOSECONDS_PER_MILLISECOND {1.0e6};
 
 struct SedInstanceTaskResults
 {
@@ -75,6 +82,10 @@ public:
     libcellml::AnalyserModelPtr mAnalyserModel;
     SolverOdePtr mOdeSolver;
     SolverNlaPtr mNlaSolver;
+
+    const std::atomic<std::int64_t> *mDelay {nullptr}; // In nanoseconds.
+    std::chrono::steady_clock::time_point mPreviousPointTime;
+    std::chrono::steady_clock::duration mDelayDuration {0};
 
     size_t mStateCount {0};
     size_t mConstantCount {0};
@@ -128,6 +139,9 @@ public:
     static SedInstanceTaskPtr create(const SedAbstractTaskPtr &pTask);
 
     explicit Impl(const SedAbstractTaskPtr &pTask);
+
+    void waitForResume(std::unique_lock<std::mutex> &pPauseLock);
+    bool waitForDelay();
 
     void allocateResults(size_t pResultsSize);
     void trackResults(size_t pIndex);

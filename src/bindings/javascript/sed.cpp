@@ -155,6 +155,7 @@ void sedApi()
     emscripten::class_<libOpenCOR::SedInstance, emscripten::base<libOpenCOR::Logger>>("SedInstance")
         .smart_ptr<libOpenCOR::SedInstancePtr>("SedInstance")
         .property("status", &libOpenCOR::SedInstance::status)
+        .property("delay", &libOpenCOR::SedInstance::delay, &libOpenCOR::SedInstance::setDelay)
         .function("run", &libOpenCOR::SedInstance::run)
         // clang-format off
         .function("startRun", emscripten::optional_override([](libOpenCOR::SedInstance &pThis) {

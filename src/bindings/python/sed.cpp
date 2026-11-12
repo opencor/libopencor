@@ -145,6 +145,7 @@ void sedApi(nb::module_ &m)
         .value("Paused", libOpenCOR::SedInstance::Status::PAUSED);
 
     sedInstance.def_prop_ro("status", &libOpenCOR::SedInstance::status, "Return the status of this instance.")
+        .def_prop_rw("delay", &libOpenCOR::SedInstance::delay, &libOpenCOR::SedInstance::setDelay, "The delay, in milliseconds (can be fractional), between two output points of a run.")
         .def("run", &libOpenCOR::SedInstance::run, "Run all the tasks associated with this instance.", nb::call_guard<nb::gil_scoped_release>())
         .def("start_run", &libOpenCOR::SedInstance::startRun, "Start running, in a background thread, all the tasks associated with this instance.", nb::call_guard<nb::gil_scoped_release>())
         .def("wait_for_run", &libOpenCOR::SedInstance::waitForRun, "Wait for any currently-running instance to complete.", nb::call_guard<nb::gil_scoped_release>())

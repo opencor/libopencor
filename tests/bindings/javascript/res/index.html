@@ -15,14 +15,7 @@
     <nav class="navbar bg-dark border-bottom border-bottom-dark navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
       <div class="container-fluid">
         <div class="navbar-brand">libOpenCOR</div>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -112,6 +105,20 @@
                 <input class="form-check-input" type="checkbox" id="runAsync" checked />
                 <label class="form-check-label" for="runAsync">Run asynchronously</label>
               </div>
+              <div class="delay-wheel-container">
+                <div class="delay-wheel" id="delayWheel" tabindex="0">
+                  <svg class="delay-wheel-ridges" viewBox="0 0 160 24" preserveAspectRatio="none">
+                    <g id="delayWheelRidges"></g>
+                  </svg>
+                  <div class="delay-wheel-position">
+                    <div class="delay-wheel-position-fill" id="delayWheelPositionFill"></div>
+                  </div>
+                </div>
+                <span class="delay-wheel-value">
+                  <span id="delayValue">No delay</span>
+                  <small class="text-body-secondary" id="delayTotal"></small>
+                </span>
+              </div>
               <div id="progressBar">
                 <div id="progressBarFill"></div>
               </div>
@@ -174,9 +181,11 @@
     import {
       reset,
       run,
+      setupDelayWheel,
       showPage,
       stopSimulation,
       updateAxisIntervals,
+      updateDelayInfo,
       updatePlottingAreaAndAxesInfo
     } from './res/libopencor.js';
 
@@ -196,6 +205,11 @@
 
     $('#simulationDuration').on('input', () => {
       updateAxisIntervals();
+      updateDelayInfo();
+    });
+
+    $('#simulationInterval').on('input', () => {
+      updateDelayInfo();
     });
 
     $('#xAxis').on('change', () => {
@@ -215,6 +229,8 @@
     $('#stop').on('click', () => {
       stopSimulation();
     });
+
+    setupDelayWheel();
     </script>
   </body>
 </html>

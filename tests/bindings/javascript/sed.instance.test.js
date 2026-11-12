@@ -904,6 +904,366 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
+  test('Delay', () => {
+    const DELAY = 5;
+    const FRACTIONAL_DELAY = 0.0125;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.delay, 0);
+
+    instance.delay = DELAY;
+
+    assert.strictEqual(instance.delay, DELAY);
+
+    instance.delay = FRACTIONAL_DELAY;
+
+    assert.strictEqual(instance.delay, FRACTIONAL_DELAY);
+
+    instance.delay = 0;
+
+    assert.strictEqual(instance.delay, 0);
+
+    // A negative or NaN delay is treated as no delay while a huge delay is capped.
+
+    instance.delay = -DELAY;
+
+    assert.strictEqual(instance.delay, 0);
+
+    instance.delay = Number.NaN;
+
+    assert.strictEqual(instance.delay, 0);
+
+    instance.delay = Number.POSITIVE_INFINITY;
+
+    assert.ok(instance.delay > 0);
+    assert.ok(Number.isFinite(instance.delay));
+  });
+
+  test('Fractional delay slows down run', () => {
+    const STEP_COUNT = 1000;
+    const DELAY = 0.1;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = STEP_COUNT;
+    simulation.outputEndTime = STEP_COUNT;
+
+    const instance = document.instantiate();
+
+    instance.delay = DELAY;
+
+    // Each output point, but our initial one, is made available at least DELAY milliseconds after the previous one (on
+    // average), so our run must take at least STEP_COUNT * DELAY milliseconds.
+
+    const runStart = performance.now();
+
+    instance.run();
+
+    const runTime = performance.now() - runStart;
+
+    assert.ok(runTime >= STEP_COUNT * DELAY);
+    assert.strictEqual(instance.progress, 1.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Delay slows down run', () => {
+    const STEP_COUNT = 10;
+    const DELAY = 50;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = STEP_COUNT;
+    simulation.outputEndTime = STEP_COUNT;
+
+    const instance = document.instantiate();
+
+    instance.delay = DELAY;
+
+    // Note #1: each output point, but our initial one, is made available at least DELAY milliseconds after the
+    //          previous one, so our run must take at least STEP_COUNT * DELAY milliseconds.
+    // Note #2: the time spent waiting for our delay is not included in the elapsed time of our run. We wait for DELAY
+    //          milliseconds minus the time it takes to compute an output point, so as long as computing an output point
+    //          takes less than DELAY / 2 milliseconds, we wait for at least STEP_COUNT * DELAY / 2 milliseconds, which
+    //          must therefore be missing from our elapsed time.
+
+    const runStart = performance.now();
+    const elapsedTime = instance.run();
+    const runTime = performance.now() - runStart;
+
+    assert.ok(runTime >= STEP_COUNT * DELAY);
+    assert.ok(elapsedTime <= runTime - 0.5 * STEP_COUNT * DELAY);
+    assert.strictEqual(instance.progress, 1.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Delay interrupted by stop run', async () => {
+    const LONG_DELAY = 3600000;
+    const WAIT_ITERATIONS = 60000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    instance.delay = LONG_DELAY;
+
+    assert.strictEqual(instance.startRun(), true);
+
+    // Give our run time to compute its first output point and start waiting for our delay before stopping it.
+
+    await sleep(50);
+
+    instance.stopRun();
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
+    assert.strictEqual(instance.progress, 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Delay removed while running', async () => {
+    const LONG_DELAY = 3600000;
+    const WAIT_ITERATIONS = 60000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    instance.delay = LONG_DELAY;
+
+    assert.strictEqual(instance.startRun(), true);
+
+    // Give our run time to compute its first output point and start waiting for our delay before removing it.
+
+    await sleep(50);
+
+    assert.strictEqual(instance.progress, 0.0);
+
+    instance.delay = 0;
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
+    assert.strictEqual(instance.progress, 1.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Delay set while running', async () => {
+    const SIMULATION_PROPERTY = 1000000;
+    const LONG_DELAY = 3600000;
+    const WAIT_ITERATIONS = 60000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = SIMULATION_PROPERTY;
+    simulation.outputEndTime = SIMULATION_PROPERTY;
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.progress > 0.0) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    // Pause our run (so that its progress doesn't change while we set our delay), set a long delay, and resume our run.
+    // The next output point must be made available straight away, after which our delay must apply.
+
+    instance.pauseRun();
+
+    await sleep(50);
+
+    const pausedProgress = instance.progress;
+
+    instance.delay = LONG_DELAY;
+    instance.resumeRun();
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.progress > pausedProgress) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    const delayedProgress = instance.progress;
+
+    assert.ok(delayedProgress > pausedProgress);
+
+    await sleep(50);
+
+    assert.strictEqual(instance.status, loc.SedInstance.Status.RUNNING);
+    assert.strictEqual(instance.progress, delayedProgress);
+
+    instance.stopRun();
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Delay suspended by pause run', async () => {
+    const DELAY = 600;
+    const WAIT_ITERATIONS = 60000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    instance.delay = DELAY;
+
+    const runStart = performance.now();
+
+    assert.strictEqual(instance.startRun(), true);
+
+    // Pause our run while it waits for our delay and remain paused for longer than our delay, and check that our first
+    // output point is not made available while we are paused.
+
+    await sleep(50);
+
+    const pauseStart = performance.now();
+
+    instance.pauseRun();
+
+    await sleep(2 * DELAY);
+
+    assert.strictEqual(instance.status, loc.SedInstance.Status.PAUSED);
+    assert.strictEqual(instance.progress, 0.0);
+
+    // Resume our run and check that our first output point is only made available once whatever was left of our delay,
+    // when we paused our run, has elapsed. That is at least DELAY - (pauseStart - runStart) milliseconds after resuming
+    // our run, but we only check for half of it to allow for some timing noise.
+
+    const resumeStart = performance.now();
+
+    instance.resumeRun();
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.progress > 0.0) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    const firstPointTime = performance.now() - resumeStart;
+    const pauseTime = pauseStart - runStart;
+
+    assert.ok(instance.progress > 0.0);
+    assert.ok(firstPointTime >= 0.5 * (DELAY - pauseTime));
+
+    // Remove our delay so that our run can complete quickly.
+
+    instance.delay = 0;
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
+    assert.strictEqual(instance.progress, 1.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Delay paused then stopped', async () => {
+    const LONG_DELAY = 3600000;
+    const WAIT_ITERATIONS = 60000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    instance.delay = LONG_DELAY;
+
+    assert.strictEqual(instance.startRun(), true);
+
+    // Pause our run while it waits for our delay, remove our delay (which must not resume our run), and then stop it.
+
+    await sleep(50);
+
+    instance.pauseRun();
+    instance.delay = 0;
+
+    await sleep(50);
+
+    assert.strictEqual(instance.status, loc.SedInstance.Status.PAUSED);
+    assert.strictEqual(instance.progress, 0.0);
+
+    instance.stopRun();
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
+    assert.strictEqual(instance.progress, 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
   test('Start run while already running', async () => {
     const SIMULATION_PROPERTY = 1000000;
     const WAIT_ITERATIONS = 60000;
