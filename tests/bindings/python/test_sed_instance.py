@@ -423,6 +423,7 @@ def test_stop_run():
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
+
     simulation.number_of_steps = SIMULATION_PROPERTY
     simulation.output_end_time = float(SIMULATION_PROPERTY)
 
@@ -455,6 +456,7 @@ def test_stop_run_results_have_nans():
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
+
     simulation.number_of_steps = SIMULATION_PROPERTY
     simulation.output_end_time = float(SIMULATION_PROPERTY)
 
@@ -540,6 +542,7 @@ def test_stop_run_right_after_start_run():
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
+
     simulation.number_of_steps = SIMULATION_PROPERTY
     simulation.output_end_time = float(SIMULATION_PROPERTY)
 
@@ -562,6 +565,7 @@ def test_pause_run_right_after_start_run():
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
+
     simulation.number_of_steps = SIMULATION_PROPERTY
     simulation.output_end_time = float(SIMULATION_PROPERTY)
 
@@ -799,6 +803,324 @@ def test_pause_run_and_resume_run_with_natural_completion():
 
     assert instance.status == loc.SedInstance.Status.Idle
     assert instance.wait_for_run() > 0.0
+    assert not instance.has_issues
+
+
+def test_delay():
+    DELAY = 5.0
+    FRACTIONAL_DELAY = 0.0125
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert instance.delay == 0.0
+
+    instance.delay = DELAY
+
+    assert instance.delay == DELAY
+
+    instance.delay = FRACTIONAL_DELAY
+
+    assert instance.delay == FRACTIONAL_DELAY
+
+    instance.delay = 0.0
+
+    assert instance.delay == 0.0
+
+    # A negative or NaN delay is treated as no delay while a huge delay is capped.
+
+    instance.delay = -DELAY
+
+    assert instance.delay == 0.0
+
+    instance.delay = math.nan
+
+    assert instance.delay == 0.0
+
+    instance.delay = math.inf
+
+    assert 0.0 < instance.delay < math.inf
+
+
+def test_fractional_delay_slows_down_run():
+    STEP_COUNT = 1000
+    DELAY = 0.1
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.number_of_steps = STEP_COUNT
+    simulation.output_end_time = float(STEP_COUNT)
+
+    instance = document.instantiate()
+
+    instance.delay = DELAY
+
+    # Each output point, but our initial one, is made available at least DELAY milliseconds after the previous one (on
+    # average), so our run must take at least STEP_COUNT * DELAY milliseconds.
+
+    run_start = time.perf_counter()
+
+    instance.run()
+
+    run_time = 1000.0 * (time.perf_counter() - run_start)
+
+    assert run_time >= STEP_COUNT * DELAY
+    assert instance.progress == 1.0
+    assert not instance.has_issues
+
+
+def test_delay_slows_down_run():
+    STEP_COUNT = 10
+    DELAY = 50
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    simulation.number_of_steps = STEP_COUNT
+    simulation.output_end_time = float(STEP_COUNT)
+
+    instance = document.instantiate()
+
+    instance.delay = DELAY
+
+    # Note #1: each output point, but our initial one, is made available at least DELAY milliseconds after the previous
+    #          one, so our run must take at least STEP_COUNT * DELAY milliseconds.
+    # Note #2: the time spent waiting for our delay is not included in the elapsed time of our run. We wait for DELAY
+    #          milliseconds minus the time it takes to compute an output point, so as long as computing an output point
+    #          takes less than DELAY / 2 milliseconds, we wait for at least STEP_COUNT * DELAY / 2 milliseconds, which
+    #          must therefore be missing from our elapsed time.
+
+    run_start = time.perf_counter()
+    elapsed_time = instance.run()
+    run_time = 1000.0 * (time.perf_counter() - run_start)
+
+    assert run_time >= STEP_COUNT * DELAY
+    assert elapsed_time <= run_time - 0.5 * STEP_COUNT * DELAY
+    assert instance.progress == 1.0
+    assert not instance.has_issues
+
+
+def test_delay_interrupted_by_stop_run():
+    LONG_DELAY = 3600000
+    WAIT_ITERATIONS = 60000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    instance.delay = LONG_DELAY
+
+    assert instance.start_run() is True
+
+    # Give our run time to compute its first output point and start waiting for our delay before stopping it.
+
+    time.sleep(0.05)
+
+    instance.stop_run()
+
+    for _ in range(WAIT_ITERATIONS):
+        if instance.status == loc.SedInstance.Status.Idle:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.status == loc.SedInstance.Status.Idle
+    assert instance.progress == 0.0
+    assert not instance.has_issues
+
+
+def test_delay_removed_while_running():
+    LONG_DELAY = 3600000
+    WAIT_ITERATIONS = 60000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    instance.delay = LONG_DELAY
+
+    assert instance.start_run() is True
+
+    # Give our run time to compute its first output point and start waiting for our delay before removing it.
+
+    time.sleep(0.05)
+
+    assert instance.progress == 0.0
+
+    instance.delay = 0
+
+    for _ in range(WAIT_ITERATIONS):
+        if instance.status == loc.SedInstance.Status.Idle:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.status == loc.SedInstance.Status.Idle
+    assert instance.progress == 1.0
+    assert not instance.has_issues
+
+
+def test_delay_set_while_running():
+    SIMULATION_PROPERTY = 1000000
+    LONG_DELAY = 3600000
+    WAIT_ITERATIONS = 60000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.number_of_steps = SIMULATION_PROPERTY
+    simulation.output_end_time = float(SIMULATION_PROPERTY)
+
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    for _ in range(WAIT_ITERATIONS):
+        if instance.progress > 0.0:
+            break
+
+        time.sleep(0.001)
+
+    # Pause our run (so that its progress doesn't change while we set our delay), set a long delay, and resume our run.
+    # The next output point must be made available straight away, after which our delay must apply.
+
+    instance.pause_run()
+
+    time.sleep(0.05)
+
+    paused_progress = instance.progress
+
+    instance.delay = LONG_DELAY
+    instance.resume_run()
+
+    for _ in range(WAIT_ITERATIONS):
+        if instance.progress > paused_progress:
+            break
+
+        time.sleep(0.001)
+
+    delayed_progress = instance.progress
+
+    assert delayed_progress > paused_progress
+
+    time.sleep(0.05)
+
+    assert instance.status == loc.SedInstance.Status.Running
+    assert instance.progress == delayed_progress
+
+    instance.stop_run()
+
+    for _ in range(WAIT_ITERATIONS):
+        if instance.status == loc.SedInstance.Status.Idle:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.status == loc.SedInstance.Status.Idle
+    assert not instance.has_issues
+
+
+def test_delay_suspended_by_pause_run():
+    DELAY = 600
+    WAIT_ITERATIONS = 60000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    instance.delay = DELAY
+
+    run_start = time.perf_counter()
+
+    assert instance.start_run() is True
+
+    # Pause our run while it waits for our delay and remain paused for longer than our delay, and check that our first
+    # output point is not made available while we are paused.
+
+    time.sleep(0.05)
+
+    pause_start = time.perf_counter()
+
+    instance.pause_run()
+
+    time.sleep(0.002 * DELAY)
+
+    assert instance.status == loc.SedInstance.Status.Paused
+    assert instance.progress == 0.0
+
+    # Resume our run and check that our first output point is only made available once whatever was left of our delay,
+    # when we paused our run, has elapsed. That is at least DELAY - (pause_start - run_start) milliseconds after
+    # resuming our run, but we only check for half of it to allow for some timing noise.
+
+    resume_start = time.perf_counter()
+
+    instance.resume_run()
+
+    for _ in range(WAIT_ITERATIONS):
+        if instance.progress > 0.0:
+            break
+
+        time.sleep(0.001)
+
+    first_point_time = 1000.0 * (time.perf_counter() - resume_start)
+    pause_time = 1000.0 * (pause_start - run_start)
+
+    assert instance.progress > 0.0
+    assert first_point_time >= 0.5 * (DELAY - pause_time)
+
+    # Remove our delay so that our run can complete quickly.
+
+    instance.delay = 0
+
+    for _ in range(WAIT_ITERATIONS):
+        if instance.status == loc.SedInstance.Status.Idle:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.status == loc.SedInstance.Status.Idle
+    assert instance.progress == 1.0
+    assert not instance.has_issues
+
+
+def test_delay_paused_then_stopped():
+    LONG_DELAY = 3600000
+    WAIT_ITERATIONS = 60000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    instance.delay = LONG_DELAY
+
+    assert instance.start_run() is True
+
+    # Pause our run while it waits for our delay, remove our delay (which must not resume our run), and then stop it.
+
+    time.sleep(0.05)
+
+    instance.pause_run()
+    instance.delay = 0
+
+    time.sleep(0.05)
+
+    assert instance.status == loc.SedInstance.Status.Paused
+    assert instance.progress == 0.0
+
+    instance.stop_run()
+
+    for _ in range(WAIT_ITERATIONS):
+        if instance.status == loc.SedInstance.Status.Idle:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.status == loc.SedInstance.Status.Idle
+    assert instance.progress == 0.0
     assert not instance.has_issues
 
 

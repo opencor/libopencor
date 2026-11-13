@@ -38,6 +38,8 @@ public:
     IssuePtrs mTasksErrors;
     IssuePtrs mTasksWarnings;
 
+    std::atomic<std::int64_t> mDelay {0}; // In nanoseconds.
+
     mutable std::atomic<bool> mRunning {false};
     mutable std::mutex mRunMutex;
     mutable std::thread mRunThread;
@@ -54,6 +56,9 @@ public:
     explicit Impl(const SedDocumentPtr &pDocument);
 
     Status status() const;
+
+    double delay() const;
+    void setDelay(double pDelay);
 
     void prepareRun();
     double executeRun();

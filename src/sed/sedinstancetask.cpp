@@ -24,12 +24,14 @@ limitations under the License.
 #include "solverode_p.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstdint>
 #include <condition_variable>
 #include <limits>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <stdexcept>
 #include <unordered_set>
 
@@ -254,6 +256,107 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     }
 }
 
+void SedInstanceTask::Impl::waitForResume(std::unique_lock<std::mutex> &pPauseLock)
+{
+    // Wait for our run to be resumed or stopped.
+    // Note: the time we spend paused doesn't count towards our delay, hence we shift the time of our previous output
+    //       point by it (see waitForDelay()).
+
+    const auto pauseStart {std::chrono::steady_clock::now()};
+
+    mPauseConditionVariable->wait(pPauseLock, [this]() {
+        const auto runControl = mRunControl->load(std::memory_order_relaxed);
+
+        return ((runControl & INSTANCE_RUN_CONTROL_PAUSE) == 0) || ((runControl & INSTANCE_RUN_CONTROL_STOP) != 0);
+    });
+
+    mPreviousPointTime += std::chrono::steady_clock::now() - pauseStart;
+}
+
+bool SedInstanceTask::Impl::waitForDelay()
+{
+    // Wait until our delay has elapsed since our previous output point, so that our output points are tracked at a
+    // steady rate, whatever the time it takes to compute them. Return false if our run got stopped while waiting.
+    // Note #1: we wait on our pause condition variable so that we get woken up as soon as a pause, a resume, or a stop
+    //          is requested, or our delay gets changed (see SedInstance::Impl::setDelay()), in which case our new delay
+    //          is also counted from our previous output point.
+    // Note #2: a pause suspends our delay, i.e. once resumed, we wait for whatever was left of our delay when we got
+    //          paused (see waitForResume()).
+    // Note #3: we keep track of the time we spend waiting for our delay (but not the time we spend paused), so that it
+    //          can be excluded from our elapsed time (see run()).
+    // Note #4: we only get called if we have a delay (see run()), so that checking for it doesn't involve a function
+    //          call when there is no delay.
+
+    static constexpr auto INTERRUPTIONS {INSTANCE_RUN_CONTROL_PAUSE | INSTANCE_RUN_CONTROL_STOP};
+
+    auto res {true};
+    const auto waitStart {std::chrono::steady_clock::now()};
+    const auto initialPreviousPointTime {mPreviousPointTime};
+    std::optional<std::chrono::steady_clock::time_point> deadline;
+
+    {
+        std::unique_lock<std::mutex> pauseLock(*mPauseMutex);
+
+        for (;;) {
+            const auto runControl {mRunControl->load(std::memory_order_relaxed)};
+
+            if ((runControl & INSTANCE_RUN_CONTROL_STOP) != 0) {
+                res = false;
+
+                break;
+            }
+
+            if ((runControl & INSTANCE_RUN_CONTROL_PAUSE) != 0) {
+                waitForResume(pauseLock);
+
+                continue;
+            }
+
+            const auto delay {mDelay->load(std::memory_order_relaxed)};
+
+            if (delay == 0) {
+                deadline.reset();
+
+                break;
+            }
+
+            deadline = mPreviousPointTime + std::chrono::nanoseconds(delay);
+
+            const auto interrupted = mPauseConditionVariable->wait_until(pauseLock, *deadline, [this, delay]() {
+                return (mDelay->load(std::memory_order_relaxed) != delay)
+                       || ((mRunControl->load(std::memory_order_relaxed) & INTERRUPTIONS) != 0);
+            });
+
+            if (!interrupted) {
+                break;
+            }
+        }
+    }
+
+    // Account for the time we spent waiting for our delay, i.e. the time we spent waiting minus the time we spent
+    // paused (by which waitForResume() shifted the time of our previous output point).
+
+    const auto waitEnd {std::chrono::steady_clock::now()};
+
+    mDelayDuration += (waitEnd - waitStart) - (mPreviousPointTime - initialPreviousPointTime);
+
+    // Determine the time of our (new) previous output point.
+    // Note: we use the time at which our output point was due (i.e. our deadline) rather than the time at which we
+    //       stopped waiting. Indeed, the operating system may wake us up later than requested (by up to a few tens of
+    //       microseconds or even, on Windows, several milliseconds), which would otherwise add up for each output point
+    //       and make very short delays much longer than requested. This way, if we are late for an output point, we
+    //       catch up by not waiting (as much) for the next ones, meaning that our delay is honoured on average.
+    //       However, we don't catch up for more than MAX_CATCH_UP, so that our output points don't get made available
+    //       in a large burst should we get delayed for a long time (e.g., because computing an output point took much
+    //       longer than our delay).
+
+    static constexpr auto MAX_CATCH_UP {std::chrono::milliseconds(50)};
+
+    mPreviousPointTime = deadline.has_value() ? std::max(*deadline, waitEnd - MAX_CATCH_UP) : waitEnd;
+
+    return res;
+}
+
 void SedInstanceTask::Impl::allocateResults(size_t pResultsSize)
 {
     // Allocate our results, but only if their size has changed.
@@ -476,7 +579,13 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
 
     if (pTrackResults) {
         trackResults(index);
+
+        mPreviousPointTime = std::chrono::steady_clock::now();
     }
+
+    // Keep track of whether our previous output point was subject to a delay (see below).
+
+    auto delayed {mDelay->load(std::memory_order_relaxed) != 0};
 
     // Set up a guard function to fill the tail of our results with NaN values in case we exit this function before
     // reaching the end of our simulation.
@@ -506,11 +615,7 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
         if ((runControl & INSTANCE_RUN_CONTROL_PAUSE) != 0) {
             std::unique_lock<std::mutex> pauseLock(*mPauseMutex);
 
-            mPauseConditionVariable->wait(pauseLock, [this]() {
-                const auto crtRunControl = mRunControl->load(std::memory_order_relaxed);
-
-                return ((crtRunControl & INSTANCE_RUN_CONTROL_PAUSE) == 0) || ((crtRunControl & INSTANCE_RUN_CONTROL_STOP) != 0);
-            });
+            waitForResume(pauseLock);
 
             if ((mRunControl->load(std::memory_order_relaxed) & INSTANCE_RUN_CONTROL_STOP) != 0) {
                 guard();
@@ -579,9 +684,35 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
         // Note: our progress is only about the steps for which we track our results (see run() below).
 
         if (pTrackResults) {
-            mCompletedSteps.fetch_add(1, std::memory_order_relaxed);
+            // Wait for our delay, if any, before tracking our results, so that they get tracked at a steady rate (see
+            // waitForDelay()).
+            // Note: if our previous output point was not subject to a delay (i.e. a delay was set while we were running
+            //       without one), then the time of our previous output point is not known (since we don't keep track
+            //       of it when there is no delay, so that running without a delay doesn't involve getting the current
+            //       time for each output point). So, our current output point is made available straight away and our
+            //       delay only applies from it.
 
-            trackResults(++index);
+            if (mDelay->load(std::memory_order_relaxed) != 0) {
+                if (!delayed) {
+                    delayed = true;
+
+                    mPreviousPointTime = std::chrono::steady_clock::now();
+                } else if (!waitForDelay()) {
+                    guard();
+
+                    return;
+                }
+            } else {
+                delayed = false;
+            }
+
+            // Note: we are the only one to update our number of completed steps, which is reset to zero before we get
+            //       run (see prepareRun()) and is therefore equal to our index, hence we can use a (cheap) store rather
+            //       than a (more expensive) read-modify-write operation.
+
+            mCompletedSteps.store(++index, std::memory_order_relaxed);
+
+            trackResults(index);
         }
     }
 }
@@ -651,7 +782,9 @@ double SedInstanceTask::Impl::run()
 
     // Start our timer.
 
-    auto startTime {std::chrono::high_resolution_clock::now()};
+    auto startTime {std::chrono::steady_clock::now()};
+
+    mDelayDuration = {};
 
     // (Re)initialise our model.
     // Note: reinitialise our model because it was initialised when our instance was created (see
@@ -720,9 +853,10 @@ double SedInstanceTask::Impl::run()
         mCompletedSteps.store(1, std::memory_order_relaxed);
     }
 
-    // Stop our timer and return the elapsed time in milliseconds.
+    // Stop our timer and return the elapsed time in milliseconds, excluding the time we spent waiting for our delay, if
+    // any (see waitForDelay()).
 
-    return std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - startTime).count();
+    return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - startTime - mDelayDuration).count();
 }
 
 double SedInstanceTask::Impl::progress() const noexcept

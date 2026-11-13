@@ -16,6 +16,16 @@ const chart = lightningChart()
   .setAnimationsEnabled(false);
 const lineSeries = chart.addLineSeries().setName('');
 let plottedPointCount = 0;
+const MIN_DELAY_EXPONENT = -3;
+const MAX_DELAY_EXPONENT = 0;
+const DELAY_WHEEL_WIDTH = 160; // Must match the width of our wheel (see libopencor.css).
+const DELAY_WHEEL_HEIGHT = 24; // Must match the height of the view box of our wheel (see index.html).
+const DELAY_WHEEL_RADIUS = 0.5 * DELAY_WHEEL_WIDTH;
+const DELAY_WHEEL_RIDGE_SPACING = 12;
+const DELAY_WHEEL_DRAG_RANGE = 320;
+const DELAY_WHEEL_SCROLL_RANGE = 1500;
+const DELAY_WHEEL_KEY_STEP = 0.02;
+let delayPosition = 0;
 
 export function showPage(page) {
   $('.nav-link').each(function () {
@@ -215,6 +225,8 @@ function plotAndUpdateProgressBar() {
 }
 
 function runSync() {
+  applyDelay();
+
   console.log('-------------------');
   console.time('Computing time');
   instance.run();
@@ -228,6 +240,8 @@ function runSync() {
 function runAsync() {
   const currentSimulationId = simulationId;
   const $progressBarFill = $('#progressBarFill');
+
+  applyDelay();
 
   console.log('-------------------');
   console.time('Computing time');
@@ -276,6 +290,205 @@ function runAsync() {
       plotAndUpdateProgressBar();
     }
   }, 50);
+}
+
+function isAsyncRun() {
+  return $('#runAsync').is(':checked');
+}
+
+function delay() {
+  // Note: our delay grows exponentially with the position of our wheel (from 1 µs to 1 ms), so that both very short
+  //       delays (useful for runs with many output points) and long ones can be set, with the very beginning of our
+  //       wheel meaning no delay.
+
+  if (delayPosition === 0) {
+    return 0;
+  }
+
+  return 10 ** (MIN_DELAY_EXPONENT + (MAX_DELAY_EXPONENT - MIN_DELAY_EXPONENT) * delayPosition);
+}
+
+function formattedNumber(number) {
+  // Format the given number using three significant digits, but without any decimals if they are all zeroes (e.g.,
+  // "1.00" becomes "1" while "1.50" remains "1.50").
+
+  return number.toPrecision(3).replace(/\.0+$/, '');
+}
+
+function formattedTime(time) {
+  // Format the given time, which is in milliseconds, using the most appropriate unit.
+  // Note: we round our time before choosing our unit so that, for instance, 0.9999 ms is formatted as "1 ms" rather
+  //       than as "1.00e+3 µs".
+
+  const roundedTime = Number(time.toPrecision(3));
+
+  if (roundedTime < 1) {
+    return `${formattedNumber(1000 * roundedTime)} µs`;
+  }
+
+  if (roundedTime < 1000) {
+    return `${formattedNumber(roundedTime)} ms`;
+  }
+
+  if (roundedTime < 60000) {
+    return `${formattedNumber(roundedTime / 1000)} s`;
+  }
+
+  return `${formattedNumber(roundedTime / 60000)} min`;
+}
+
+function simulationStepCount() {
+  const stepCount = $('#simulationDuration').val() / $('#simulationInterval').val();
+
+  return Number.isFinite(stepCount) ? Math.round(stepCount) : 0;
+}
+
+export function updateDelayInfo() {
+  // Let the user know how long our delay would, at least, make a run take.
+
+  const value = delay();
+
+  $('#delayValue').text(value === 0 ? 'No delay' : formattedTime(value));
+  $('#delayTotal').text(value === 0 ? '' : `(≥ ${formattedTime(value * simulationStepCount())} per run)`);
+}
+
+function applyDelay() {
+  // Note: a synchronous run blocks the page for as long as it runs, so we only apply our delay to asynchronous runs.
+
+  if (instance !== null) {
+    instance.delay = isAsyncRun() ? delay() : 0;
+  }
+}
+
+function updateDelayWheel() {
+  // Draw the ridges of our wheel, as seen from above, i.e. as if they were on a cylinder that rotates as our delay
+  // changes.
+  // Note: our wheel rotates by as much as it is dragged (i.e. its surface follows the mouse pointer), hence its
+  //       rotation is the arc length (i.e. how much our wheel has been dragged) divided by its radius.
+
+  const rotation = (((delayPosition * DELAY_WHEEL_DRAG_RANGE) / DELAY_WHEEL_RADIUS) * 180) / Math.PI;
+  const firstAngle =
+    (((rotation % DELAY_WHEEL_RIDGE_SPACING) + DELAY_WHEEL_RIDGE_SPACING) % DELAY_WHEEL_RIDGE_SPACING) - 90;
+  let ridges = '';
+
+  for (let angle = firstAngle; angle < 90; angle += DELAY_WHEEL_RIDGE_SPACING) {
+    const radians = (angle * Math.PI) / 180;
+    const depth = Math.cos(radians); // 1 in the middle of our wheel and 0 on its sides.
+    const x = DELAY_WHEEL_RADIUS * (1 + Math.sin(radians));
+
+    ridges += `<line x1="${x}" y1="4" x2="${x}" y2="${DELAY_WHEEL_HEIGHT - 4}" stroke-width="${0.5 + 1.5 * depth}" opacity="${depth ** 1.5}" />`;
+  }
+
+  $('#delayWheelRidges').html(ridges);
+  $('#delayWheelPositionFill').css('width', `${100 * delayPosition}%`);
+
+  // Update our delay information.
+
+  updateDelayInfo();
+}
+
+function setDelayPosition(position) {
+  delayPosition = Math.min(Math.max(position, 0), 1);
+
+  updateDelayWheel();
+
+  // Apply our new delay straight away, so that it can be changed while a simulation is running.
+
+  applyDelay();
+}
+
+export function setupDelayWheel() {
+  // Drag our wheel right/left to increase/decrease our delay.
+
+  const $wheel = $('#delayWheel');
+  const wheel = $wheel[0];
+  let dragStartX = null;
+  let dragStartPosition = 0;
+
+  wheel.addEventListener('pointerdown', (event) => {
+    if (!isAsyncRun()) {
+      return;
+    }
+
+    dragStartX = event.clientX;
+    dragStartPosition = delayPosition;
+
+    wheel.setPointerCapture(event.pointerId);
+    wheel.focus();
+  });
+
+  wheel.addEventListener('pointermove', (event) => {
+    if (dragStartX !== null) {
+      setDelayPosition(dragStartPosition + (event.clientX - dragStartX) / DELAY_WHEEL_DRAG_RANGE);
+    }
+  });
+
+  ['pointerup', 'pointercancel'].forEach((eventName) => {
+    wheel.addEventListener(eventName, () => {
+      dragStartX = null;
+    });
+  });
+
+  // Scroll our wheel (sideways or up/down) to increase/decrease our delay.
+  // Note: a scroll may be expressed in lines (e.g., in Firefox) rather than in pixels, hence we convert it to pixels.
+
+  wheel.addEventListener(
+    'wheel',
+    (event) => {
+      if (!isAsyncRun()) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : -event.deltaY;
+      const pixelDelta = event.deltaMode === WheelEvent.DOM_DELTA_LINE ? 16 * delta : delta;
+
+      setDelayPosition(delayPosition + pixelDelta / DELAY_WHEEL_SCROLL_RANGE);
+    },
+    { passive: false }
+  );
+
+  // Use the arrow, Home, and End keys to change our delay.
+
+  wheel.addEventListener('keydown', (event) => {
+    if (!isAsyncRun()) {
+      return;
+    }
+
+    const positions = {
+      ArrowUp: delayPosition + DELAY_WHEEL_KEY_STEP,
+      ArrowRight: delayPosition + DELAY_WHEEL_KEY_STEP,
+      ArrowDown: delayPosition - DELAY_WHEEL_KEY_STEP,
+      ArrowLeft: delayPosition - DELAY_WHEEL_KEY_STEP,
+      Home: 0,
+      End: 1
+    };
+
+    if (event.key in positions) {
+      event.preventDefault();
+
+      setDelayPosition(positions[event.key]);
+    }
+  });
+
+  // Double-click our wheel to reset our delay.
+
+  wheel.addEventListener('dblclick', () => {
+    if (isAsyncRun()) {
+      setDelayPosition(0);
+    }
+  });
+
+  // Our delay only applies to asynchronous runs (see applyDelay()), so disable our wheel for synchronous ones.
+
+  $('#runAsync').on('change', () => {
+    $wheel.toggleClass('disabled', !isAsyncRun());
+
+    applyDelay();
+  });
+
+  updateDelayWheel();
 }
 
 function axisInfo(index) {
@@ -455,6 +668,8 @@ $(() => {
 
                 instanceTask = instance.tasks[0];
 
+                applyDelay();
+
                 if (instanceTask?.hasIssues) {
                   showIssues(instanceTask.issues);
 
@@ -466,6 +681,8 @@ $(() => {
 
                 $('#simulationInterval').val(simulation.outputEndTime / simulation.numberOfSteps);
                 $('#simulationIntervalUnit').text(instanceTask.voiUnit);
+
+                updateDelayInfo();
 
                 // Populate the X and Y axis dropdown lists.
 

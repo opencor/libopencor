@@ -835,6 +835,355 @@ TEST(InstanceSedTest, pauseRunAndResumeRunWithNaturalCompletion)
     EXPECT_FALSE(instance->hasIssues());
 }
 
+TEST(InstanceSedTest, delay)
+{
+    static const auto DELAY {5.0};
+    static const auto FRACTIONAL_DELAY {0.0125};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_DOUBLE_EQ(instance->delay(), 0.0);
+
+    instance->setDelay(DELAY);
+
+    EXPECT_DOUBLE_EQ(instance->delay(), DELAY);
+
+    instance->setDelay(FRACTIONAL_DELAY);
+
+    EXPECT_DOUBLE_EQ(instance->delay(), FRACTIONAL_DELAY);
+
+    instance->setDelay(0.0);
+
+    EXPECT_DOUBLE_EQ(instance->delay(), 0.0);
+
+    // A negative or NaN delay is treated as no delay while a huge delay is capped.
+
+    instance->setDelay(-DELAY);
+
+    EXPECT_DOUBLE_EQ(instance->delay(), 0.0);
+
+    instance->setDelay(std::numeric_limits<double>::quiet_NaN());
+
+    EXPECT_DOUBLE_EQ(instance->delay(), 0.0);
+
+    instance->setDelay(std::numeric_limits<double>::infinity());
+
+    EXPECT_GT(instance->delay(), 0.0);
+    EXPECT_LT(instance->delay(), std::numeric_limits<double>::infinity());
+}
+
+TEST(InstanceSedTest, fractionalDelaySlowsDownRun)
+{
+    static const auto STEP_COUNT {1000};
+    static const auto DELAY {0.1};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(STEP_COUNT);
+    simulation->setOutputEndTime(static_cast<double>(STEP_COUNT));
+
+    auto instance {document->instantiate()};
+
+    instance->setDelay(DELAY);
+
+    // Each output point, but our initial one, is made available at least DELAY milliseconds after the previous one (on
+    // average, see SedInstance::setDelay()), so our run must take at least STEP_COUNT * DELAY milliseconds.
+
+    const auto runStart {std::chrono::steady_clock::now()};
+
+    instance->run();
+
+    const auto runTime {std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - runStart).count()};
+
+    EXPECT_GE(runTime, STEP_COUNT * DELAY);
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, delaySlowsDownRun)
+{
+    static const auto STEP_COUNT {10};
+    static const auto DELAY {50U};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(STEP_COUNT);
+    simulation->setOutputEndTime(static_cast<double>(STEP_COUNT));
+
+    auto instance {document->instantiate()};
+
+    instance->setDelay(DELAY);
+
+    // Note #1: each output point, but our initial one, is made available at least DELAY milliseconds after the previous
+    //          one, so our run must take at least STEP_COUNT * DELAY milliseconds.
+    // Note #2: the time spent waiting for our delay is not included in the elapsed time of our run. We wait for DELAY
+    //          milliseconds minus the time it takes to compute an output point, so as long as computing an output point
+    //          takes less than DELAY / 2 milliseconds, we wait for at least STEP_COUNT * DELAY / 2 milliseconds, which
+    //          must therefore be missing from our elapsed time.
+
+    const auto runStart {std::chrono::steady_clock::now()};
+    const auto elapsedTime {instance->run()};
+    const auto runTime {std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - runStart).count()};
+
+    EXPECT_GE(runTime, static_cast<double>(STEP_COUNT * DELAY));
+    EXPECT_LE(elapsedTime, runTime - 0.5 * STEP_COUNT * DELAY);
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, delayInterruptedByStopRun)
+{
+    static const auto LONG_DELAY {3600000U};
+    static const auto WAIT_ITERATIONS = 60000;
+    static const auto SLEEP = 50;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    instance->setDelay(LONG_DELAY);
+
+    EXPECT_TRUE(instance->startRun());
+
+    // Give our run time to compute its first output point and start waiting for our delay before stopping it.
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
+
+    instance->stopRun();
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
+    EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, delayRemovedWhileRunning)
+{
+    static const auto LONG_DELAY {3600000U};
+    static const auto WAIT_ITERATIONS = 60000;
+    static const auto SLEEP = 50;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    instance->setDelay(LONG_DELAY);
+
+    EXPECT_TRUE(instance->startRun());
+
+    // Give our run time to compute its first output point and start waiting for our delay before removing it.
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
+
+    EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
+
+    instance->setDelay(0);
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, delaySetWhileRunning)
+{
+    static const auto SIMULATION_PROPERTY {1000000};
+    static const auto LONG_DELAY {3600000U};
+    static const auto WAIT_ITERATIONS = 60000;
+    static const auto SLEEP = 50;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(SIMULATION_PROPERTY);
+    simulation->setOutputEndTime(static_cast<double>(SIMULATION_PROPERTY));
+
+    auto instance {document->instantiate()};
+
+    EXPECT_TRUE(instance->startRun());
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->progress() > 0.0) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    // Pause our run (so that its progress doesn't change while we set our delay), set a long delay, and resume our run.
+    // The next output point must be made available straight away, after which our delay must apply.
+
+    instance->pauseRun();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
+
+    const auto pausedProgress {instance->progress()};
+
+    instance->setDelay(LONG_DELAY);
+    instance->resumeRun();
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->progress() > pausedProgress) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    const auto delayedProgress {instance->progress()};
+
+    EXPECT_GT(delayedProgress, pausedProgress);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
+
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::RUNNING);
+    EXPECT_DOUBLE_EQ(instance->progress(), delayedProgress);
+
+    instance->stopRun();
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, delaySuspendedByPauseRun)
+{
+    static const auto DELAY {600U};
+    static const auto WAIT_ITERATIONS = 60000;
+    static const auto SLEEP = 50;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    instance->setDelay(DELAY);
+
+    const auto runStart {std::chrono::steady_clock::now()};
+
+    EXPECT_TRUE(instance->startRun());
+
+    // Pause our run while it waits for our delay and remain paused for longer than our delay, and check that our first
+    // output point is not made available while we are paused.
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
+
+    const auto pauseStart {std::chrono::steady_clock::now()};
+
+    instance->pauseRun();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(2 * DELAY));
+
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::PAUSED);
+    EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
+
+    // Resume our run and check that our first output point is only made available once whatever was left of our delay,
+    // when we paused our run, has elapsed. That is at least DELAY - (pauseStart - runStart) milliseconds after resuming
+    // our run, but we only check for half of it to allow for some timing noise.
+
+    const auto resumeStart {std::chrono::steady_clock::now()};
+
+    instance->resumeRun();
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->progress() > 0.0) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    const auto firstPointTime {std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - resumeStart).count()};
+    const auto pauseTime {std::chrono::duration<double, std::milli>(pauseStart - runStart).count()};
+
+    EXPECT_GT(instance->progress(), 0.0);
+    EXPECT_GE(firstPointTime, 0.5 * (static_cast<double>(DELAY) - pauseTime));
+
+    // Remove our delay so that our run can complete quickly.
+
+    instance->setDelay(0);
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, delayPausedThenStopped)
+{
+    static const auto LONG_DELAY {3600000U};
+    static const auto WAIT_ITERATIONS = 60000;
+    static const auto SLEEP = 50;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    instance->setDelay(LONG_DELAY);
+
+    EXPECT_TRUE(instance->startRun());
+
+    // Pause our run while it waits for our delay, remove our delay (which must not resume our run), and then stop it.
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
+
+    instance->pauseRun();
+    instance->setDelay(0);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP));
+
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::PAUSED);
+    EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
+
+    instance->stopRun();
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
+    EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
 TEST(InstanceSedTest, startRunWhileAlreadyRunning)
 {
     static const auto SIMULATION_PROPERTY {1000000};

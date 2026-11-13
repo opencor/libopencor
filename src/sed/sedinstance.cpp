@@ -20,8 +20,12 @@ limitations under the License.
 
 #include "libopencor/seddocument.h"
 
+#include <algorithm>
 #include <atomic>
+#include <cmath>
+#include <cstdint>
 #include <exception>
+#include <limits>
 #include <memory>
 
 namespace libOpenCOR {
@@ -127,6 +131,39 @@ SedInstance::Status SedInstance::Impl::status() const
     return Status::RUNNING;
 }
 
+double SedInstance::Impl::delay() const
+{
+    // Note: we divide by NANOSECONDS_PER_MILLISECOND rather than multiply by 1.0e-6. Indeed, 1.0e6 is exactly
+    //       representable as a double while 1.0e-6 is not, meaning that a division gives back the exact delay that was
+    //       set (e.g., 0.0125) while a multiplication may not (e.g., 0.012499999999999999).
+
+    return static_cast<double>(mDelay.load(std::memory_order_relaxed)) / NANOSECONDS_PER_MILLISECOND;
+}
+
+void SedInstance::Impl::setDelay(double pDelay)
+{
+    // Note #1: we keep track of our delay in nanoseconds (see SedInstanceTask::Impl::waitForDelay()). A negative or NaN
+    //          delay is treated as no delay while a huge delay is capped so that it cannot overflow when added to a
+    //          time point (in practice, it would mean waiting forever anyway).
+    // Note #2: a task may be waiting for its delay, in which case it must be woken up so that it uses our new delay
+    //          (see SedInstanceTask::Impl::waitForDelay()), hence we notify our pause condition variable (see the note
+    //          in resumeRun()).
+
+    static constexpr auto MAX_DELAY {0.5 * static_cast<double>(std::numeric_limits<std::int64_t>::max()) / NANOSECONDS_PER_MILLISECOND};
+
+    const auto delay {(std::isnan(pDelay) || (pDelay <= 0.0)) ?
+                          0 :
+                          std::llround(std::min(pDelay, MAX_DELAY) * NANOSECONDS_PER_MILLISECOND)};
+
+    {
+        const std::scoped_lock<std::mutex> pauseLock(mPauseMutex);
+
+        mDelay.store(delay, std::memory_order_relaxed);
+    }
+
+    mPauseConditionVariable.notify_all();
+}
+
 void SedInstance::Impl::prepareRun()
 {
     // Note: we are called from the thread that runs us or that starts running us (see run() and startRun()), i.e.
@@ -162,6 +199,8 @@ void SedInstance::Impl::prepareRun()
     //       between would be lost.
 
     for (const auto &task : mTasks) {
+        task->pimpl()->mDelay = &mDelay;
+
         task->pimpl()->mRunControl = &mRunControl;
 
         task->pimpl()->mPauseMutex = &mPauseMutex;
@@ -256,6 +295,8 @@ double SedInstance::Impl::executeRun()
     mTasksToRun.clear();
 
     for (const auto &task : mTasks) {
+        task->pimpl()->mDelay = nullptr;
+
         task->pimpl()->mRunControl = nullptr;
 
         task->pimpl()->mPauseMutex = nullptr;
@@ -393,7 +434,16 @@ double SedInstance::Impl::waitForRun()
 
 void SedInstance::Impl::pauseRun()
 {
-    mRunControl.fetch_or(INSTANCE_RUN_CONTROL_PAUSE, std::memory_order_relaxed);
+    // Note: a task may be waiting for its delay (see setDelay()), in which case it must be woken up so that it gets
+    //       paused straight away, hence we notify our pause condition variable (see the note in resumeRun()).
+
+    {
+        const std::scoped_lock<std::mutex> pauseLock(mPauseMutex);
+
+        mRunControl.fetch_or(INSTANCE_RUN_CONTROL_PAUSE, std::memory_order_relaxed);
+    }
+
+    mPauseConditionVariable.notify_all();
 }
 
 void SedInstance::Impl::resumeRun()
@@ -504,6 +554,16 @@ const SedInstance::Impl *SedInstance::pimpl() const
 SedInstance::Status SedInstance::status() const noexcept
 {
     return pimpl()->status();
+}
+
+double SedInstance::delay() const noexcept
+{
+    return pimpl()->delay();
+}
+
+void SedInstance::setDelay(double pDelay)
+{
+    pimpl()->setDelay(pDelay);
 }
 
 double SedInstance::run()
