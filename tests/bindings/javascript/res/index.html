@@ -107,8 +107,20 @@
               </div>
               <div class="delay-wheel-container">
                 <div class="delay-wheel" id="delayWheel" tabindex="0">
-                  <svg class="delay-wheel-ridges" viewBox="0 0 160 24" preserveAspectRatio="none">
-                    <g id="delayWheelRidges"></g>
+                  <svg class="delay-wheel-svg" id="delayWheelSvg">
+                    <defs>
+                      <linearGradient id="delayWheelFade" gradientUnits="userSpaceOnUse" x1="0" y1="0" y2="0">
+                        <stop offset="0" stop-color="#000" />
+                        <stop offset="0.3" stop-color="#fff" />
+                        <stop offset="0.7" stop-color="#fff" />
+                        <stop offset="1" stop-color="#000" />
+                      </linearGradient>
+                      <mask id="delayWheelMask" maskUnits="userSpaceOnUse" x="0" y="0">
+                        <rect id="delayWheelMaskRect" x="0" y="0" fill="url(#delayWheelFade)" />
+                      </mask>
+                    </defs>
+                    <g class="delay-wheel-ticks" id="delayWheelTicks" mask="url(#delayWheelMask)"></g>
+                    <rect class="delay-wheel-marker" id="delayWheelMarker" />
                   </svg>
                   <div class="delay-wheel-position">
                     <div class="delay-wheel-position-fill" id="delayWheelPositionFill"></div>
