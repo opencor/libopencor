@@ -12,3 +12,4 @@
         mErrors = mTasksErrors;
         mErrorCount.store(mErrors.size(), std::memory_order_release);
     if ((document->getNumErrors() == 0)
+  // straightaway.

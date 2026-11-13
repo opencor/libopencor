@@ -16,16 +16,43 @@ const chart = lightningChart()
   .setAnimationsEnabled(false);
 const lineSeries = chart.addLineSeries().setName('');
 let plottedPointCount = 0;
-const MIN_DELAY_EXPONENT = -3;
-const MAX_DELAY_EXPONENT = 0;
-const DELAY_WHEEL_WIDTH = 160; // Must match the width of our wheel (see libopencor.css).
-const DELAY_WHEEL_HEIGHT = 24; // Must match the height of the view box of our wheel (see index.html).
-const DELAY_WHEEL_RADIUS = 0.5 * DELAY_WHEEL_WIDTH;
-const DELAY_WHEEL_RIDGE_SPACING = 12;
-const DELAY_WHEEL_DRAG_RANGE = 320;
-const DELAY_WHEEL_SCROLL_RANGE = 1500;
-const DELAY_WHEEL_KEY_STEP = 0.02;
-let delayPosition = 0;
+// Our delays (in microseconds), i.e. no delay, 1 to 10 µs in steps of 1 µs, 10 to 100 µs in steps of 10 µs, and 100 µs
+// to 1 ms in steps of 100 µs, with a major step for 1 µs, 10 µs, 100 µs, and 1 ms (see setupDelayWheel()).
+const DELAYS = [
+  0,
+  ...Array.from({ length: 10 }, (_, i) => i + 1),
+  ...Array.from({ length: 9 }, (_, i) => 10 * (i + 2)),
+  ...Array.from({ length: 9 }, (_, i) => 100 * (i + 2))
+];
+const DELAY_STEPS = DELAYS.length - 1;
+const DELAY_MAJOR_STEPS = DELAYS.flatMap((delay, index) => ([1, 10, 100, 1000].includes(delay) ? [index] : []));
+const DELAY_WHEEL_WIDTH = 120; // Must match the width of our wheel (see .delay-wheel in libopencor.css).
+const DELAY_WHEEL_HEIGHT = 28; // Must match the height of our wheel (see .delay-wheel in libopencor.css).
+const DELAY_WHEEL_BORDER_WIDTH = 1; // Must match the width of our border (see .delay-wheel in libopencor.css).
+const DELAY_WHEEL_INNER_WIDTH = DELAY_WHEEL_WIDTH - 2 * DELAY_WHEEL_BORDER_WIDTH;
+const DELAY_WHEEL_INNER_HEIGHT = DELAY_WHEEL_HEIGHT - 2 * DELAY_WHEEL_BORDER_WIDTH;
+const DELAY_WHEEL_RADIUS = 0.5 * DELAY_WHEEL_INNER_WIDTH;
+const DELAY_WHEEL_TICK_SPACING = 10; // Spacing between two ticks, in degrees.
+const DELAY_WHEEL_POSITION_AREA_HEIGHT = 7; // Height of our position bar and of the space below it.
+const DELAY_WHEEL_MARKER_GAP = 2; // Space between our marker and our position bar.
+const DELAY_WHEEL_MARKER_WIDTH = 2;
+const DELAY_WHEEL_MARKER_TOP = 2;
+const DELAY_WHEEL_MARKER_BOTTOM = DELAY_WHEEL_INNER_HEIGHT - DELAY_WHEEL_POSITION_AREA_HEIGHT - DELAY_WHEEL_MARKER_GAP;
+const DELAY_WHEEL_TICKS_MIDDLE = 0.5 * (DELAY_WHEEL_MARKER_TOP + DELAY_WHEEL_MARKER_BOTTOM);
+const DELAY_WHEEL_END_TICK_WIDTH = 2; // Must match the stroke width of our stop ticks (see libopencor.css).
+const DELAY_WHEEL_END_TICK_HALF_LENGTH =
+  0.5 * (DELAY_WHEEL_MARKER_BOTTOM - DELAY_WHEEL_MARKER_TOP - DELAY_WHEEL_END_TICK_WIDTH) - 0.5;
+const DELAY_WHEEL_MAJOR_TICK_HALF_LENGTH = DELAY_WHEEL_END_TICK_HALF_LENGTH - 1.5;
+const DELAY_WHEEL_MINOR_TICK_HALF_LENGTH = DELAY_WHEEL_END_TICK_HALF_LENGTH - 3.5;
+const DELAY_WHEEL_TURN_DURATION = 120; // How long our wheel takes to turn to its new step (in milliseconds).
+const DELAY_WHEEL_DRAG_RANGE = (DELAY_STEPS * DELAY_WHEEL_RADIUS * DELAY_WHEEL_TICK_SPACING * Math.PI) / 180;
+const DELAY_WHEEL_SCROLL_RANGE = 1500; // How much our wheel must be scrolled (in pixels) to go from one end to the other.
+const DELAY_WHEEL_LINE_HEIGHT = 16; // Height of a line (in pixels), for scrolls that are expressed in lines.
+const DELAY_WHEEL_PAGE_KEY_STEPS = Math.max(1, Math.round(0.1 * DELAY_STEPS));
+let delayStep = 0;
+let delayRawStep = 0; // Unsnapped step, so that small drags and scrolls eventually move our wheel by a step.
+let delayDisplayedStep = 0; // Step shown by our wheel, which follows our step smoothly.
+let delayTurnAnimationFrame = 0;
 
 export function showPage(page) {
   $('.nav-link').each(function () {
@@ -297,15 +324,9 @@ function isAsyncRun() {
 }
 
 function delay() {
-  // Note: our delay grows exponentially with the position of our wheel (from 1 µs to 1 ms), so that both very short
-  //       delays (useful for runs with many output points) and long ones can be set, with the very beginning of our
-  //       wheel meaning no delay.
+  // Note: our delays are in microseconds, but libOpenCOR expects them in milliseconds.
 
-  if (delayPosition === 0) {
-    return 0;
-  }
-
-  return 10 ** (MIN_DELAY_EXPONENT + (MAX_DELAY_EXPONENT - MIN_DELAY_EXPONENT) * delayPosition);
+  return DELAYS[delayStep] / 1000;
 }
 
 function formattedNumber(number) {
@@ -360,58 +381,121 @@ function applyDelay() {
   }
 }
 
-function updateDelayWheel() {
-  // Draw the ridges of our wheel, as seen from above, i.e. as if they were on a cylinder that rotates as our delay
-  // changes.
-  // Note: our wheel rotates by as much as it is dragged (i.e. its surface follows the mouse pointer), hence its
-  //       rotation is the arc length (i.e. how much our wheel has been dragged) divided by its radius.
+function drawDelayWheel() {
+  // Draw our wheel as a ruler dial, i.e. as a scale on a cylinder seen from above (so its ticks get closer to one
+  // another towards the sides of our wheel, where they also fade out, see index.html), with a tick for each of our
+  // steps, a longer tick for each of our major steps, and a stop tick at each end of our scale. Only the ticks on the
+  // visible half of our cylinder are drawn and nothing is drawn beyond our stop ticks, so one side of our wheel is
+  // empty when we are at the start or end of our wheel.
 
-  const rotation = (((delayPosition * DELAY_WHEEL_DRAG_RANGE) / DELAY_WHEEL_RADIUS) * 180) / Math.PI;
-  const firstAngle =
-    (((rotation % DELAY_WHEEL_RIDGE_SPACING) + DELAY_WHEEL_RIDGE_SPACING) % DELAY_WHEEL_RIDGE_SPACING) - 90;
-  let ridges = '';
+  const rotation = delayDisplayedStep * DELAY_WHEEL_TICK_SPACING;
+  const firstStep = Math.max(0, Math.ceil((rotation - 90) / DELAY_WHEEL_TICK_SPACING));
+  const lastStep = Math.min(DELAY_STEPS, Math.floor((rotation + 90) / DELAY_WHEEL_TICK_SPACING));
+  let ticks = '';
 
-  for (let angle = firstAngle; angle < 90; angle += DELAY_WHEEL_RIDGE_SPACING) {
-    const radians = (angle * Math.PI) / 180;
-    const depth = Math.cos(radians); // 1 in the middle of our wheel and 0 on its sides.
-    const x = DELAY_WHEEL_RADIUS * (1 + Math.sin(radians));
+  for (let step = firstStep; step <= lastStep; ++step) {
+    const angle = step * DELAY_WHEEL_TICK_SPACING - rotation;
+    const x = DELAY_WHEEL_RADIUS * (1 + Math.sin((angle * Math.PI) / 180));
+    const end = step === 0 || step === DELAY_STEPS;
+    const major = DELAY_MAJOR_STEPS.includes(step);
+    const halfLength = end
+      ? DELAY_WHEEL_END_TICK_HALF_LENGTH
+      : major
+        ? DELAY_WHEEL_MAJOR_TICK_HALF_LENGTH
+        : DELAY_WHEEL_MINOR_TICK_HALF_LENGTH;
+    const tickClass = end ? 'delay-wheel-tick-end' : major ? 'delay-wheel-tick-major' : '';
 
-    ridges += `<line x1="${x}" y1="4" x2="${x}" y2="${DELAY_WHEEL_HEIGHT - 4}" stroke-width="${0.5 + 1.5 * depth}" opacity="${depth ** 1.5}" />`;
+    ticks += `<line class="${tickClass}" x1="${x}" y1="${DELAY_WHEEL_TICKS_MIDDLE - halfLength}" x2="${x}" y2="${DELAY_WHEEL_TICKS_MIDDLE + halfLength}" />`;
   }
 
-  $('#delayWheelRidges').html(ridges);
-  $('#delayWheelPositionFill').css('width', `${100 * delayPosition}%`);
-
-  // Update our delay information.
-
-  updateDelayInfo();
+  $('#delayWheelTicks').html(ticks);
+  $('#delayWheelPositionFill').css('width', `${(100 * delayDisplayedStep) / DELAY_STEPS}%`);
 }
 
-function setDelayPosition(position) {
-  delayPosition = Math.min(Math.max(position, 0), 1);
+function turnDelayWheel() {
+  // Turn our wheel smoothly to its new step, unless reduced motion is requested, in which case it gets there
+  // straightaway.
 
-  updateDelayWheel();
+  cancelAnimationFrame(delayTurnAnimationFrame);
 
-  // Apply our new delay straight away, so that it can be changed while a simulation is running.
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    delayDisplayedStep = delayStep;
 
-  applyDelay();
+    drawDelayWheel();
+
+    return;
+  }
+
+  const startStep = delayDisplayedStep;
+  const startTime = performance.now();
+  const turn = (time) => {
+    const progress = Math.min((time - startTime) / DELAY_WHEEL_TURN_DURATION, 1);
+    const easedProgress = 1 - (1 - progress) ** 3; // Ease out.
+
+    delayDisplayedStep = startStep + (delayStep - startStep) * easedProgress;
+
+    drawDelayWheel();
+
+    if (progress < 1) {
+      delayTurnAnimationFrame = requestAnimationFrame(turn);
+    }
+  };
+
+  delayTurnAnimationFrame = requestAnimationFrame(turn);
+}
+
+function setDelayStep(step) {
+  // Set our (unsnapped) step and, if our (snapped) step has changed, turn our wheel to it and apply our new delay
+  // straight away, so that it can be changed while a simulation is running.
+
+  delayRawStep = Math.min(Math.max(step, 0), DELAY_STEPS);
+
+  const newDelayStep = Math.round(delayRawStep);
+
+  if (newDelayStep !== delayStep) {
+    delayStep = newDelayStep;
+
+    turnDelayWheel();
+    updateDelayInfo();
+    applyDelay();
+  }
 }
 
 export function setupDelayWheel() {
-  // Drag our wheel right/left to increase/decrease our delay.
+  // Set up our wheel (a bit like a thumbwheel or a jog wheel), which has a marker in its middle and a position bar at
+  // its bottom.
+  // Note: our ticks and our marker are drawn within our border.
 
   const $wheel = $('#delayWheel');
   const wheel = $wheel[0];
+
+  $('#delayWheelSvg').attr('viewBox', `0 0 ${DELAY_WHEEL_INNER_WIDTH} ${DELAY_WHEEL_INNER_HEIGHT}`);
+  $('#delayWheelFade').attr('x2', DELAY_WHEEL_INNER_WIDTH);
+  $('#delayWheelMask, #delayWheelMaskRect').attr({ width: DELAY_WHEEL_INNER_WIDTH, height: DELAY_WHEEL_INNER_HEIGHT });
+  $('#delayWheelMarker').attr({
+    x: DELAY_WHEEL_RADIUS - 0.5 * DELAY_WHEEL_MARKER_WIDTH,
+    y: DELAY_WHEEL_MARKER_TOP,
+    width: DELAY_WHEEL_MARKER_WIDTH,
+    height: DELAY_WHEEL_MARKER_BOTTOM - DELAY_WHEEL_MARKER_TOP,
+    rx: 0.5 * DELAY_WHEEL_MARKER_WIDTH
+  });
+
+  // Drag our wheel left/right to increase/decrease our delay, i.e. our scale follows the mouse pointer, like the
+  // surface of a physical wheel, so dragging our wheel left brings the ticks on the right (i.e. longer delays) under
+  // our marker.
+
   let dragStartX = null;
-  let dragStartPosition = 0;
+  let dragStartStep = 0;
 
   wheel.addEventListener('pointerdown', (event) => {
-    if (!isAsyncRun()) {
+    if (!isAsyncRun() || event.button !== 0) {
       return;
     }
 
     dragStartX = event.clientX;
-    dragStartPosition = delayPosition;
+    dragStartStep = delayStep;
+
+    $wheel.addClass('dragging');
 
     wheel.setPointerCapture(event.pointerId);
     wheel.focus();
@@ -419,13 +503,15 @@ export function setupDelayWheel() {
 
   wheel.addEventListener('pointermove', (event) => {
     if (dragStartX !== null) {
-      setDelayPosition(dragStartPosition + (event.clientX - dragStartX) / DELAY_WHEEL_DRAG_RANGE);
+      setDelayStep(dragStartStep - (DELAY_STEPS * (event.clientX - dragStartX)) / DELAY_WHEEL_DRAG_RANGE);
     }
   });
 
-  ['pointerup', 'pointercancel'].forEach((eventName) => {
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((eventName) => {
     wheel.addEventListener(eventName, () => {
       dragStartX = null;
+
+      $wheel.removeClass('dragging');
     });
   });
 
@@ -442,33 +528,36 @@ export function setupDelayWheel() {
       event.preventDefault();
 
       const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : -event.deltaY;
-      const pixelDelta = event.deltaMode === WheelEvent.DOM_DELTA_LINE ? 16 * delta : delta;
+      const pixelDelta = event.deltaMode === WheelEvent.DOM_DELTA_LINE ? DELAY_WHEEL_LINE_HEIGHT * delta : delta;
 
-      setDelayPosition(delayPosition + pixelDelta / DELAY_WHEEL_SCROLL_RANGE);
+      setDelayStep(delayRawStep + (DELAY_STEPS * pixelDelta) / DELAY_WHEEL_SCROLL_RANGE);
     },
     { passive: false }
   );
 
-  // Use the arrow, Home, and End keys to change our delay.
+  // Use the arrow keys to change our delay by one step, the Page Up/Down keys to change it by several steps, and the
+  // Home and End keys to go to the start and end of our wheel.
 
   wheel.addEventListener('keydown', (event) => {
     if (!isAsyncRun()) {
       return;
     }
 
-    const positions = {
-      ArrowUp: delayPosition + DELAY_WHEEL_KEY_STEP,
-      ArrowRight: delayPosition + DELAY_WHEEL_KEY_STEP,
-      ArrowDown: delayPosition - DELAY_WHEEL_KEY_STEP,
-      ArrowLeft: delayPosition - DELAY_WHEEL_KEY_STEP,
+    const steps = {
+      ArrowUp: delayStep + 1,
+      ArrowRight: delayStep + 1,
+      ArrowDown: delayStep - 1,
+      ArrowLeft: delayStep - 1,
+      PageUp: delayStep + DELAY_WHEEL_PAGE_KEY_STEPS,
+      PageDown: delayStep - DELAY_WHEEL_PAGE_KEY_STEPS,
       Home: 0,
-      End: 1
+      End: DELAY_STEPS
     };
 
-    if (event.key in positions) {
+    if (event.key in steps) {
       event.preventDefault();
 
-      setDelayPosition(positions[event.key]);
+      setDelayStep(steps[event.key]);
     }
   });
 
@@ -476,7 +565,7 @@ export function setupDelayWheel() {
 
   wheel.addEventListener('dblclick', () => {
     if (isAsyncRun()) {
-      setDelayPosition(0);
+      setDelayStep(0);
     }
   });
 
@@ -484,11 +573,13 @@ export function setupDelayWheel() {
 
   $('#runAsync').on('change', () => {
     $wheel.toggleClass('disabled', !isAsyncRun());
+    $wheel.attr('tabindex', isAsyncRun() ? 0 : -1);
 
     applyDelay();
   });
 
-  updateDelayWheel();
+  drawDelayWheel();
+  updateDelayInfo();
 }
 
 function axisInfo(index) {
