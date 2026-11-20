@@ -75,14 +75,14 @@ TEST(VersionTest, libcurl)
 {
     // Note: this has no JavaScript equivalent since our JavaScript bindings are built without libcurl.
 
-    EXPECT_EQ(0x081500U, libOpenCOR::libcurlVersion());
-    EXPECT_EQ("8.21.0-DEV", libOpenCOR::libcurlVersionString());
+    EXPECT_EQ(0x081700U, libOpenCOR::libcurlVersion());
+    EXPECT_EQ("8.23.0-DEV", libOpenCOR::libcurlVersionString());
 }
 
 TEST(VersionTest, libSEDML)
 {
-    EXPECT_EQ(20033U, libOpenCOR::libsedmlVersion());
-    EXPECT_EQ("2.0.33", libOpenCOR::libsedmlVersionString());
+    EXPECT_EQ(20034U, libOpenCOR::libsedmlVersion());
+    EXPECT_EQ("2.0.34", libOpenCOR::libsedmlVersionString());
 }
 
 TEST(VersionTest, LLVM)
@@ -93,6 +93,6 @@ TEST(VersionTest, LLVM)
 
 TEST(VersionTest, SUNDIALS)
 {
-    EXPECT_EQ(0x070700U, libOpenCOR::sundialsVersion());
-    EXPECT_EQ("7.7.0", libOpenCOR::sundialsVersionString());
+    EXPECT_EQ(0x070900U, libOpenCOR::sundialsVersion());
+    EXPECT_EQ("7.9.0", libOpenCOR::sundialsVersionString());
 }

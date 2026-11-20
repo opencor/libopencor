@@ -80,8 +80,8 @@ def test_libcombine():
 def test_libcurl():
     # Note: this has no JavaScript equivalent since our JavaScript bindings are built without libcurl.
 
-    assert loc.libcurl_version() == 0x081500
-    assert loc.libcurl_version_string() == "8.21.0-DEV"
+    assert loc.libcurl_version() == 0x081700
+    assert loc.libcurl_version_string() == "8.23.0-DEV"
 
     # The version is an integer and the version string is a string.
     # Note: this has no C++ equivalent since C++ is statically typed.
@@ -91,8 +91,8 @@ def test_libcurl():
 
 
 def test_libsedml():
-    assert loc.libsedml_version() == 20033
-    assert loc.libsedml_version_string() == "2.0.33"
+    assert loc.libsedml_version() == 20034
+    assert loc.libsedml_version_string() == "2.0.34"
 
     # The version is an integer and the version string is a string.
     # Note: this has no C++ equivalent since C++ is statically typed.
@@ -113,8 +113,8 @@ def test_llvm():
 
 
 def test_sundials():
-    assert loc.sundials_version() == 0x070700
-    assert loc.sundials_version_string() == "7.7.0"
+    assert loc.sundials_version() == 0x070900
+    assert loc.sundials_version_string() == "7.9.0"
 
     # The version is an integer and the version string is a string.
     # Note: this has no C++ equivalent since C++ is statically typed.
