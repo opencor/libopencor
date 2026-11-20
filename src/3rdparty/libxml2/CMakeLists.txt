@@ -136,3 +136,13 @@ set(LIBXML2_INCLUDE_DIR ${INSTALL_DIR}/include/libxml2 CACHE INTERNAL "${PACKAGE
 set(LIBXML2_LIBRARY libxml2::libxml2${LIBRARY_SUFFIX} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
 set(LIBXML2_LIBRARY_FILE ${INSTALL_DIR}/lib/libxml2${LIBRARY_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
 set(LIBXML2_DEFINITIONS LIBXML_STATIC CACHE INTERNAL "${PACKAGE_NAME}'s definitions.")
+
+# On Windows, libxml2 (2.14+) uses BCryptGenRandom() to seed its random number generator, so anything that links
+# against our copy of libxml2 also needs to link against bcrypt.
+# Note: this is the case whether our package was built or retrieved, hence we set it here.
+
+if(WIN32)
+    set(LIBXML2_LIBRARIES bcrypt CACHE INTERNAL "${PACKAGE_NAME}'s system libraries.")
+else()
+    set(LIBXML2_LIBRARIES "" CACHE INTERNAL "${PACKAGE_NAME}'s system libraries.")
+endif()

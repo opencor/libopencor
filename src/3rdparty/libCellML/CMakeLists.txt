@@ -39,7 +39,8 @@ if(NOT TARGET LibXml2::LibXml2)
     set_target_properties(LibXml2::LibXml2 PROPERTIES
                           IMPORTED_LOCATION "@LIBXML2_LIBRARY_FILE@"
                           INTERFACE_COMPILE_DEFINITIONS "@LIBXML2_DEFINITIONS@"
-                          INTERFACE_INCLUDE_DIRECTORIES "@LIBXML2_INCLUDE_DIR@")
+                          INTERFACE_INCLUDE_DIRECTORIES "@LIBXML2_INCLUDE_DIR@"
+                          INTERFACE_LINK_LIBRARIES "@LIBXML2_LIBRARIES@")
 endif()
 
 set(LIBXML2_INCLUDE_DIRS "@LIBXML2_INCLUDE_DIR@")

@@ -6,5 +6,6 @@ libOpenCOR doesn't handle SBML documents. It only needs libSBML because libSEDML
   - Make the L3v2extendedmath package's AST plugin neither evaluate SBML math nor determine its units (`src/sbml/packages/l3v2extendedmath/extension/L3v2extendedmathASTPlugin.cpp`) since libOpenCOR never does either. The AST plugin itself is still registered since it is needed to parse some of the math used in SED-ML files (e.g., `max`, `min`, and `rem`).
 - `libsbml-no-sax1.patch`:
   - Use `xmlReadFile()` rather than `xmlParseFile()` in the test executable that libSBML compiles to check libxml2 (`CMakeModules/FindLIBXML.cmake`) since we build libxml2 without its older SAX1 interface, which `xmlParseFile()` is part of. libSBML itself only uses libxml2's SAX2 interface (through a push parser), so it is not otherwise affected.
+  - Link that test executable against `bcrypt.lib` on Windows since libxml2 (2.14+) needs it (`CMakeModules/FindLIBXML.cmake`).
 
 This means that libSBML's SBML converters, SBML document support (incl. its validators), SBML model classes, and SBO support are not linked into libOpenCOR. The parts of libSBML that libSEDML, libNuML, and libCOMBINE use are not affected.
