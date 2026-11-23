@@ -42,11 +42,11 @@ jobs:
           #       glibc symbols that are not available in that container, resulting in our Python wheels failing to
           #       load.
           - name: 'Linux (Intel)'
-            os: ubuntu-24.04
+            os: ubuntu-26.04
             container: quay.io/pypa/manylinux_2_34_x86_64:2025.09.19-1
             build_type: Release
           - name: 'Linux (ARM)'
-            os: ubuntu-24.04-arm
+            os: ubuntu-26.04-arm
             container: quay.io/pypa/manylinux_2_34_aarch64:2025.09.19-1
             build_type: Release
           - name: 'macOS (Intel)'
