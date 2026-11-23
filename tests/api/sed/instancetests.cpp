@@ -1887,9 +1887,9 @@ TEST(InstanceSedTest, odeModelResultsReusedWhenRunAgain)
 
 TEST(InstanceSedTest, odeModelWithRoundingErrorOnOutputEndTime)
 {
-    // Note: with an output start time of -1, an output end time of 0, and 49 steps, the time of the last step is computed
-    //       as -1 + 49 * (1 / 49), which is not exactly 0 due to rounding errors. This used to result in an extra step
-    //       being taken and its results being written past the end of our results arrays.
+    // Note: with an output start time of -1, an output end time of 0, and 49 steps, the time of the last step is
+    //       computed as -1 + 49 * (1 / 49), which is not exactly 0 due to rounding errors. This used to result in an
+    //       extra step being taken and its results being written past the end of our results arrays.
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};

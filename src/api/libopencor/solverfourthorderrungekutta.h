@@ -23,7 +23,8 @@ namespace libOpenCOR {
 /**
  * @brief The SolverFourthOrderRungeKutta class.
  *
- * The SolverFourthOrderRungeKutta class is used to represent the <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">fourth-order Runge-Kutta</a> solver.
+ * The SolverFourthOrderRungeKutta class is used to represent the
+ * <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">fourth-order Runge-Kutta</a> solver.
  */
 
 class LIBOPENCOR_EXPORT SolverFourthOrderRungeKutta: public SolverOdeFixedStep

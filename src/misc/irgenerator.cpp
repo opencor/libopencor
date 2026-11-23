@@ -1801,8 +1801,8 @@ private:
         // A postfix expression preceded by some unary operators and/or casts, which apply from right to left, i.e.
         // -(double) !x is -((double) (!x)).
         // Note: this is where we keep track of the nesting depth of our expressions since a parenthesised expression, a
-        //       subscript, an argument, and the second operand of the conditional operator are all parsed from here, and
-        //       since our unary operators and casts are nested in one another.
+        //       subscript, an argument, and the second operand of the conditional operator are all parsed from here,
+        //       and since our unary operators and casts are nested in one another.
 
         DepthGuard depthGuard(mDepth);
 
@@ -2116,8 +2116,8 @@ private:
             return res;
         }
 
-        // Note: as in C, an integer constant with a leading 0 is an octal constant, and an integer constant is an int if
-        //       it fits in one, otherwise a long long (and it must fit in one).
+        // Note: as in C, an integer constant with a leading 0 is an octal constant, and an integer constant is an int
+        //       if it fits in one, otherwise a long long (and it must fit in one).
 
         uint64_t value {0};
 

@@ -240,8 +240,8 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
     // Determine the master file, if none was specified.
     // Note: the master attribute is optional, so if no master file was specified then we consider the SED-ML file to be
     //       the master file, if there is only one SED-ML file, or the CellML file to be the master file, if there is no
-    //       SED-ML file and only one CellML file. Otherwise, it is up to the user (or a tool like Web OpenCOR) to decide
-    //       which file should be used.
+    //       SED-ML file and only one CellML file. Otherwise, it is up to the user (or a tool like Web OpenCOR) to
+    //       decide which file should be used.
 
     if (mMasterFile == nullptr) {
         if (mSedmlFileCount == 1) {

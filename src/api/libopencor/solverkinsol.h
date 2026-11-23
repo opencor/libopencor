@@ -23,7 +23,8 @@ namespace libOpenCOR {
 /**
  * @brief The SolverKinsol class.
  *
- * The SolverKinsol class is used to represent the <a href="https://computing.llnl.gov/projects/sundials/kinsol">KINSOL</a> solver.
+ * The SolverKinsol class is used to represent the
+ * <a href="https://computing.llnl.gov/projects/sundials/kinsol">KINSOL</a> solver.
  */
 
 class LIBOPENCOR_EXPORT SolverKinsol: public SolverNla

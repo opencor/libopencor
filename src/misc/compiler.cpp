@@ -504,8 +504,8 @@ bool Compiler::Impl::compile(const std::string &pCode, const Strings &pEntryPoin
     //       for
     //           clang -O3 -fno-math-errno -fno-trapping-math -fno-stack-protector -funroll-loops -march=native
     //       (with -mcpu=native rather than -march=native on AArch64), and our IR generator only needs to know about the
-    //       parts of it that depend on our target. For our WASM version, it is the IR for wasm32-unknown-emscripten with
-    //       -fvisibility=hidden and a static relocation model (we don't link our code, we just instantiate it).
+    //       parts of it that depend on our target. For our WASM version, it is the IR for wasm32-unknown-emscripten
+    //       with -fvisibility=hidden and a static relocation model (we don't link our code, we just instantiate it).
 
     static const auto irGeneratorTarget {[&targetMachine] {
         IrGeneratorTarget res;
@@ -618,9 +618,10 @@ bool Compiler::Impl::compile(const std::string &pCode, const Strings &pEntryPoin
     llvmContext->setDiscardValueNames(true);
 
 #if defined(BUILDING_ON_MACOS) && defined(BUILDING_ON_ARM)
-    // Skip LLVM's machine instruction scheduler on Apple Silicon since, there, it accounts for about a third of the time
-    // it takes to compile a big model (AArch64 schedules in both directions while tracking register pressure) while it
-    // makes no measurable difference to the time it takes to compute it (Apple's cores are wide out-of-order cores).
+    // Skip LLVM's machine instruction scheduler on Apple Silicon since, there, it accounts for about a third of the
+    // time it takes to compile a big model (AArch64 schedules in both directions while tracking register pressure)
+    // while it makes no measurable difference to the time it takes to compute it (Apple's cores are wide out-of-order
+    // cores).
     // Note: an OptPassGate is given the argument of a (legacy) pass, i.e. "machine-scheduler" in our case.
 
     class NoMachineSchedulerPassGate: public llvm::OptPassGate
@@ -705,14 +706,14 @@ bool Compiler::Impl::compile(const std::string &pCode, const Strings &pEntryPoin
 
     // Determine the size of the stack that our WebAssembly code needs (see initialiseWorkerWasm() in
     // cellmlfileruntime.cpp).
-    // Note: WebAssembly keeps our values in its own locals, so the only memory that our code uses on its stack (which is
-    //       in linear memory and has no guard page) is that of our allocas. Also, our code is never re-entered: our
-    //       functions may call nlaSolve(), which runs on the stack of our main WebAssembly module and calls our objective
-    //       functions, which themselves don't call any of our functions. So, the memory needed by all of our allocas is
-    //       an upper bound on the size of the stack that our code needs, as long as our allocas are static (i.e. they
-    //       have a fixed size and are in the entry block of their function otherwise they would allocate some memory
-    //       each time they are executed). We align each of our functions' frames to 16 bytes, as the WebAssembly
-    //       backend does.
+    // Note: WebAssembly keeps our values in its own locals, so the only memory that our code uses on its stack (which
+    //       is in linear memory and has no guard page) is that of our allocas. Also, our code is never re-entered: our
+    //       functions may call nlaSolve(), which runs on the stack of our main WebAssembly module and calls our
+    //       objective functions, which themselves don't call any of our functions. So, the memory needed by all of our
+    //       allocas is an upper bound on the size of the stack that our code needs, as long as our allocas are static
+    //       (i.e. they have a fixed size and are in the entry block of their function otherwise they would allocate
+    //       some memory each time they are executed). We align each of our functions' frames to 16 bytes, as the
+    //       WebAssembly backend does.
 
     static constexpr uint64_t WASM_STACK_ALIGNMENT {16};
 

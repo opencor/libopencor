@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libxml2)
-set(PACKAGE_VERSION 2.9.14)
+set(PACKAGE_VERSION 2.15.4)
 set(PACKAGE_REPOSITORY libxml2)
-set(RELEASE_TAG v2.9.14)
+set(RELEASE_TAG v2.15.4)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -24,49 +24,49 @@ if(LIBOPENCOR_PREBUILT_LIBXML2)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         f67b580d4d6e20fdbf25c1fef6a0187683c8caf2)
+                         d755e638bc31e3dd07ffa30e309a6ad57f0dd0c6)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     8e0a7d05dbe9fb144dadec732f0efe262d49a359)
+                                     90fc907f46f4681341cb5fc0a1cdb31a27fdb8c9)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     9f26f4c25447cbfe94430d2d7ea773ffe6839299)
+                                     57ddbd6460f3eda5a8b05159bc91b1a7cc1aa856)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     e726158b3ab5031f87214df8f507b421bb822c33)
+                                     5127f23517e220ad1467e8b606e03ee1336a3304)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     55808611458e02c7711edc7bb7ed5529116b1055)
+                                     5ba67a19782f9a8866213c906d0613c9909f5357)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 d80688917fc42b90297fffb0ab6d2894562baad9)
+                                 fcb8b2943f3ddcbbda5e6ceec50bd817afe11bfb)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 8ddb9699f4f6be84a3dd8afa03e7e87522278521)
+                                 a24568fb8b499380255ae0c97a4814b2b9c848d1)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 66fb0eb3c0c6f007daea9044a5f3bba767423296)
+                                 6899d9121febe3b8f39045274ee9bbf43ea3225d)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 f85336ddbaa96c1bb0cf3eb6f279a745a886aa0a)
+                                 649d950bd9ea4df97c55bda6179db3c2205b4ffa)
             endif()
         endif()
     endif()
@@ -136,3 +136,13 @@ set(LIBXML2_INCLUDE_DIR ${INSTALL_DIR}/include/libxml2 CACHE INTERNAL "${PACKAGE
 set(LIBXML2_LIBRARY libxml2::libxml2${LIBRARY_SUFFIX} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
 set(LIBXML2_LIBRARY_FILE ${INSTALL_DIR}/lib/libxml2${LIBRARY_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
 set(LIBXML2_DEFINITIONS LIBXML_STATIC CACHE INTERNAL "${PACKAGE_NAME}'s definitions.")
+
+# On Windows, libxml2 (2.14+) uses BCryptGenRandom() to seed its random number generator, so anything that links
+# against our copy of libxml2 also needs to link against bcrypt.
+# Note: this is the case whether our package was built or retrieved, hence we set it here.
+
+if(WIN32)
+    set(LIBXML2_LIBRARIES bcrypt CACHE INTERNAL "${PACKAGE_NAME}'s system libraries.")
+else()
+    set(LIBXML2_LIBRARIES "" CACHE INTERNAL "${PACKAGE_NAME}'s system libraries.")
+endif()

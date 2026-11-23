@@ -231,15 +231,28 @@ function(add_package PACKAGE)
 endfunction()
 
 function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG SHA1_VALUE)
-    # Check whether the package has already been retrieved by simply checking whether its installation directory exists.
+    # Check whether the package has already been retrieved by checking whether its installation directory contains a
+    # marker file with the SHA-1 value of the package that we want. If the marker file is missing or if it has a
+    # different SHA-1 value, then we remove the installation directory and retrieve the package anew.
+    # Note: the marker file is located at the root of the installation directory, so create_package() never includes
+    #       it in a package since it only packages some specific subdirectories and/or files.
 
     set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
+    set(MARKER_FILE ${INSTALL_DIR}/.sha1)
 
     message(STATUS "Retrieving Package ${PACKAGE_NAME}")
 
-    if(EXISTS ${INSTALL_DIR})
+    set(INSTALLED_SHA1_VALUE)
+
+    if(EXISTS ${MARKER_FILE})
+        file(READ ${MARKER_FILE} INSTALLED_SHA1_VALUE)
+        string(STRIP "${INSTALLED_SHA1_VALUE}" INSTALLED_SHA1_VALUE)
+    endif()
+
+    if("${INSTALLED_SHA1_VALUE}" STREQUAL "${SHA1_VALUE}")
         message(STATUS "Retrieving Package ${PACKAGE_NAME} - Success")
     else()
+        file(REMOVE_RECURSE ${INSTALL_DIR})
         # Retrieve the package.
 
         set(PACKAGE_FILE ${PACKAGE_NAME}.${PACKAGE_VERSION}.${TARGET_PLATFORM_ARCHITECTURE}.tar.gz)
@@ -291,6 +304,10 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
                 endif()
 
                 file(REMOVE ${REAL_PACKAGE_FILE})
+
+                # Keep track of the SHA-1 value of the package that we have retrieved.
+
+                file(WRITE ${MARKER_FILE} "${SHA1_VALUE}\n")
 
                 message(STATUS "Retrieving Package ${PACKAGE_NAME} - Success")
             else()

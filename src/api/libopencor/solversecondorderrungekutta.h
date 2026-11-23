@@ -23,7 +23,8 @@ namespace libOpenCOR {
 /**
  * @brief The SolverSecondOrderRungeKutta class.
  *
- * The SolverSecondOrderRungeKutta class is used to represent the <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">second-order Runge-Kutta</a> solver.
+ * The SolverSecondOrderRungeKutta class is used to represent the
+ * <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">second-order Runge-Kutta</a> solver.
  */
 
 class LIBOPENCOR_EXPORT SolverSecondOrderRungeKutta: public SolverOdeFixedStep

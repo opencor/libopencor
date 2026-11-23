@@ -454,8 +454,8 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
         ASSERT_EQ(KINSetLinearSolver(kinsolObjects.solver, kinsolObjects.sunLinearSolver, kinsolObjects.sunMatrix), KINLS_SUCCESS);
 
-        // Keep track of the linear solver settings with which our KINSOL objects were created and of the fact that their
-        // linear solver has yet to be set up.
+        // Keep track of the linear solver settings with which our KINSOL objects were created and of the fact that
+        // their linear solver has yet to be set up.
 
         kinsolObjects.linearSolver = mLinearSolver;
         kinsolObjects.upperHalfBandwidth = mUpperHalfBandwidth;

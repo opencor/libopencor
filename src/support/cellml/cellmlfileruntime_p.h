@@ -34,8 +34,8 @@ public:
 
     int mWasmModuleId {0};
 
-    // The size, in bytes, of the stack of our WebAssembly instances (see initialiseWorkerWasm()), i.e. the size that our
-    // compiler tells us our WebAssembly code needs plus a safety margin.
+    // The size, in bytes, of the stack of our WebAssembly instances (see initialiseWorkerWasm()), i.e. the size that
+    // our compiler tells us our WebAssembly code needs plus a safety margin.
 
     static constexpr size_t WASM_STACK_MARGIN_SIZE {65536};
 

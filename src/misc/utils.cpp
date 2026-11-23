@@ -1429,7 +1429,8 @@ std::optional<int> parseInt(const std::string &pString)
 {
     // Parse the given string as an int value, i.e. as 0 or as a non-zero decimal number with an optional sign, no
     // leading zero, and an optional non-negative exponent (e.g., "-123" or "1e3", i.e. 1000), i.e. whether it matches
-    // "^([-+]?[1-9][0-9]*([eE][+]?[0-9]+)?|0)$", which value must fit in an int (e.g., "1e10" is not a valid int value).
+    // "^([-+]?[1-9][0-9]*([eE][+]?[0-9]+)?|0)$", which value must fit in an int (e.g., "1e10" is not a valid int
+    // value).
     // Note: we compute the absolute value of the int value using a 64-bit integer and stop as soon as it is too big, so
     //       that it never overflows. Also, since that absolute value is at least 1, an exponent of 10 or more would
     //       always result in a value that is too big.

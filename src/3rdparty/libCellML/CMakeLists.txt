@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libCellML)
-set(PACKAGE_VERSION 2026-10-29)
+set(PACKAGE_VERSION 2026-11-23)
 set(PACKAGE_REPOSITORY libcellml)
-set(RELEASE_TAG 2026-10-29)
+set(RELEASE_TAG 2026-11-23)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
@@ -39,7 +39,8 @@ if(NOT TARGET LibXml2::LibXml2)
     set_target_properties(LibXml2::LibXml2 PROPERTIES
                           IMPORTED_LOCATION "@LIBXML2_LIBRARY_FILE@"
                           INTERFACE_COMPILE_DEFINITIONS "@LIBXML2_DEFINITIONS@"
-                          INTERFACE_INCLUDE_DIRECTORIES "@LIBXML2_INCLUDE_DIR@")
+                          INTERFACE_INCLUDE_DIRECTORIES "@LIBXML2_INCLUDE_DIR@"
+                          INTERFACE_LINK_LIBRARIES "@LIBXML2_LIBRARIES@")
 endif()
 
 set(LIBXML2_INCLUDE_DIRS "@LIBXML2_INCLUDE_DIR@")
@@ -70,56 +71,56 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         a0ae6d3219d4f25d8940f8544e743ec85bdcc7b7)
+                         78550f76126404eda8a634b8ca0d8f00b84fd37b)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     c92f68ba407220910188c48cefa28790a2835845)
+                                     52068fe31c0fc7849c43dafe4884a4bae63b3446)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     fa8776f96e9b52be0e98d91da02623d08615ad97)
+                                     82f7cbb02b11b340b11c3501d372e0be48c8786e)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     70358d8858a9e9aa3c76a8c73722c5e1fb52325a)
+                                     0212676c85db10dbca085f3e80c3ed45336a3781)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     398a41a28cfbc36069a95bab1a887a858aa20453)
+                                     34e03701b520d06e310d1f2b8636eb481a7a32b1)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 a2437ff44cf14155f1c4102df4a1570c2e4915c7)
+                                 5388d1de2f87b9cd7aac375bb1beb59406892493)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 edc9144be7c2f157dd6498e491c5f993baf7fc9b)
+                                 c73e701610115dac5f0d24749e7cdc481af08d3a)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5a29376c6a5655093c761de2e04db405048cd51f)
+                                 fa3ab246e5a73b72709ef8159d22fa074e3300d8)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 eed442abf2ce3d1c48bb2ae865b275e23035af82)
+                                 d31b686e6851eb4fc2dcb703558814ba05bcadc1)
             endif()
         endif()
     endif()
 elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our WASM version of libCellML with size optimisation.
-    # Note: -Os makes libCellML's contribution to our WASM file noticeably smaller without making it noticeably slower to
-    #       load (i.e. parse and validate) or instantiate (i.e. analyse and generate code for) a model, unlike -Oz.
+    # Note: -Os makes libCellML's contribution to our WASM file noticeably smaller without making it noticeably slower
+    #       to load (i.e. parse and validate) or instantiate (i.e. analyse and generate code for) a model, unlike -Oz.
 
     if(EMSCRIPTEN)
         set(WASM_FLAGS

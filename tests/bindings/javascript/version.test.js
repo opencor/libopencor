@@ -80,8 +80,8 @@ test.describe('Version tests', () => {
   });
 
   test('libSEDML', () => {
-    assert.strictEqual(loc.libsedmlVersion(), 20033);
-    assert.strictEqual(loc.libsedmlVersionString(), '2.0.33');
+    assert.strictEqual(loc.libsedmlVersion(), 20034);
+    assert.strictEqual(loc.libsedmlVersionString(), '2.0.34');
 
     // The version is a number and the version string is a string.
     // Note: this has no C++ equivalent since C++ is statically typed.
@@ -102,8 +102,8 @@ test.describe('Version tests', () => {
   });
 
   test('SUNDIALS', () => {
-    assert.strictEqual(loc.sundialsVersion(), 0x070700);
-    assert.strictEqual(loc.sundialsVersionString(), '7.7.0');
+    assert.strictEqual(loc.sundialsVersion(), 0x070900);
+    assert.strictEqual(loc.sundialsVersionString(), '7.9.0');
 
     // The version is a number and the version string is a string.
     // Note: this has no C++ equivalent since C++ is statically typed.
