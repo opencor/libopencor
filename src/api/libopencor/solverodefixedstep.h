@@ -23,9 +23,9 @@ limitations under the License.
 namespace libOpenCOR {
 
 /**
- * @brief The SolverCvode class.
+ * @brief The SolverOdeFixedStep class.
  *
- * The SolverCvode class is used to represent the forward Euler solver.
+ * The SolverOdeFixedStep class is used to represent a fixed-step ODE solver.
  */
 
 class LIBOPENCOR_EXPORT SolverOdeFixedStep: public SolverOde
