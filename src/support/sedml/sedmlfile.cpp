@@ -275,7 +275,8 @@ NlaSolverInfo SedmlFile::Impl::legacyNlaSolver(const libsedml::SedSimulation *se
                 for (unsigned int j {0}; j < nlaSolverNode.getNumChildren(); ++j) {
                     const auto &nlaSolverPropertyNode {nlaSolverNode.getChild(j)};
 
-                    // Convert the properties to a pointer to libsedml::SedAlgorithm so that we can then call SolverKinsol::Impl::populate() on it.
+                    // Convert the properties to a pointer to libsedml::SedAlgorithm so that we can then call
+                    // SolverKinsol::Impl::populate() on it.
 
                     if ((nlaSolverPropertyNode.getURI() == OPENCOR_NAMESPACE)
                         && (nlaSolverPropertyNode.getName() == "solverProperty")) {

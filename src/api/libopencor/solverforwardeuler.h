@@ -23,7 +23,8 @@ namespace libOpenCOR {
 /**
  * @brief The SolverCvode class.
  *
- * The SolverCvode class is used to represent the <a href="https://en.wikipedia.org/wiki/Euler_method">forward Euler</a> solver.
+ * The SolverCvode class is used to represent the
+ * <a href="https://en.wikipedia.org/wiki/Euler_method">forward Euler</a> solver.
  */
 
 class LIBOPENCOR_EXPORT SolverForwardEuler: public SolverOdeFixedStep

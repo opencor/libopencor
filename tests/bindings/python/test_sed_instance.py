@@ -1860,9 +1860,9 @@ def test_ode_model_results_reused_when_run_again():
 
 
 def test_ode_model_with_rounding_error_on_output_end_time():
-    # Note: with an output start time of -1, an output end time of 0, and 49 steps, the time of the last step is computed
-    #       as -1 + 49 * (1 / 49), which is not exactly 0 due to rounding errors. This used to result in an extra step
-    #       being taken and its results being written past the end of our results arrays.
+    # Note: with an output start time of -1, an output end time of 0, and 49 steps, the time of the last step is
+    #       computed as -1 + 49 * (1 / 49), which is not exactly 0 due to rounding errors. This used to result in an
+    #       extra step being taken and its results being written past the end of our results arrays.
 
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)

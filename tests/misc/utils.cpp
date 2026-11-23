@@ -104,7 +104,8 @@ TEST(UtilsTest, decodeUrl)
     EXPECT_EQ(libOpenCOR::decodeUrl("%XX"), "%XX");
     EXPECT_EQ(libOpenCOR::decodeUrl("%2X"), "%2X");
 
-    // Don't decode the reserved characters, the percent sign, and the backslash, but uppercase their hexadecimal digits.
+    // Don't decode the reserved characters, the percent sign, and the backslash, but uppercase their hexadecimal
+    // digits.
 
     EXPECT_EQ(libOpenCOR::decodeUrl("%20!%22#$%25&'()*+,-./0123456789:;%3C=%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~", false),
               " !\"#$%25&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D^_`abcdefghijklmnopqrstuvwxyz{|}~");

@@ -412,8 +412,8 @@ double pointers(S *s, S *t) { return ((s ? s : t)->x) + (!s ? 1.0 : 0.0); }
         EXPECT_EQ((a > 0.0) ? 1.0 : 2.0, function<UnaryFunction>(mCompiler, "integers")(a));
         EXPECT_EQ((a > 0.0) ? 1.0 : 2.0, function<UnaryFunction>(mCompiler, "voidArms")(a));
 
-        // Note: we use a volatile variable for -a since MSVC would otherwise turn (a > 0.0) ? a : -a into fabs(a), which
-        //       is wrong for a = 0.0 (i.e. we would get 0.0 rather than -0.0).
+        // Note: we use a volatile variable for -a since MSVC would otherwise turn (a > 0.0) ? a : -a into fabs(a),
+        //       which is wrong for a = 0.0 (i.e. we would get 0.0 rather than -0.0).
 
         const volatile double minusA {-a};
 

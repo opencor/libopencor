@@ -664,8 +664,8 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
         // Note #2: we compute our variables even when we don't track our results (i.e. when we run our simulation from
         //          its initial time to its output start time). Indeed, computeVariables() may solve some NLA systems,
         //          which use the current value of their unknowns as an initial guess, so computing them at each output
-        //          interval keeps that initial guess close to the solution. Otherwise, computeVariables() is cheap since
-        //          most of our algebraic variables are computed by computeRates().
+        //          interval keeps that initial guess close to the solution. Otherwise, computeVariables() is cheap
+        //          since most of our algebraic variables are computed by computeRates().
 
         computeRates(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
         computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);

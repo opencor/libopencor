@@ -119,8 +119,8 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
     endif()
 elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our WASM version of libCellML with size optimisation.
-    # Note: -Os makes libCellML's contribution to our WASM file noticeably smaller without making it noticeably slower to
-    #       load (i.e. parse and validate) or instantiate (i.e. analyse and generate code for) a model, unlike -Oz.
+    # Note: -Os makes libCellML's contribution to our WASM file noticeably smaller without making it noticeably slower
+    #       to load (i.e. parse and validate) or instantiate (i.e. analyse and generate code for) a model, unlike -Oz.
 
     if(EMSCRIPTEN)
         set(WASM_FLAGS

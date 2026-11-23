@@ -208,8 +208,8 @@ void SedModel::Impl::serialise(xmlNodePtr pNode) const
         source = std::move(encodedSource);
     }
 
-    // A relative model source which first segment contains a colon (e.g., "my:model.cellml") would be mistaken for a URI
-    // with a scheme (i.e. "my"), so we prefix it with "./" (i.e. "./my:model.cellml"), as recommended by
+    // A relative model source which first segment contains a colon (e.g., "my:model.cellml") would be mistaken for a
+    // URI with a scheme (i.e. "my"), so we prefix it with "./" (i.e. "./my:model.cellml"), as recommended by
     // https://www.rfc-editor.org/rfc/rfc3986#section-4.2.
     // Note: a model source is relative if we were given a base path (see relativePath()) or if the file name of a local
     //       model is relative (see urlPath()). An absolute file name, including one with the drive letter of a Windows

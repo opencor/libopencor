@@ -284,8 +284,8 @@ function(configure_target TARGET)
            AND "${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME}" STREQUAL "")
             # There are no CMake configuration files, so manually configure the package using targets of the form
             # <PACKAGE_NAME>::<LIBRARY_NAME>.
-            # Note: a package may also list some system libraries (e.g., bcrypt for libxml2 on Windows), which are not of
-            #       that form and which we therefore link as is.
+            # Note: a package may also list some system libraries (e.g., bcrypt for libxml2 on Windows), which are not
+            #       of that form and which we therefore link as is.
 
             foreach(AVAILABLE_PACKAGE_LIBRARY ${PACKAGE_LIBRARIES})
                 if(    "${AVAILABLE_PACKAGE_LIBRARY}" MATCHES "::"

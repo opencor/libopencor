@@ -159,8 +159,8 @@ TEST(ConcurrentSedTest, parallelAsyncLifecycle)
 
 TEST(ConcurrentSedTest, parallelInstancesWithNlaSystems)
 {
-    // Make sure that simulations of a model with NLA systems don't interfere with one another when run in parallel, i.e.
-    // that they give the same results as when run sequentially.
+    // Make sure that simulations of a model with NLA systems don't interfere with one another when run in parallel,
+    // i.e. that they give the same results as when run sequentially.
 
     static const auto INSTANCE_COUNT {3U};
 

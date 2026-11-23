@@ -175,8 +175,8 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
 
         if (pNlaSolver != nullptr) {
             // Note: both uintptr_t and size_t are defined as follows:
-            //        - Emscripten (wasm32): unsigned int (which is the same as unsigned long on 32 bits, which is what we
-            //          use here);
+            //        - Emscripten (wasm32): unsigned int (which is the same as unsigned long on 32 bits, which is what
+            //          we use here);
             //        - Windows (64 bits): unsigned long long; and
             //        - Linux/macOS (64 bits): unsigned long.
 
@@ -242,8 +242,8 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 
         // Compile the generated code.
         // Note: only our four methods need to be accessible from outside of our generated code (our objective functions
-        //       are only ever passed to nlaSolve() by our generated code), so we let our compiler know about them, so that
-        //       all our other functions (e.g., findRoot0()) can be made internal.
+        //       are only ever passed to nlaSolve() by our generated code), so we let our compiler know about them, so
+        //       that all our other functions (e.g., findRoot0()) can be made internal.
 
         static const Strings ENTRY_POINTS {"initialiseArrays", "computeComputedConstants", "computeRates", "computeVariables"};
 
@@ -429,8 +429,8 @@ EM_JS(int, initialiseWorkerWasmJS, (int wasmModuleId, const void* wasmBytesPtr, 
             nlaSolve: _wasmNlaSolve,
 
             // Arithmetic operators.
-            // Note: LLVM may optimise pow(b, x), where b is a power of two (e.g., 2.0, 4.0, or 0.5), to exp2(n*x), so we
-            //       also need exp2().
+            // Note: LLVM may optimise pow(b, x), where b is a power of two (e.g., 2.0, 4.0, or 0.5), to exp2(n*x), so
+            //       we also need exp2().
 
             pow: _pow,
             sqrt: _sqrt,
