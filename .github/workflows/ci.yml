@@ -386,6 +386,9 @@ jobs:
       - name: Install Emscripten
         if: ${{ matrix.javascript_support == 'ON' }}
         uses: emscripten-core/setup-emsdk@v16
+      - name: Install TypeScript
+        if: ${{ matrix.javascript_support == 'ON' }}
+        run: npm install -g typescript
       - name: Install Biome
         if: ${{ matrix.target == 'javascript_check_code_formatting' }}
         run: |

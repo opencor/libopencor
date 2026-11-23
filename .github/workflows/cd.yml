@@ -253,6 +253,8 @@ jobs:
           cache_key: cd-webassembly
       - name: Install Emscripten
         uses: emscripten-core/setup-emsdk@v16
+      - name: Install TypeScript
+        run: npm install -g typescript
       - name: Configure libOpenCOR
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=ON -DJAVASCRIPT_UNIT_TESTING=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=OFF -DUNIT_TESTING=OFF
       - name: Build WebAssembly
