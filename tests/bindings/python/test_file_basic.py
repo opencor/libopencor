@@ -30,7 +30,7 @@ expected_non_existing_file_issues = [
 expected_unknown_file_issues = [
     [
         loc.Issue.Type.Error,
-        "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
+        "The file is not a CellML file, a SED-ML file, or an OMEX file.",
     ],
 ]
 

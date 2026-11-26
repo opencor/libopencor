@@ -91,8 +91,8 @@ File::Impl::~Impl()
 void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
 {
     // Reset the type of the file, if needed.
-    // Note: we also release our previous CellML file, SED-ML file, or COMBINE archive, if any, so that we don't keep
-    //       using it (and, for a COMBINE archive, keep its child files managed) if our new contents are of a different
+    // Note: we also release our previous CellML file, SED-ML file, or OMEX file, if any, so that we don't keep
+    //       using it (and, for an OMEX file, keep its child files managed) if our new contents are of a different
     //       type or are not recognised.
 
     if (pResetType) {
@@ -102,14 +102,14 @@ void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
 
         mCellmlFile = nullptr;
         mSedmlFile = nullptr;
-        mCombineArchive = nullptr;
+        mOmexFile = nullptr;
 #ifndef __EMSCRIPTEN__
     } else if (mType == Type::IRRETRIEVABLE_FILE) {
         return;
 #endif
     }
 
-    // Try to get a CellML file, a SED-ML file, or a COMBINE archive, but only if we have some contents.
+    // Try to get a CellML file, a SED-ML file, or an OMEX file, but only if we have some contents.
 
     if (!contents().empty()) {
         mCellmlFile = CellmlFile::create(pOwner);
@@ -126,14 +126,14 @@ void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
 
                 addIssues(mSedmlFile, "SED-ML file");
             } else {
-                mCombineArchive = CombineArchive::create(pOwner);
+                mOmexFile = OmexFile::create(pOwner);
 
-                if (mCombineArchive != nullptr) {
-                    mType = Type::COMBINE_ARCHIVE;
+                if (mOmexFile != nullptr) {
+                    mType = Type::OMEX_FILE;
 
-                    addIssues(mCombineArchive, "COMBINE archive");
+                    addIssues(mOmexFile, "OMEX file");
                 } else {
-                    addError("The file is not a CellML file, a SED-ML file, or a COMBINE archive.");
+                    addError("The file is not a CellML file, a SED-ML file, or an OMEX file.");
                 }
             }
         }
@@ -187,8 +187,8 @@ void File::Impl::setContents(const UnsignedChars &pContents)
 
 bool File::Impl::hasChildFiles() const
 {
-    if (mType == Type::COMBINE_ARCHIVE) {
-        return mCombineArchive->hasFiles();
+    if (mType == Type::OMEX_FILE) {
+        return mOmexFile->hasFiles();
     }
 
     return false;
@@ -196,8 +196,8 @@ bool File::Impl::hasChildFiles() const
 
 size_t File::Impl::childFileCount() const
 {
-    if (mType == Type::COMBINE_ARCHIVE) {
-        return mCombineArchive->fileCount();
+    if (mType == Type::OMEX_FILE) {
+        return mOmexFile->fileCount();
     }
 
     return 0;
@@ -207,8 +207,8 @@ const Strings &File::Impl::childFileNames() const
 {
     static const Strings NO_STRINGS;
 
-    if (mType == Type::COMBINE_ARCHIVE) {
-        return mCombineArchive->fileNames();
+    if (mType == Type::OMEX_FILE) {
+        return mOmexFile->fileNames();
     }
 
     return NO_STRINGS;
@@ -218,8 +218,8 @@ const FilePtrs &File::Impl::childFiles() const
 {
     static const FilePtrs NO_FILE_PTRS;
 
-    if (mType == Type::COMBINE_ARCHIVE) {
-        return mCombineArchive->files();
+    if (mType == Type::OMEX_FILE) {
+        return mOmexFile->files();
     }
 
     return NO_FILE_PTRS;
@@ -229,12 +229,12 @@ const FilePtr &File::Impl::childFile(size_t pIndex) const
 {
     static const FilePtr NO_FILE_PTR;
 
-    if (mType == Type::COMBINE_ARCHIVE) {
-        if (pIndex >= mCombineArchive->fileCount()) {
+    if (mType == Type::OMEX_FILE) {
+        if (pIndex >= mOmexFile->fileCount()) {
             return NO_FILE_PTR;
         }
 
-        return mCombineArchive->file(pIndex);
+        return mOmexFile->file(pIndex);
     }
 
     return NO_FILE_PTR;
@@ -248,8 +248,8 @@ const FilePtr &File::Impl::childFile(const std::string &pFileName) const
 {
     static const FilePtr NO_FILE_PTR;
 
-    if (mType == Type::COMBINE_ARCHIVE) {
-        return mCombineArchive->file(pFileName);
+    if (mType == Type::OMEX_FILE) {
+        return mOmexFile->file(pFileName);
     }
 
     return NO_FILE_PTR;

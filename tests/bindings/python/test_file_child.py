@@ -76,8 +76,8 @@ def test_dataset_157():
     )
 
 
-def test_remote_virtual_combine_archives():
-    # Two remote COMBINE archives that are not downloaded must not share their child files.
+def test_remote_virtual_omex_files():
+    # Two remote OMEX files that are not downloaded must not share their child files.
 
     file_135 = File(utils.RemoteBasePath + "/api/file/dataset_135.omex", False)
     file_157 = File(utils.RemoteBasePath + "/api/file/dataset_157.omex", False)
@@ -89,8 +89,8 @@ def test_remote_virtual_combine_archives():
         utils.binary_file_contents(utils.resource_path("api/file/dataset_157.omex"))
     )
 
-    assert file_135.type == File.Type.CombineArchive
-    assert file_157.type == File.Type.CombineArchive
+    assert file_135.type == File.Type.OmexFile
+    assert file_157.type == File.Type.OmexFile
 
     simulation_file_135 = file_135.child_file("simulation.json")
     simulation_file_157 = file_157.child_file("simulation.json")
@@ -106,9 +106,9 @@ def test_remote_virtual_combine_archives():
     )
 
 
-def test_remote_combine_archive():
-    # The child files of a remote COMBINE archive must be retrievable using their file name, even if the local copy of
-    # the COMBINE archive is in a directory that is accessed through a symbolic link (e.g., on macOS, the temporary
+def test_remote_omex_file():
+    # The child files of a remote OMEX file must be retrievable using their file name, even if the local copy of
+    # the OMEX file is in a directory that is accessed through a symbolic link (e.g., on macOS, the temporary
     # directory is "/var/...", which is a symbolic link to "/private/var/...").
     # Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
     #       remote file is never downloaded.
@@ -116,15 +116,15 @@ def test_remote_combine_archive():
     file = File(utils.RemoteBasePath + "/api/file/dataset_135.omex")
     simulation_file = file.child_file("simulation.json")
 
-    assert file.type == File.Type.CombineArchive
+    assert file.type == File.Type.OmexFile
     assert simulation_file is not None
     assert utils.to_string(simulation_file.contents) == utils.text_file_contents(
         utils.resource_path("api/file/dataset_135.json")
     )
 
 
-def test_combine_archive_replaced_with_other_contents():
-    # Replacing the contents of a COMBINE archive with some other contents must release its child files.
+def test_omex_file_replaced_with_other_contents():
+    # Replacing the contents of an OMEX file with some other contents must release its child files.
 
     file = File(utils.resource_path("cellml_2.omex"))
     file_manager = FileManager.instance()
@@ -140,23 +140,23 @@ def test_combine_archive_replaced_with_other_contents():
     assert file_manager.file_count == 1
 
 
-def test_combine_archive_with_files_outside_of_it():
-    # A COMBINE archive may reference files that are located outside of it (e.g., "../sibling.cellml" or even the
-    # COMBINE archive itself), in which case they must be ignored rather than replace the contents of another managed
+def test_omex_file_with_files_outside_of_it():
+    # An OMEX file may reference files that are located outside of it (e.g., "../sibling.cellml" or even the
+    # OMEX file itself), in which case they must be ignored rather than replace the contents of another managed
     # file (or result in an infinite recursion).
 
     expected_issues = [
         [
             Issue.Type.Warning,
-            "COMBINE archive: the file '../sibling.cellml' is not located within the COMBINE archive. It has been ignored.",
+            "OMEX file: the file '../sibling.cellml' is not located within the OMEX file. It has been ignored.",
         ],
         [
             Issue.Type.Warning,
-            "COMBINE archive: the file '%2E%2E/encoded_sibling.cellml' is not located within the COMBINE archive. It has been ignored.",
+            "OMEX file: the file '%2E%2E/encoded_sibling.cellml' is not located within the OMEX file. It has been ignored.",
         ],
         [
             Issue.Type.Warning,
-            "COMBINE archive: the file '../entries_outside_of_archive.omex' is not located within the COMBINE archive. It has been ignored.",
+            "OMEX file: the file '../entries_outside_of_archive.omex' is not located within the OMEX file. It has been ignored.",
         ],
     ]
 
@@ -167,7 +167,7 @@ def test_combine_archive_with_files_outside_of_it():
 
     file = File(utils.resource_path("api/file/entries_outside_of_archive.omex"))
 
-    assert file.type == File.Type.CombineArchive
+    assert file.type == File.Type.OmexFile
     assert file.child_file_count == 1
     assert file.child_file("model.cellml") is not None
     utils.assert_issues(file, expected_issues)
@@ -179,31 +179,31 @@ def test_combine_archive_with_files_outside_of_it():
     platform.system() == "Windows",
     reason="A symbolic link usually requires some special privileges on Windows.",
 )
-def test_combine_archive_with_files_outside_of_it_through_symbolic_link():
-    # The files of a COMBINE archive are located in a directory which name is that of the COMBINE archive followed by
+def test_omex_file_with_files_outside_of_it_through_symbolic_link():
+    # The files of an OMEX file are located in a directory which name is that of the OMEX file followed by
     # ".contents". If such a directory happens to exist and to be a symbolic link then the ".." components that follow
-    # it are kept (see canonicalFileName()), but the files they refer to are still located outside of the COMBINE
-    # archive, so they must still be ignored.
+    # it are kept (see canonicalFileName()), but the files they refer to are still located outside of the OMEX
+    # file, so they must still be ignored.
     # Note: a symbolic link usually requires some special privileges on Windows.
 
     expected_issues = [
         [
             Issue.Type.Warning,
-            "COMBINE archive: the file '../sibling.cellml' is not located within the COMBINE archive. It has been ignored.",
+            "OMEX file: the file '../sibling.cellml' is not located within the OMEX file. It has been ignored.",
         ],
         [
             Issue.Type.Warning,
-            "COMBINE archive: the file '%2E%2E/encoded_sibling.cellml' is not located within the COMBINE archive. It has been ignored.",
+            "OMEX file: the file '%2E%2E/encoded_sibling.cellml' is not located within the OMEX file. It has been ignored.",
         ],
         [
             Issue.Type.Warning,
-            "COMBINE archive: the file '../entries_outside_of_archive.omex' is not located within the COMBINE archive. It has been ignored.",
+            "OMEX file: the file '../entries_outside_of_archive.omex' is not located within the OMEX file. It has been ignored.",
         ],
     ]
 
     dir_path = os.path.join(
         tempfile.gettempdir(),
-        "libopencor_combine_archive_with_files_outside_of_it_through_symbolic_link",
+        "libopencor_omex_file_with_files_outside_of_it_through_symbolic_link",
     )
 
     shutil.rmtree(dir_path, ignore_errors=True)
@@ -226,7 +226,7 @@ def test_combine_archive_with_files_outside_of_it_through_symbolic_link():
 
     os.chdir(orig_dir)
 
-    assert file.type == File.Type.CombineArchive
+    assert file.type == File.Type.OmexFile
     assert file.child_file_count == 1
     assert file.child_file("model.cellml") is not None
     utils.assert_issues(file, expected_issues)
@@ -235,7 +235,7 @@ def test_combine_archive_with_files_outside_of_it_through_symbolic_link():
     shutil.rmtree(dir_path)
 
 
-def test_combine_archive_with_percent_encoded_locations():
+def test_omex_file_with_percent_encoded_locations():
     # A location is a URI reference, so it may be percent-encoded (e.g., "./my%20file.txt"), in which case the name of
     # its ZIP entry should be its decoded location (e.g., "my file.txt"), although some tools use the location itself
     # (e.g., "other%20file.txt"). Either way, a child file must have the contents of its ZIP entry and be retrievable
@@ -250,7 +250,7 @@ def test_combine_archive_with_percent_encoded_locations():
     ]
     file = File(utils.resource_path("api/file/percent_encoded_locations.omex"))
 
-    assert file.type == File.Type.CombineArchive
+    assert file.type == File.Type.OmexFile
     assert not file.has_issues
     assert file.child_file_count == len(locations_and_file_names)
 
@@ -264,7 +264,7 @@ def test_combine_archive_with_percent_encoded_locations():
         assert child_file.contents == utils.text_to_list(file_name)
 
 
-def test_combine_archive_with_non_utf8_locations():
+def test_omex_file_with_non_utf8_locations():
     # A location may get percent-decoded to a file name that is not valid UTF-8 (e.g., "./%FF.txt" gets decoded to
     # "\xFF.txt") or that has a character outside of the Basic Multilingual Plane (e.g., "./%F0%9F%98%80.txt" gets
     # decoded to an emoji), which must not result in an exception being thrown. Either way, a child file must have the
@@ -277,7 +277,7 @@ def test_combine_archive_with_non_utf8_locations():
     ]
     file = File(utils.resource_path("api/file/non_utf8_locations.omex"))
 
-    assert file.type == File.Type.CombineArchive
+    assert file.type == File.Type.OmexFile
     assert not file.has_issues
     assert file.child_file_count == len(locations_and_file_names)
 
@@ -292,7 +292,7 @@ def test_combine_archive_with_non_utf8_locations():
         assert child_file.contents == utils.text_to_list(location)
 
 
-def test_combine_archive_with_duplicate_locations():
+def test_omex_file_with_duplicate_locations():
     # Different locations may refer to the same file (e.g., "./my%20file.txt" and "./my file.txt", or "./file.txt" and
     # "file.txt"), in which case only the first one is kept and the other ones are ignored. The ignored locations can,
     # however, still be used to retrieve the child file since they refer to the same file.
@@ -300,15 +300,15 @@ def test_combine_archive_with_duplicate_locations():
     expected_issues = [
         [
             Issue.Type.Warning,
-            "COMBINE archive: the file 'file.txt' is the same as the file './file.txt'. It has been ignored.",
+            "OMEX file: the file 'file.txt' is the same as the file './file.txt'. It has been ignored.",
         ],
         [
             Issue.Type.Warning,
-            "COMBINE archive: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored.",
+            "OMEX file: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored.",
         ],
         [
             Issue.Type.Warning,
-            "COMBINE archive: the file './other%20file.txt' is the same as the file './other file.txt'. It has been ignored.",
+            "OMEX file: the file './other%20file.txt' is the same as the file './other file.txt'. It has been ignored.",
         ],
     ]
     locations_file_names_and_duplicate_locations = [
@@ -318,7 +318,7 @@ def test_combine_archive_with_duplicate_locations():
     ]
     file = File(utils.resource_path("api/file/duplicate_locations.omex"))
 
-    assert file.type == File.Type.CombineArchive
+    assert file.type == File.Type.OmexFile
     utils.assert_issues(file, expected_issues)
     assert file.child_file_count == len(locations_file_names_and_duplicate_locations)
 
@@ -337,13 +337,13 @@ def test_combine_archive_with_duplicate_locations():
     assert FileManager.instance().file_count == 4
 
 
-def test_combine_archive_with_self_referencing_locations():
-    # Locations that refer to the COMBINE archive itself (e.g., ".", "./", or "/") are not child files of the COMBINE
-    # archive.
+def test_omex_file_with_self_referencing_locations():
+    # Locations that refer to the OMEX file itself (e.g., ".", "./", or "/") are not child files of the OMEX
+    # file.
 
     file = File(utils.resource_path("api/file/self_referencing_locations.omex"))
 
-    assert file.type == File.Type.CombineArchive
+    assert file.type == File.Type.OmexFile
     assert not file.has_issues
     assert file.child_file_count == 1
     assert file.child_file_names[0] == "./file.txt"

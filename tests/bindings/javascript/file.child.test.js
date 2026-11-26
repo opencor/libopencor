@@ -83,8 +83,8 @@ test.describe('File child tests', () => {
     ]);
   });
 
-  test('Remote virtual COMBINE archives', () => {
-    // Two remote COMBINE archives that are not downloaded must not share their child files.
+  test('Remote virtual OMEX files', () => {
+    // Two remote OMEX files that are not downloaded must not share their child files.
 
     const file135 = new loc.File(`${utils.REMOTE_BASE_PATH}/api/file/dataset_135.omex`);
     const file157 = new loc.File(`${utils.REMOTE_BASE_PATH}/api/file/dataset_157.omex`);
@@ -92,8 +92,8 @@ test.describe('File child tests', () => {
     file135.setContents(utils.fileContents(utils.resourcePath('api/file/dataset_135.omex')));
     file157.setContents(utils.fileContents(utils.resourcePath('api/file/dataset_157.omex')));
 
-    assert.strictEqual(file135.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
-    assert.strictEqual(file157.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file135.type.value, loc.File.Type.OMEX_FILE.value);
+    assert.strictEqual(file157.type.value, loc.File.Type.OMEX_FILE.value);
 
     const simulationFile135 = file135.childFileFromFileName('simulation.json');
     const simulationFile157 = file157.childFileFromFileName('simulation.json');
@@ -111,8 +111,8 @@ test.describe('File child tests', () => {
     );
   });
 
-  test('COMBINE archive replaced with other contents', () => {
-    // Replacing the contents of a COMBINE archive with some other contents must release its child files.
+  test('OMEX file replaced with other contents', () => {
+    // Replacing the contents of an OMEX file with some other contents must release its child files.
 
     const file = new loc.File(utils.resourcePath('cellml_2.omex'));
     const fileManager = loc.FileManager.instance();
@@ -128,23 +128,23 @@ test.describe('File child tests', () => {
     assert.strictEqual(fileManager.fileCount, 1);
   });
 
-  test('COMBINE archive with files outside of it', () => {
-    // A COMBINE archive may reference files that are located outside of it (e.g., "../sibling.cellml" or even the
-    // COMBINE archive itself), in which case they must be ignored rather than replace the contents of another managed
+  test('OMEX file with files outside of it', () => {
+    // An OMEX file may reference files that are located outside of it (e.g., "../sibling.cellml" or even the
+    // OMEX file itself), in which case they must be ignored rather than replace the contents of another managed
     // file (or result in an infinite recursion).
 
     const expectedIssues = [
       [
         loc.Issue.Type.WARNING,
-        "COMBINE archive: the file '../sibling.cellml' is not located within the COMBINE archive. It has been ignored."
+        "OMEX file: the file '../sibling.cellml' is not located within the OMEX file. It has been ignored."
       ],
       [
         loc.Issue.Type.WARNING,
-        "COMBINE archive: the file '%2E%2E/encoded_sibling.cellml' is not located within the COMBINE archive. It has been ignored."
+        "OMEX file: the file '%2E%2E/encoded_sibling.cellml' is not located within the OMEX file. It has been ignored."
       ],
       [
         loc.Issue.Type.WARNING,
-        "COMBINE archive: the file '../entries_outside_of_archive.omex' is not located within the COMBINE archive. It has been ignored."
+        "OMEX file: the file '../entries_outside_of_archive.omex' is not located within the OMEX file. It has been ignored."
       ]
     ];
     const sibling = new loc.File(utils.resourcePath('api/file/sibling.cellml'));
@@ -156,7 +156,7 @@ test.describe('File child tests', () => {
 
     file.setContents(utils.fileContents(file.path));
 
-    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.OMEX_FILE.value);
     assert.strictEqual(file.childFileCount, 1);
     assert.notStrictEqual(file.childFileFromFileName('model.cellml'), null);
     utils.assertIssues(loc, file, expectedIssues);
@@ -164,29 +164,29 @@ test.describe('File child tests', () => {
     assert.strictEqual(loc.FileManager.instance().fileCount, 3);
   });
 
-  test('COMBINE archive with files outside of it through symbolic link', () => {
-    // The files of a COMBINE archive are located in a directory which name is that of the COMBINE archive followed by
+  test('OMEX file with files outside of it through symbolic link', () => {
+    // The files of an OMEX file are located in a directory which name is that of the OMEX file followed by
     // ".contents". If such a directory happens to exist and to be a symbolic link then the ".." components that follow
-    // it are kept (see canonicalFileName()), but the files they refer to are still located outside of the COMBINE
-    // archive, so they must still be ignored.
+    // it are kept (see canonicalFileName()), but the files they refer to are still located outside of the OMEX
+    // file, so they must still be ignored.
     // Note: our JavaScript bindings use a virtual file system, so a symbolic link is never followed (i.e. the ".."
     //       components are normalised lexically), but the result must be the same.
 
     const expectedIssues = [
       [
         loc.Issue.Type.WARNING,
-        "COMBINE archive: the file '../sibling.cellml' is not located within the COMBINE archive. It has been ignored."
+        "OMEX file: the file '../sibling.cellml' is not located within the OMEX file. It has been ignored."
       ],
       [
         loc.Issue.Type.WARNING,
-        "COMBINE archive: the file '%2E%2E/encoded_sibling.cellml' is not located within the COMBINE archive. It has been ignored."
+        "OMEX file: the file '%2E%2E/encoded_sibling.cellml' is not located within the OMEX file. It has been ignored."
       ],
       [
         loc.Issue.Type.WARNING,
-        "COMBINE archive: the file '../entries_outside_of_archive.omex' is not located within the COMBINE archive. It has been ignored."
+        "OMEX file: the file '../entries_outside_of_archive.omex' is not located within the OMEX file. It has been ignored."
       ]
     ];
-    const dir = path.join(os.tmpdir(), 'libopencor_combine_archive_with_files_outside_of_it_through_symbolic_link');
+    const dir = path.join(os.tmpdir(), 'libopencor_omex_file_with_files_outside_of_it_through_symbolic_link');
 
     fs.rmSync(dir, { recursive: true, force: true });
     fs.mkdirSync(path.join(dir, 'real'), { recursive: true });
@@ -207,7 +207,7 @@ test.describe('File child tests', () => {
 
     process.chdir(origDir);
 
-    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.OMEX_FILE.value);
     assert.strictEqual(file.childFileCount, 1);
     assert.notStrictEqual(file.childFileFromFileName('model.cellml'), null);
     utils.assertIssues(loc, file, expectedIssues);
@@ -216,7 +216,7 @@ test.describe('File child tests', () => {
     fs.rmSync(dir, { recursive: true, force: true });
   });
 
-  test('COMBINE archive with percent-encoded locations', () => {
+  test('OMEX file with percent-encoded locations', () => {
     // A location is a URI reference, so it may be percent-encoded (e.g., "./my%20file.txt"), in which case the name of
     // its ZIP entry should be its decoded location (e.g., "my file.txt"), although some tools use the location itself
     // (e.g., "other%20file.txt"). Either way, a child file must have the contents of its ZIP entry and be retrievable
@@ -233,7 +233,7 @@ test.describe('File child tests', () => {
 
     file.setContents(utils.fileContents(file.path));
 
-    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.OMEX_FILE.value);
     assert.strictEqual(file.hasIssues, false);
     assert.strictEqual(file.childFileCount, locationsAndFileNames.length);
 
@@ -248,7 +248,7 @@ test.describe('File child tests', () => {
     }
   });
 
-  test('COMBINE archive with non-UTF-8 locations', () => {
+  test('OMEX file with non-UTF-8 locations', () => {
     // A location may get percent-decoded to a file name that is not valid UTF-8 (e.g., "./%FF.txt" gets decoded to
     // "\xFF.txt") or that has a character outside of the Basic Multilingual Plane (e.g., "./%F0%9F%98%80.txt" gets
     // decoded to an emoji), which must not result in an exception being thrown. Either way, a child file must have the
@@ -263,7 +263,7 @@ test.describe('File child tests', () => {
 
     file.setContents(utils.fileContents(file.path));
 
-    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.OMEX_FILE.value);
     assert.strictEqual(file.hasIssues, false);
     assert.strictEqual(file.childFileCount, locationsAndFileNames.length);
 
@@ -279,7 +279,7 @@ test.describe('File child tests', () => {
     }
   });
 
-  test('COMBINE archive with duplicate locations', () => {
+  test('OMEX file with duplicate locations', () => {
     // Different locations may refer to the same file (e.g., "./my%20file.txt" and "./my file.txt", or "./file.txt" and
     // "file.txt"), in which case only the first one is kept and the other ones are ignored. The ignored locations can,
     // however, still be used to retrieve the child file since they refer to the same file.
@@ -287,15 +287,15 @@ test.describe('File child tests', () => {
     const expectedIssues = [
       [
         loc.Issue.Type.WARNING,
-        "COMBINE archive: the file 'file.txt' is the same as the file './file.txt'. It has been ignored."
+        "OMEX file: the file 'file.txt' is the same as the file './file.txt'. It has been ignored."
       ],
       [
         loc.Issue.Type.WARNING,
-        "COMBINE archive: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored."
+        "OMEX file: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored."
       ],
       [
         loc.Issue.Type.WARNING,
-        "COMBINE archive: the file './other%20file.txt' is the same as the file './other file.txt'. It has been ignored."
+        "OMEX file: the file './other%20file.txt' is the same as the file './other file.txt'. It has been ignored."
       ]
     ];
     const locationsFileNamesAndDuplicateLocations = [
@@ -307,7 +307,7 @@ test.describe('File child tests', () => {
 
     file.setContents(utils.fileContents(file.path));
 
-    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.OMEX_FILE.value);
     utils.assertIssues(loc, file, expectedIssues);
     assert.strictEqual(file.childFileCount, locationsFileNamesAndDuplicateLocations.length);
 
@@ -325,15 +325,15 @@ test.describe('File child tests', () => {
     assert.strictEqual(loc.FileManager.instance().fileCount, 4);
   });
 
-  test('COMBINE archive with self-referencing locations', () => {
-    // Locations that refer to the COMBINE archive itself (e.g., ".", "./", or "/") are not child files of the COMBINE
-    // archive.
+  test('OMEX file with self-referencing locations', () => {
+    // Locations that refer to the OMEX file itself (e.g., ".", "./", or "/") are not child files of the OMEX
+    // file.
 
     const file = new loc.File(utils.resourcePath('api/file/self_referencing_locations.omex'));
 
     file.setContents(utils.fileContents(file.path));
 
-    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.OMEX_FILE.value);
     assert.strictEqual(file.hasIssues, false);
     assert.strictEqual(file.childFileCount, 1);
     assert.strictEqual(file.childFileNames.get(0), './file.txt');

@@ -67,8 +67,8 @@ std::string pathFromUrl(const std::string &pUrl)
 
 std::optional<std::string> importedFileContents(bool pIsLocalFile, const std::string &pFileNameOrUrl)
 {
-    // Use the contents of the managed file, if any, with the given file name or URL. This is the case for a file in a
-    // COMBINE archive or for a file which contents were set in memory (e.g., from JavaScript).
+    // Use the contents of the managed file, if any, with the given file name or URL. This is the case for a file in an
+    // OMEX file or for a file which contents were set in memory (e.g., from JavaScript).
 
 #ifdef __EMSCRIPTEN__
     auto file {FileManager::instance().fileFromFileNameOrUrl(pFileNameOrUrl)};
@@ -233,7 +233,7 @@ void populateImporterLibrary(const libcellml::ImporterPtr &pImporter, const libc
     // Populate the library of the given importer with the models that are (directly or indirectly) imported by the
     // given model.
     // Note #1: libCellML can only resolve imports that are local files. So, we retrieve the imported models ourselves
-    //          (be they local files, remote files, files in a COMBINE archive, or files which contents were set in
+    //          (be they local files, remote files, files in an OMEX file, or files which contents were set in
     //          memory) and add them to the library of its importer, which is what libCellML looks up before trying to
     //          open a file.
     // Note #2: libCellML looks up an imported model using its URL as is or, if there is no such key, using the URL

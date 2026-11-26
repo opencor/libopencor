@@ -22,33 +22,33 @@ TEST(I18nFileTest, arabicFiles)
 {
     EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/ملف/file.cellml"))->type(), libOpenCOR::File::Type::CELLML_FILE);
     EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/ملف/file.sedml"))->type(), libOpenCOR::File::Type::SEDML_FILE);
-    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/ملف/file.omex"))->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/ملف/file.omex"))->type(), libOpenCOR::File::Type::OMEX_FILE);
 }
 
 TEST(I18nFileTest, chineseFiles)
 {
     EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/文件夹/file.cellml"))->type(), libOpenCOR::File::Type::CELLML_FILE);
     EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/文件夹/file.sedml"))->type(), libOpenCOR::File::Type::SEDML_FILE);
-    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/文件夹/file.omex"))->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/文件夹/file.omex"))->type(), libOpenCOR::File::Type::OMEX_FILE);
 }
 
 TEST(I18nFileTest, hindiFiles)
 {
     EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/फोल्डर/file.cellml"))->type(), libOpenCOR::File::Type::CELLML_FILE);
     EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/फोल्डर/file.sedml"))->type(), libOpenCOR::File::Type::SEDML_FILE);
-    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/फोल्डर/file.omex"))->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/फोल्डर/file.omex"))->type(), libOpenCOR::File::Type::OMEX_FILE);
 }
 
 TEST(I18nFileTest, japaneseFiles)
 {
     EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/フォルダ/file.cellml"))->type(), libOpenCOR::File::Type::CELLML_FILE);
     EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/フォルダ/file.sedml"))->type(), libOpenCOR::File::Type::SEDML_FILE);
-    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/フォルダ/file.omex"))->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/フォルダ/file.omex"))->type(), libOpenCOR::File::Type::OMEX_FILE);
 }
 
 TEST(I18nFileTest, russianFiles)
 {
     EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/папка/file.cellml"))->type(), libOpenCOR::File::Type::CELLML_FILE);
     EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/папка/file.sedml"))->type(), libOpenCOR::File::Type::SEDML_FILE);
-    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/папка/file.omex"))->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/папка/file.omex"))->type(), libOpenCOR::File::Type::OMEX_FILE);
 }

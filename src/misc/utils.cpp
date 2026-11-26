@@ -1609,9 +1609,9 @@ bool isCombineSpecificationsFormat(const std::string &pFormat, std::initializer_
 {
     // Check whether the given format is one of the given COMBINE specifications (e.g., "cellml.2.0" for
     // "http://identifiers.org/combine.specifications/cellml.2.0").
-    // Note: identifiers.org can be accessed using either the "http" or the "https" scheme, and both are used in COMBINE
-    //       archives (e.g., "https://identifiers.org/combine.specifications/sed-ml.level-1.version-2" is used by some
-    //       COMBINE archives on BioModels).
+    // Note: identifiers.org can be accessed using either the "http" or the "https" scheme, and both are used in OMEX
+    //       files (e.g., "https://identifiers.org/combine.specifications/sed-ml.level-1.version-2" is used by some
+    //       OMEX files on BioModels).
 
     static constexpr std::string_view HTTP_COMBINE_SPECIFICATIONS {"http://identifiers.org/combine.specifications/"};
     static constexpr std::string_view HTTPS_COMBINE_SPECIFICATIONS {"https://identifiers.org/combine.specifications/"};
@@ -1633,7 +1633,7 @@ bool isCombineSpecificationsFormat(const std::string &pFormat, std::initializer_
 
 bool isCellmlFormat(const std::string &pFormat)
 {
-    // Check whether the given format is the CellML format of a COMBINE archive entry, i.e. one of the CellML
+    // Check whether the given format is the CellML format of an OMEX file entry, i.e. one of the CellML
     // specifications listed in the COMBINE specifications registry (see
     // https://github.com/combine-org/combine-specifications/tree/main/specifications).
 
@@ -1642,7 +1642,7 @@ bool isCellmlFormat(const std::string &pFormat)
 
 bool isSedmlFormat(const std::string &pFormat)
 {
-    // Check whether the given format is the SED-ML format of a COMBINE archive entry, i.e. one of the SED-ML
+    // Check whether the given format is the SED-ML format of an OMEX file entry, i.e. one of the SED-ML
     // specifications listed in the COMBINE specifications registry (see
     // https://github.com/combine-org/combine-specifications/tree/main/specifications).
 

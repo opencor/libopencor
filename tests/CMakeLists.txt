@@ -46,7 +46,7 @@ include(api/version/tests.cmake)
 include(misc/tests.cmake)
 
 include(support/cellml/tests.cmake)
-include(support/combine/tests.cmake)
+include(support/omex/tests.cmake)
 include(support/sedml/tests.cmake)
 
 # Prepare our different tests.
@@ -70,7 +70,7 @@ string(REPLACE "\"" "\\\"" SEDML_CONTENTS "${SEDML_CONTENTS}")
 string(REGEX REPLACE "\n" "\" \\n\"" SEDML_CONTENTS_C "${SEDML_CONTENTS}")
 
 execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/cellml_2.omex"
-                OUTPUT_VARIABLE BASE64_COMBINE_ARCHIVE_CONTENTS
+                OUTPUT_VARIABLE BASE64_OMEX_FILE_CONTENTS
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 configure_file(${UTILS_HEADER_FILE_IN} ${UTILS_HEADER_FILE})
@@ -78,7 +78,7 @@ configure_file(${UTILS_HEADER_FILE_IN} ${UTILS_HEADER_FILE})
 include_directories(${CMAKE_SOURCE_DIR}/src/misc
                     ${CMAKE_SOURCE_DIR}/src/solver
                     ${CMAKE_SOURCE_DIR}/src/support/cellml
-                    ${CMAKE_SOURCE_DIR}/src/support/combine
+                    ${CMAKE_SOURCE_DIR}/src/support/omex
                     ${CMAKE_SOURCE_DIR}/src/support/sedml
                     ${CMAKE_BINARY_DIR})
 

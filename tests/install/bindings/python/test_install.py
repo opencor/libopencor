@@ -8,7 +8,7 @@ if __name__ == "__main__":
     print(f"Version:        {loc.version()}")
     print(f"Version string: {loc.version_string()}")
 
-    # Load a COMBINE archive from GitHub and output some information about it.
+    # Load an OMEX file from GitHub and output some information about it.
 
     file = loc.File(
         "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex"

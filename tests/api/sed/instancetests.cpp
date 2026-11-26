@@ -139,13 +139,13 @@ TEST(InstanceSedTest, cellmlFileWithInMemoryImports)
     }
 }
 
-TEST(InstanceSedTest, combineArchiveWithCellmlFileWithImports)
+TEST(InstanceSedTest, omexFileWithCellmlFileWithImports)
 {
     // Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
 
     static constexpr auto ABS_TOL {1e-5};
 
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/combine/model_with_nested_imports.omex"))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/omex/model_with_nested_imports.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};
     auto instance {document->instantiate()};
 
@@ -2061,7 +2061,7 @@ TEST(InstanceSedTest, daeModelWithFailingOdeSolver)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
-TEST(InstanceSedTest, combineArchive)
+TEST(InstanceSedTest, omexFile)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -2072,7 +2072,7 @@ TEST(InstanceSedTest, combineArchive)
     EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(InstanceSedTest, combineArchiveWithCellmlFileAsMasterFile)
+TEST(InstanceSedTest, omexFileWithCellmlFileAsMasterFile)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/cellml_file_as_master_file.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -2121,7 +2121,7 @@ TEST(InstanceSedTest, daeModelFromSedmlFile)
     EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(InstanceSedTest, daeModelFromCombineArchive)
+TEST(InstanceSedTest, daeModelFromOmexFile)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -2168,7 +2168,7 @@ TEST(InstanceSedTest, daeModelFromLegacySedmlFile)
     EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(InstanceSedTest, daeModelFromLegacyCombineArchive)
+TEST(InstanceSedTest, daeModelFromLegacyOmexFile)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};

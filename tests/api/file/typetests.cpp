@@ -24,7 +24,7 @@ namespace {
 libOpenCOR::ExpectedIssues expectedUnknownFileIssues()
 {
     return {{
-        {libOpenCOR::Issue::Type::ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."},
+        {libOpenCOR::Issue::Type::ERROR, "The file is not a CellML file, a SED-ML file, or an OMEX file."},
     }};
 }
 
@@ -82,11 +82,11 @@ TEST(TypeFileTest, sedml1xFile)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
-TEST(TypeFileTest, combine1xArchive)
+TEST(TypeFileTest, omex1xFile)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_1_x.omex"))};
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::OMEX_FILE);
 }
 
 TEST(TypeFileTest, cellml2File)
@@ -103,11 +103,11 @@ TEST(TypeFileTest, sedml2File)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
-TEST(TypeFileTest, combine2Archive)
+TEST(TypeFileTest, omex2File)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"))};
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::OMEX_FILE);
 }
 
 TEST(TypeFileTest, unknownVirtualFile)
@@ -150,7 +150,7 @@ TEST(TypeFileTest, sedmlVirtualFile)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
-TEST(TypeFileTest, combineVirtualArchive)
+TEST(TypeFileTest, omexVirtualFile)
 {
     auto filePath {libOpenCOR::resourcePath("cellml_2.omex")};
     auto file {libOpenCOR::File::create(filePath, false)};
@@ -160,5 +160,5 @@ TEST(TypeFileTest, combineVirtualArchive)
 
     file->setContents(libOpenCOR::fileContents(filePath));
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::OMEX_FILE);
 }

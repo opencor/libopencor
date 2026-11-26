@@ -38,7 +38,7 @@ test.describe('File i18n tests', () => {
 
     assert.strictEqual(cellmlFile.type.value, loc.File.Type.CELLML_FILE.value);
     assert.strictEqual(sedmlFile.type.value, loc.File.Type.SEDML_FILE.value);
-    assert.strictEqual(omexFile.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(omexFile.type.value, loc.File.Type.OMEX_FILE.value);
   });
 
   test('Chinese files', () => {
@@ -52,7 +52,7 @@ test.describe('File i18n tests', () => {
 
     assert.strictEqual(cellmlFile.type.value, loc.File.Type.CELLML_FILE.value);
     assert.strictEqual(sedmlFile.type.value, loc.File.Type.SEDML_FILE.value);
-    assert.strictEqual(omexFile.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(omexFile.type.value, loc.File.Type.OMEX_FILE.value);
   });
 
   test('Hindi files', () => {
@@ -66,7 +66,7 @@ test.describe('File i18n tests', () => {
 
     assert.strictEqual(cellmlFile.type.value, loc.File.Type.CELLML_FILE.value);
     assert.strictEqual(sedmlFile.type.value, loc.File.Type.SEDML_FILE.value);
-    assert.strictEqual(omexFile.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(omexFile.type.value, loc.File.Type.OMEX_FILE.value);
   });
 
   test('Japanese files', () => {
@@ -80,7 +80,7 @@ test.describe('File i18n tests', () => {
 
     assert.strictEqual(cellmlFile.type.value, loc.File.Type.CELLML_FILE.value);
     assert.strictEqual(sedmlFile.type.value, loc.File.Type.SEDML_FILE.value);
-    assert.strictEqual(omexFile.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(omexFile.type.value, loc.File.Type.OMEX_FILE.value);
   });
 
   test('Russian files', () => {
@@ -94,6 +94,6 @@ test.describe('File i18n tests', () => {
 
     assert.strictEqual(cellmlFile.type.value, loc.File.Type.CELLML_FILE.value);
     assert.strictEqual(sedmlFile.type.value, loc.File.Type.SEDML_FILE.value);
-    assert.strictEqual(omexFile.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(omexFile.type.value, loc.File.Type.OMEX_FILE.value);
   });
 });

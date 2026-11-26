@@ -134,12 +134,10 @@ def test_cellml_file_with_in_memory_imports():
         assert math.isclose(state[i], math.exp(-voi[i]), abs_tol=1e-5)
 
 
-def test_combine_archive_with_cellml_file_with_imports():
+def test_omex_file_with_cellml_file_with_imports():
     # Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
 
-    file = loc.File(
-        utils.resource_path("support/combine/model_with_nested_imports.omex")
-    )
+    file = loc.File(utils.resource_path("support/omex/model_with_nested_imports.omex"))
     document = loc.SedDocument(file)
     instance = document.instantiate()
 
@@ -2052,7 +2050,7 @@ def test_dae_model_with_failing_ode_solver():
     assert_issues(instance, expected_issues)
 
 
-def test_combine_archive():
+def test_omex_file():
     file = loc.File(utils.resource_path("cellml_2.omex"))
     document = loc.SedDocument(file)
     instance = document.instantiate()
@@ -2062,7 +2060,7 @@ def test_combine_archive():
     assert not instance.has_issues
 
 
-def test_combine_archive_with_cellml_file_as_master_file():
+def test_omex_file_with_cellml_file_as_master_file():
     file = loc.File(utils.resource_path("api/sed/cellml_file_as_master_file.omex"))
     document = loc.SedDocument(file)
     instance = document.instantiate()
@@ -2108,7 +2106,7 @@ def test_dae_model_from_sedml_file():
     assert not instance.has_issues
 
 
-def test_dae_model_from_combine_archive():
+def test_dae_model_from_omex_file():
     file = loc.File(utils.resource_path("api/sed/dae/model.omex"))
     document = loc.SedDocument(file)
 
@@ -2153,7 +2151,7 @@ def test_dae_model_from_legacy_sedml_file():
     assert not instance.has_issues
 
 
-def test_dae_model_from_legacy_combine_archive():
+def test_dae_model_from_legacy_omex_file():
     file = loc.File(utils.resource_path("api/sed/dae/model_legacy.omex"))
     document = loc.SedDocument(file)
 

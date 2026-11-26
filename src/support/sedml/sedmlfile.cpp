@@ -726,7 +726,7 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
     auto *document {libsedml::readSedMLFromString(toString(pFile->contents()).c_str())};
 
     // A non-SED-ML file results in our SED-ML document having at least one error. That error may be the result of a
-    // malformed XML file (e.g., an HTML file is an XML-like file but not actually an XML file or a COMBINE archive
+    // malformed XML file (e.g., an HTML file is an XML-like file but not actually an XML file or an OMEX file
     // which is just not an XML file) or a valid XML file but not a SED-ML file (e.g., a CellML file is an XML file but
     // not a SED-ML file). So, we use these facts to determine whether our current SED-ML document is indeed a SED-ML
     // file.

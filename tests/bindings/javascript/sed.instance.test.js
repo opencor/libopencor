@@ -112,10 +112,10 @@ test.describe('Sed instance tests', () => {
     }
   });
 
-  test('COMBINE archive with CellML file with imports', () => {
+  test('OMEX file with CellML file with imports', () => {
     // Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
 
-    const file = new loc.File(utils.resourcePath('support/combine/model_with_nested_imports.omex'));
+    const file = new loc.File(utils.resourcePath('support/omex/model_with_nested_imports.omex'));
 
     file.setContents(utils.fileContents(file.path));
 
@@ -2231,7 +2231,7 @@ test.describe('Sed instance tests', () => {
     ]);
   });
 
-  test('COMBINE archive', () => {
+  test('OMEX file', () => {
     const file = new loc.File(utils.resourcePath('cellml_2.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -2244,7 +2244,7 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test('COMBINE archive with CellML file as master file', () => {
+  test('OMEX file with CellML file as master file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/cellml_file_as_master_file.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -2302,7 +2302,7 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test('DAE model from COMBINE archive', () => {
+  test('DAE model from OMEX file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/dae/model.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -2356,7 +2356,7 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test('DAE model from legacy COMBINE archive', () => {
+  test('DAE model from legacy OMEX file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/dae/model_legacy.omex'));
 
     file.setContents(utils.fileContents(file.path));

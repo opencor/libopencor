@@ -521,18 +521,18 @@ def test_sedml_file_with_remote_cellml_file():
     assert not document.has_issues
 
 
-def test_combine_archive():
+def test_omex_file():
     file = loc.File(utils.resource_path("cellml_2.omex"))
     document = loc.SedDocument(file)
 
     assert not document.has_issues
 
 
-def test_combine_archive_with_no_manifest_file():
+def test_omex_file_with_no_manifest_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
+            "A simulation experiment description cannot be created using an OMEX file with no master file.",
         ],
     ]
 
@@ -542,7 +542,7 @@ def test_combine_archive_with_no_manifest_file():
     assert_issues(document, expected_issues)
 
 
-def test_combine_archive_with_no_master_file_and_one_cellml_file():
+def test_omex_file_with_no_master_file_and_one_cellml_file():
     file = loc.File(
         utils.resource_path("api/sed/no_master_file_with_one_cellml_file.omex")
     )
@@ -558,11 +558,11 @@ def test_combine_archive_with_no_master_file_and_one_cellml_file():
     assert not instance.has_issues
 
 
-def test_combine_archive_with_no_master_file_and_one_unknown_cellml_file():
+def test_omex_file_with_no_master_file_and_one_unknown_cellml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+            "A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).",
         ],
     ]
 
@@ -574,14 +574,14 @@ def test_combine_archive_with_no_master_file_and_one_unknown_cellml_file():
     assert_issues(document, expected_issues)
 
 
-def test_combine_archive_with_no_master_file_and_one_unknown_https_cellml_file():
+def test_omex_file_with_no_master_file_and_one_unknown_https_cellml_file():
     # The format of an unknown file is used to determine its type, and a format may use the "https" scheme (e.g.,
     # "https://identifiers.org/combine.specifications/cellml.1.1").
 
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+            "A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).",
         ],
     ]
 
@@ -595,11 +595,11 @@ def test_combine_archive_with_no_master_file_and_one_unknown_https_cellml_file()
     assert_issues(document, expected_issues)
 
 
-def test_combine_archive_with_no_master_file_and_several_cellml_files():
+def test_omex_file_with_no_master_file_and_several_cellml_files():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "A simulation experiment description cannot be created using a COMBINE archive with no master file, no SED-ML file, and several CellML files.",
+            "A simulation experiment description cannot be created using an OMEX file with no master file, no SED-ML file, and several CellML files.",
         ],
     ]
 
@@ -611,14 +611,14 @@ def test_combine_archive_with_no_master_file_and_several_cellml_files():
     assert_issues(document, expected_issues)
 
 
-def test_combine_archive_with_master_file_with_duplicate_location():
+def test_omex_file_with_master_file_with_duplicate_location():
     # The master attribute of an entry that is ignored because its location refers to the same file as another entry
     # still applies to that file.
 
     expected_issues = [
         [
             loc.Issue.Type.Warning,
-            "COMBINE archive: the file 'cellml_2_b.cellml' is the same as the file './cellml_2_b.cellml'. It has been ignored.",
+            "OMEX file: the file 'cellml_2_b.cellml' is the same as the file './cellml_2_b.cellml'. It has been ignored.",
         ],
     ]
 
@@ -633,7 +633,7 @@ def test_combine_archive_with_master_file_with_duplicate_location():
     assert document.models[0].file == file.child_file("./cellml_2_b.cellml")
 
 
-def test_combine_archive_with_no_master_file_and_one_sedml_file():
+def test_omex_file_with_no_master_file_and_one_sedml_file():
     file = loc.File(
         utils.resource_path("api/sed/no_master_file_with_one_sedml_file.omex")
     )
@@ -649,11 +649,11 @@ def test_combine_archive_with_no_master_file_and_one_sedml_file():
     assert not instance.has_issues
 
 
-def test_combine_archive_with_no_master_file_and_one_unknown_sedml_file():
+def test_omex_file_with_no_master_file_and_one_unknown_sedml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+            "A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).",
         ],
     ]
 
@@ -665,7 +665,7 @@ def test_combine_archive_with_no_master_file_and_one_unknown_sedml_file():
     assert_issues(document, expected_issues)
 
 
-def test_combine_archive_with_no_master_file_and_one_unknown_versioned_sedml_file():
+def test_omex_file_with_no_master_file_and_one_unknown_versioned_sedml_file():
     # The format of an unknown file is used to determine its type, and a format may be versioned and use the "https"
     # scheme (e.g., "https://identifiers.org/combine.specifications/sed-ml.level-1.version-3"). So, the unknown SED-ML
     # file is the master file, rather than the CellML file.
@@ -673,7 +673,7 @@ def test_combine_archive_with_no_master_file_and_one_unknown_versioned_sedml_fil
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+            "A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).",
         ],
     ]
 
@@ -687,11 +687,11 @@ def test_combine_archive_with_no_master_file_and_one_unknown_versioned_sedml_fil
     assert_issues(document, expected_issues)
 
 
-def test_combine_archive_with_no_master_file_and_several_sedml_files():
+def test_omex_file_with_no_master_file_and_several_sedml_files():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "A simulation experiment description cannot be created using a COMBINE archive with no master file and several SED-ML files.",
+            "A simulation experiment description cannot be created using an OMEX file with no master file and several SED-ML files.",
         ],
     ]
 
@@ -703,11 +703,11 @@ def test_combine_archive_with_no_master_file_and_several_sedml_files():
     assert_issues(document, expected_issues)
 
 
-def test_combine_archive_with_unknown_direct_cellml_file():
+def test_omex_file_with_unknown_direct_cellml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+            "A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).",
         ],
     ]
 
@@ -717,7 +717,7 @@ def test_combine_archive_with_unknown_direct_cellml_file():
     assert_issues(document, expected_issues)
 
 
-def test_combine_archive_with_unknown_indirect_cellml_file():
+def test_omex_file_with_unknown_indirect_cellml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
@@ -737,11 +737,11 @@ def test_combine_archive_with_unknown_indirect_cellml_file():
     assert_issues(instance, expected_issues)
 
 
-def test_combine_archive_with_unknown_sedml_file():
+def test_omex_file_with_unknown_sedml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+            "A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).",
         ],
     ]
 

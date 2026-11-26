@@ -42,7 +42,7 @@ libOpenCOR::ExpectedIssues expectedNonExistingFileIssues()
 libOpenCOR::ExpectedIssues expectedUnknownFileIssues()
 {
     return {{
-        {libOpenCOR::Issue::Type::ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."},
+        {libOpenCOR::Issue::Type::ERROR, "The file is not a CellML file, a SED-ML file, or an OMEX file."},
     }};
 }
 

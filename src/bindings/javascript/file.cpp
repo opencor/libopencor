@@ -26,7 +26,7 @@ void fileApi()
         .value("UNKNOWN_FILE", libOpenCOR::File::Type::UNKNOWN_FILE)
         .value("CELLML_FILE", libOpenCOR::File::Type::CELLML_FILE)
         .value("SEDML_FILE", libOpenCOR::File::Type::SEDML_FILE)
-        .value("COMBINE_ARCHIVE", libOpenCOR::File::Type::COMBINE_ARCHIVE);
+        .value("OMEX_FILE", libOpenCOR::File::Type::OMEX_FILE);
 
     emscripten::class_<libOpenCOR::File, emscripten::base<libOpenCOR::Logger>>("File")
         // clang-format off

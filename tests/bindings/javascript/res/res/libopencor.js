@@ -665,7 +665,7 @@ export function updatePlottingAreaAndAxesInfo(pointCount = 0) {
 }
 
 function formattedIssueDescription(issue) {
-  if (issue.startsWith('CellML') || issue.startsWith('SED-ML') || issue.startsWith('COMBINE')) {
+  if (issue.startsWith('CellML') || issue.startsWith('SED-ML') || issue.startsWith('OMEX')) {
     return issue;
   }
 
@@ -716,8 +716,8 @@ $(() => {
               fileType = 'a CellML file';
             } else if (file.type === loc.File.Type.SEDML_FILE) {
               fileType = 'a SED-ML file';
-            } else if (file.type === loc.File.Type.COMBINE_ARCHIVE) {
-              fileType = 'a COMBINE archive';
+            } else if (file.type === loc.File.Type.OMEX_FILE) {
+              fileType = 'an OMEX file';
             } else {
               knownFile = false;
             }
