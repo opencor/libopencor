@@ -16,16 +16,19 @@ const chart = lightningChart()
   .setAnimationsEnabled(false);
 const lineSeries = chart.addLineSeries().setName('');
 let plottedPointCount = 0;
-// Our delays (in microseconds), i.e. no delay, 1 to 10 µs in steps of 1 µs, 10 to 100 µs in steps of 10 µs, and 100 µs
-// to 1 ms in steps of 100 µs, with a major step for 1 µs, 10 µs, 100 µs, and 1 ms (see setupDelayWheel()).
+// Our delays (in microseconds), i.e. no delay, and then 1 to 9 times a power of ten, from 1 µs to 1 s (i.e. 1 to 9 µs,
+// 10 to 90 µs, ..., 100 to 900 ms, and 1 s), with a major step for each power of ten (i.e. 1 µs, 10 µs, 100 µs, 1 ms,
+// 10 ms, 100 ms, and 1 s; see setupDelayWheel()).
+const DELAY_DECADES = [1, 10, 100, 1000, 10000, 100000];
 const DELAYS = [
   0,
-  ...Array.from({ length: 10 }, (_, i) => i + 1),
-  ...Array.from({ length: 9 }, (_, i) => 10 * (i + 2)),
-  ...Array.from({ length: 9 }, (_, i) => 100 * (i + 2))
+  ...DELAY_DECADES.flatMap((decade) => Array.from({ length: 9 }, (_, i) => decade * (i + 1))),
+  1000000
 ];
 const DELAY_STEPS = DELAYS.length - 1;
-const DELAY_MAJOR_STEPS = DELAYS.flatMap((delay, index) => ([1, 10, 100, 1000].includes(delay) ? [index] : []));
+const DELAY_MAJOR_STEPS = DELAYS.flatMap((delay, index) =>
+  [...DELAY_DECADES, 1000000].includes(delay) ? [index] : []
+);
 const DELAY_WHEEL_WIDTH = 120; // Must match the width of our wheel (see .delay-wheel in libopencor.css).
 const DELAY_WHEEL_HEIGHT = 28; // Must match the height of our wheel (see .delay-wheel in libopencor.css).
 const DELAY_WHEEL_BORDER_WIDTH = 1; // Must match the width of our border (see .delay-wheel in libopencor.css).
