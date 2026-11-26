@@ -33,7 +33,7 @@ void fileApi(nb::module_ &m)
         .value("UnknownFile", libOpenCOR::File::Type::UNKNOWN_FILE)
         .value("CellmlFile", libOpenCOR::File::Type::CELLML_FILE)
         .value("SedmlFile", libOpenCOR::File::Type::SEDML_FILE)
-        .value("CombineArchive", libOpenCOR::File::Type::COMBINE_ARCHIVE)
+        .value("OmexFile", libOpenCOR::File::Type::OMEX_FILE)
         .value("IrretrievableFile", libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
 
     // Note: we release the GIL when creating a file, as well as when retrieving managed files, since it may take a

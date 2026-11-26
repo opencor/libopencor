@@ -136,8 +136,8 @@ test.describe('Sed basic tests', () => {
   });
 
   test('SED-ML file with relative CellML file in working directory', () => {
-    // A relative model source is relative to the SED-ML file, not to the current working directory, even if the
-    // current working directory contains a file with that name.
+    // A relative model source is relative to the SED-ML file, not to the current working directory, even if the current
+    // working directory contains a file with that name.
 
     const origDir = process.cwd();
 
@@ -479,7 +479,7 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(document.hasIssues, false);
   });
 
-  test('COMBINE archive', () => {
+  test('OMEX file', () => {
     const file = new loc.File(utils.resourcePath('cellml_2.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -489,7 +489,7 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(document.hasIssues, false);
   });
 
-  test('COMBINE archive with no manifest file', () => {
+  test('OMEX file with no manifest file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/no_manifest_file.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -499,12 +499,12 @@ test.describe('Sed basic tests', () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
-        'A simulation experiment description cannot be created using a COMBINE archive with no master file.'
+        'A simulation experiment description cannot be created using an OMEX file with no master file.'
       ]
     ]);
   });
 
-  test('COMBINE archive with no master file and one CellML file', () => {
+  test('OMEX file with no master file and one CellML file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_one_cellml_file.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -521,7 +521,7 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test('COMBINE archive with no master file and one unknown CellML file', () => {
+  test('OMEX file with no master file and one unknown CellML file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_one_unknown_cellml_file.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -531,12 +531,12 @@ test.describe('Sed basic tests', () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
-        'A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).'
+        'A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).'
       ]
     ]);
   });
 
-  test('COMBINE archive with no master file and one unknown HTTPS CellML file', () => {
+  test('OMEX file with no master file and one unknown HTTPS CellML file', () => {
     // The format of an unknown file is used to determine its type, and a format may use the "https" scheme (e.g.,
     // "https://identifiers.org/combine.specifications/cellml.1.1").
 
@@ -549,12 +549,12 @@ test.describe('Sed basic tests', () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
-        'A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).'
+        'A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).'
       ]
     ]);
   });
 
-  test('COMBINE archive with no master file and several CellML files', () => {
+  test('OMEX file with no master file and several CellML files', () => {
     const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_several_cellml_files.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -564,12 +564,12 @@ test.describe('Sed basic tests', () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
-        'A simulation experiment description cannot be created using a COMBINE archive with no master file, no SED-ML file, and several CellML files.'
+        'A simulation experiment description cannot be created using an OMEX file with no master file, no SED-ML file, and several CellML files.'
       ]
     ]);
   });
 
-  test('COMBINE archive with master file with duplicate location', () => {
+  test('OMEX file with master file with duplicate location', () => {
     // The master attribute of an entry that is ignored because its location refers to the same file as another entry
     // still applies to that file.
 
@@ -582,7 +582,7 @@ test.describe('Sed basic tests', () => {
     assertIssues(loc, file, [
       [
         loc.Issue.Type.WARNING,
-        "COMBINE archive: the file 'cellml_2_b.cellml' is the same as the file './cellml_2_b.cellml'. It has been ignored."
+        "OMEX file: the file 'cellml_2_b.cellml' is the same as the file './cellml_2_b.cellml'. It has been ignored."
       ]
     ]);
     assert.strictEqual(document.hasIssues, false);
@@ -590,7 +590,7 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(document.models[0].file.isAliasOf(file.childFileFromFileName('./cellml_2_b.cellml')), true);
   });
 
-  test('COMBINE archive with no master file and one SED-ML file', () => {
+  test('OMEX file with no master file and one SED-ML file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_one_sedml_file.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -607,7 +607,7 @@ test.describe('Sed basic tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test('COMBINE archive with no master file and one unknown SED-ML file', () => {
+  test('OMEX file with no master file and one unknown SED-ML file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_one_unknown_sedml_file.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -617,12 +617,12 @@ test.describe('Sed basic tests', () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
-        'A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).'
+        'A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).'
       ]
     ]);
   });
 
-  test('COMBINE archive with no master file and one unknown versioned SED-ML file', () => {
+  test('OMEX file with no master file and one unknown versioned SED-ML file', () => {
     // The format of an unknown file is used to determine its type, and a format may be versioned and use the "https"
     // scheme (e.g., "https://identifiers.org/combine.specifications/sed-ml.level-1.version-3"). So, the unknown SED-ML
     // file is the master file, rather than the CellML file.
@@ -636,12 +636,12 @@ test.describe('Sed basic tests', () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
-        'A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).'
+        'A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).'
       ]
     ]);
   });
 
-  test('COMBINE archive with no master file and several SED-ML files', () => {
+  test('OMEX file with no master file and several SED-ML files', () => {
     const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_several_sedml_files.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -651,12 +651,12 @@ test.describe('Sed basic tests', () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
-        'A simulation experiment description cannot be created using a COMBINE archive with no master file and several SED-ML files.'
+        'A simulation experiment description cannot be created using an OMEX file with no master file and several SED-ML files.'
       ]
     ]);
   });
 
-  test('COMBINE archive with unknown direct CellML file', () => {
+  test('OMEX file with unknown direct CellML file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/unknown_direct_cellml_file.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -666,12 +666,12 @@ test.describe('Sed basic tests', () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
-        'A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).'
+        'A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).'
       ]
     ]);
   });
 
-  test('COMBINE archive with unknown indirect CellML file', () => {
+  test('OMEX file with unknown indirect CellML file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/unknown_indirect_cellml_file.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -687,7 +687,7 @@ test.describe('Sed basic tests', () => {
     assertIssues(loc, instance, [[loc.Issue.Type.ERROR, "Task: task 'task1' requires a model of CellML type."]]);
   });
 
-  test('COMBINE archive with unknown SED-ML file', () => {
+  test('OMEX file with unknown SED-ML file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/unknown_sedml_file.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -697,7 +697,7 @@ test.describe('Sed basic tests', () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
-        'A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).'
+        'A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).'
       ]
     ]);
   });

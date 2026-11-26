@@ -28,7 +28,7 @@ const loc = await libOpenCOR();
 
 const expectedNoIssues = [];
 const expectedUnknownFileIssues = [
-  [loc.Issue.Type.ERROR, 'The file is not a CellML file, a SED-ML file, or a COMBINE archive.']
+  [loc.Issue.Type.ERROR, 'The file is not a CellML file, a SED-ML file, or an OMEX file.']
 ];
 
 test.describe('File basic tests', () => {

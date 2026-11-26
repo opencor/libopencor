@@ -15,9 +15,9 @@
 # Apply our patches to the source code of a third-party library.
 # Note #1: the patches are applied by build_package() when building a third-party library from source (see
 #          patch_package_args() in packages.cmake), which is also how our prebuilt packages are built.
-# Note #2: ExternalProject downloads and extracts the source code afresh whenever our patches or this script change
-#          (see patch_package_args() in packages.cmake), so we always patch a pristine copy of it and never need to
-#          revert anything.
+# Note #2: ExternalProject downloads and extracts the source code afresh whenever our patches or this script change (see
+#          patch_package_args() in packages.cmake), so we always patch a pristine copy of it and never need to revert
+#          anything.
 # Note #3: our patches have LF line endings, whatever the platform (see .gitattributes) and so do (normally) the source
 #          files that they patch. Still, we make sure that Git never writes CRLF line endings into the patched files
 #          (core.autocrlf=input overrides Git for Windows' default, i.e. core.autocrlf=true), and we ask Git to ignore

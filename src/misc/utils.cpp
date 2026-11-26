@@ -1039,8 +1039,8 @@ std::optional<std::string> resolveUriReference(const FileLocation &pFileLocation
     //          URL nor a "file" URL, which path is decoded by retrieveFileInfo()) then we must decode the URI reference
     //          to get the corresponding file name. We must, however, do this after having checked whether the URI
     //          reference is relative since a percent-encoded forward slash (i.e. "%2F") must not make a relative URI
-    //          reference absolute. If the file is a remote file then a relative URI reference is decoded as part of
-    //          the resolved URL (see retrieveFileInfo()).
+    //          reference absolute. If the file is a remote file then a relative URI reference is decoded as part of the
+    //          resolved URL (see retrieveFileInfo()).
     // Note #3: if the file is a remote file then a URI reference that is a file name is never a local file name, but a
     //          reference that is relative to the URL of the file, i.e. a network-path reference (e.g.,
     //          "//example.org/models/model.cellml") is relative to its scheme, an absolute-path reference (e.g.,
@@ -1119,8 +1119,8 @@ void getTimeOfDay(TimeVal &pTimeVal)
 std::filesystem::path uniqueFilePath()
 {
     // This is based off glibc's __gen_tempname() method, which is used in std::tmpfile(). The only reason we don't use
-    // std::tmpfile() is that it creates the file for us and as soon as we would be closing (though an automatic call
-    // to std::fclose()), the file would get automatically deleted, which is not what we want. See
+    // std::tmpfile() is that it creates the file for us and as soon as we would be closing (though an automatic call to
+    // std::fclose()), the file would get automatically deleted, which is not what we want. See
     // https://code.woboq.org/userspace/glibc/sysdeps/posix/tempname.c.html#__gen_tempname.
 
     // The number of times to attempt to generate a temporary file name.
@@ -1227,8 +1227,8 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 
     // Create a file with a unique file path.
     // Note: we must generate the file path and create the file in one go, so that another thread cannot generate the
-    //       same file path in between (in which case both threads would download to the same file and the local copy
-    //       of one remote file would get deleted with the other remote file).
+    //       same file path in between (in which case both threads would download to the same file and the local copy of
+    //       one remote file would get deleted with the other remote file).
 
     static std::mutex uniqueFilePathMutex;
 
@@ -1519,8 +1519,8 @@ std::optional<double> parseDouble(const std::string &pString)
     // Note #2: strtod() uses the decimal point of the current C locale (e.g., a comma in a French locale, in which case
     //          "1.5" would be parsed as 1), so we use the C locale instead. We don't use std::from_chars() since it is
     //          not available for floating-point numbers before macOS 26 nor an input string stream since its handling
-    //          of a value that underflows depends on the C++ standard library (e.g., libc++ considers that "1e-400"
-    //          is not a valid double value while libstdc++ considers that it is).
+    //          of a value that underflows depends on the C++ standard library (e.g., libc++ considers that "1e-400" is
+    //          not a valid double value while libstdc++ considers that it is).
 
     if (!isDecimalNumber(pString)) {
         return {};
@@ -1609,9 +1609,9 @@ bool isCombineSpecificationsFormat(const std::string &pFormat, std::initializer_
 {
     // Check whether the given format is one of the given COMBINE specifications (e.g., "cellml.2.0" for
     // "http://identifiers.org/combine.specifications/cellml.2.0").
-    // Note: identifiers.org can be accessed using either the "http" or the "https" scheme, and both are used in COMBINE
-    //       archives (e.g., "https://identifiers.org/combine.specifications/sed-ml.level-1.version-2" is used by some
-    //       COMBINE archives on BioModels).
+    // Note: identifiers.org can be accessed using either the "http" or the "https" scheme, and both are used in OMEX
+    //       files (e.g., "https://identifiers.org/combine.specifications/sed-ml.level-1.version-2" is used by some OMEX
+    //       files on BioModels).
 
     static constexpr std::string_view HTTP_COMBINE_SPECIFICATIONS {"http://identifiers.org/combine.specifications/"};
     static constexpr std::string_view HTTPS_COMBINE_SPECIFICATIONS {"https://identifiers.org/combine.specifications/"};
@@ -1633,8 +1633,8 @@ bool isCombineSpecificationsFormat(const std::string &pFormat, std::initializer_
 
 bool isCellmlFormat(const std::string &pFormat)
 {
-    // Check whether the given format is the CellML format of a COMBINE archive entry, i.e. one of the CellML
-    // specifications listed in the COMBINE specifications registry (see
+    // Check whether the given format is the CellML format of an OMEX file entry, i.e. one of the CellML specifications
+    // listed in the COMBINE specifications registry (see
     // https://github.com/combine-org/combine-specifications/tree/main/specifications).
 
     return isCombineSpecificationsFormat(pFormat, {"cellml", "cellml.1", "cellml.1.0", "cellml.1.1", "cellml.2.0"});
@@ -1642,8 +1642,8 @@ bool isCellmlFormat(const std::string &pFormat)
 
 bool isSedmlFormat(const std::string &pFormat)
 {
-    // Check whether the given format is the SED-ML format of a COMBINE archive entry, i.e. one of the SED-ML
-    // specifications listed in the COMBINE specifications registry (see
+    // Check whether the given format is the SED-ML format of an OMEX file entry, i.e. one of the SED-ML specifications
+    // listed in the COMBINE specifications registry (see
     // https://github.com/combine-org/combine-specifications/tree/main/specifications).
 
     return isCombineSpecificationsFormat(pFormat, {"sed-ml", "sed-ml.level-1", "sed-ml.level-1.version-1",

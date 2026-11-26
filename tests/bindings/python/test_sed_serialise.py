@@ -156,8 +156,8 @@ def test_relative_local_cellml_file_without_base_path():
 
 
 def test_relative_local_cellml_file_in_directory_without_base_path():
-    # A relative file name is serialised as a relative model source, so its directory separators must be forward
-    # slashes (i.e. not backslashes on Windows).
+    # A relative file name is serialised as a relative model source, so its directory separators must be forward slashes
+    # (i.e. not backslashes on Windows).
 
     file = loc.File("some/path/cellml_2.cellml", False)
 
@@ -237,8 +237,8 @@ def test_local_cellml_file_with_percent_signs():
 
 def test_local_cellml_file_with_question_marks_and_number_signs():
     # A model source is a URI reference, so the question marks and number signs in the file name of a local model must
-    # be percent-encoded for the model source to refer to that model when the SED-ML file is loaded back (rather than
-    # to the file which name is the part of that file name that precedes the first question mark or number sign).
+    # be percent-encoded for the model source to refer to that model when the SED-ML file is loaded back (rather than to
+    # the file which name is the part of that file name that precedes the first question mark or number sign).
 
     cellml_contents = utils.text_to_list(
         utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
@@ -290,8 +290,8 @@ def test_local_cellml_file_with_question_marks_and_number_signs():
     reason="A file name cannot contain a colon on Windows.",
 )
 def test_local_cellml_file_with_colon():
-    # A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
-    # mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+    # A relative model source which first segment contains a colon must be prefixed with "./" for it not to be mistaken
+    # for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
     # Note: a file name cannot contain a colon on Windows.
 
     cellml_contents = utils.text_to_list(
@@ -417,9 +417,9 @@ def test_local_cellml_file_with_non_utf8_character():
 
 
 def test_local_cellml_file_with_non_xml_character():
-    # A model source is an XML attribute, so the characters in the file name of a local model that are not allowed in
-    # an XML document (e.g., U+0001 and U+FFFF) must be percent-encoded for the SED-ML file to be valid and for the
-    # model source to refer to that model when the SED-ML file is loaded back.
+    # A model source is an XML attribute, so the characters in the file name of a local model that are not allowed in an
+    # XML document (e.g., U+0001 and U+FFFF) must be percent-encoded for the SED-ML file to be valid and for the model
+    # source to refer to that model when the SED-ML file is loaded back.
 
     cellml_contents = utils.text_to_list(
         utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
@@ -510,8 +510,8 @@ def test_remote_cellml_file_with_non_utf8_character():
 
 
 def test_remote_cellml_file_with_colon():
-    # A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
-    # mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+    # A relative model source which first segment contains a colon must be prefixed with "./" for it not to be mistaken
+    # for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
 
     cellml_contents = utils.text_to_list(
         utils.text_file_contents(utils.resource_path("cellml_2.cellml"))

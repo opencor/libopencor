@@ -112,10 +112,10 @@ test.describe('Sed instance tests', () => {
     }
   });
 
-  test('COMBINE archive with CellML file with imports', () => {
+  test('OMEX file with CellML file with imports', () => {
     // Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
 
-    const file = new loc.File(utils.resourcePath('support/combine/model_with_nested_imports.omex'));
+    const file = new loc.File(utils.resourcePath('support/omex/model_with_nested_imports.omex'));
 
     file.setContents(utils.fileContents(file.path));
 
@@ -676,9 +676,9 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(Number.isNaN(voi[0]), false);
 
-    // Start our run and stop it before it reaches the output start time, which means that we have no results to
-    // report. Our results should therefore not have been reallocated (since their size has not changed), but they
-    // should all be NaN values.
+    // Start our run and stop it before it reaches the output start time, which means that we have no results to report.
+    // Our results should therefore not have been reallocated (since their size has not changed), but they should all be
+    // NaN values.
 
     simulation.outputStartTime = OUTPUT_START_TIME;
     simulation.outputEndTime = OUTPUT_START_TIME + simulation.numberOfSteps;
@@ -995,8 +995,8 @@ test.describe('Sed instance tests', () => {
 
     instance.delay = DELAY;
 
-    // Note #1: each output point, but our initial one, is made available at least DELAY milliseconds after the
-    //          previous one, so our run must take at least STEP_COUNT * DELAY milliseconds.
+    // Note #1: each output point, but our initial one, is made available at least DELAY milliseconds after the previous
+    //          one, so our run must take at least STEP_COUNT * DELAY milliseconds.
     // Note #2: the time spent waiting for our delay is not included in the elapsed time of our run. We wait for DELAY
     //          milliseconds minus the time it takes to compute an output point, so as long as computing an output point
     //          takes less than DELAY / 2 milliseconds, we wait for at least STEP_COUNT * DELAY / 2 milliseconds, which
@@ -1381,8 +1381,8 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Results allocated when starting run', () => {
-    // Note: the results of a task must be (re)allocated before startRun() returns, so that they can be safely
-    //       retrieved while the task is being run (e.g., to plot them progressively).
+    // Note: the results of a task must be (re)allocated before startRun() returns, so that they can be safely retrieved
+    //       while the task is being run (e.g., to plot them progressively).
 
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
@@ -1441,8 +1441,8 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Simulation settings used when starting run', () => {
-    // Note: the simulation settings used by a run are those in effect when the run is started, even if they get
-    //       changed while the run is in progress.
+    // Note: the simulation settings used by a run are those in effect when the run is started, even if they get changed
+    //       while the run is in progress.
 
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
@@ -1478,8 +1478,8 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Model changes used when starting run', () => {
-    // Note: the model changes used by a run are those in effect when the run is started, even if they get changed
-    //       while the run is in progress.
+    // Note: the model changes used by a run are those in effect when the run is started, even if they get changed while
+    //       the run is in progress.
 
     const file = new loc.File(utils.resourcePath('api/sed/variables_initialised_using_variables.cellml'));
 
@@ -2231,7 +2231,7 @@ test.describe('Sed instance tests', () => {
     ]);
   });
 
-  test('COMBINE archive', () => {
+  test('OMEX file', () => {
     const file = new loc.File(utils.resourcePath('cellml_2.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -2244,7 +2244,7 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test('COMBINE archive with CellML file as master file', () => {
+  test('OMEX file with CellML file as master file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/cellml_file_as_master_file.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -2302,7 +2302,7 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test('DAE model from COMBINE archive', () => {
+  test('DAE model from OMEX file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/dae/model.omex'));
 
     file.setContents(utils.fileContents(file.path));
@@ -2356,7 +2356,7 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test('DAE model from legacy COMBINE archive', () => {
+  test('DAE model from legacy OMEX file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/dae/model_legacy.omex'));
 
     file.setContents(utils.fileContents(file.path));

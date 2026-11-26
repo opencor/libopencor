@@ -31,8 +31,8 @@ limitations under the License.
 //   #define strtoll __isoc23_strtoll
 //   #define strtoul __isoc23_strtoul
 //   #define strtoull __isoc23_strtoull
-// which would macro-expand both our forward declarations and the return strtol() calls inside our wrappers, making
-// them recursive. On ARM, glibc instead uses __asm__("__isoc23_strtol") on the declarations in <stdlib.h>, which would
+// which would macro-expand both our forward declarations and the return strtol() calls inside our wrappers, making them
+// recursive. On ARM, glibc instead uses __asm__("__isoc23_strtol") on the declarations in <stdlib.h>, which would
 // conflict with our own forward declarations (different asm labels on the same symbol). Either way, omitting <stdlib.h>
 // entirely avoids both problems while still allowing us to forward-declare the real symbols.
 

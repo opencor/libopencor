@@ -24,7 +24,7 @@ import { assertIssues } from './utils.js';
 const loc = await libOpenCOR();
 
 const expectedUnknownFileIssues = [
-  [loc.Issue.Type.ERROR, 'The file is not a CellML file, a SED-ML file, or a COMBINE archive.']
+  [loc.Issue.Type.ERROR, 'The file is not a CellML file, a SED-ML file, or an OMEX file.']
 ];
 
 test.describe('File type tests', () => {
@@ -84,12 +84,12 @@ test.describe('File type tests', () => {
     assert.strictEqual(file.type.value, loc.File.Type.SEDML_FILE.value);
   });
 
-  test('COMBINE 1.x archive', () => {
+  test('OMEX 1.x file', () => {
     const file = new loc.File(utils.resourcePath('cellml_1_x.omex'));
 
     file.setContents(utils.fileContents(file.path));
 
-    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.OMEX_FILE.value);
   });
 
   test('CellML 2 file', () => {
@@ -108,12 +108,12 @@ test.describe('File type tests', () => {
     assert.strictEqual(file.type.value, loc.File.Type.SEDML_FILE.value);
   });
 
-  test('COMBINE 2 archive', () => {
+  test('OMEX 2 file', () => {
     const file = new loc.File(utils.resourcePath('cellml_2.omex'));
 
     file.setContents(utils.fileContents(file.path));
 
-    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.OMEX_FILE.value);
   });
 
   test('Unknown virtual file', () => {
@@ -153,7 +153,7 @@ test.describe('File type tests', () => {
     assert.strictEqual(file.type.value, loc.File.Type.SEDML_FILE.value);
   });
 
-  test('COMBINE virtual archive', () => {
+  test('OMEX virtual file', () => {
     const filePath = utils.resourcePath('cellml_2.omex');
     const file = new loc.File(filePath);
 
@@ -162,6 +162,6 @@ test.describe('File type tests', () => {
 
     file.setContents(utils.fileContents(filePath));
 
-    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.OMEX_FILE.value);
   });
 });

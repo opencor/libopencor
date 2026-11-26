@@ -30,7 +30,7 @@ expected_non_existing_file_issues = [
 expected_unknown_file_issues = [
     [
         loc.Issue.Type.Error,
-        "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
+        "The file is not a CellML file, a SED-ML file, or an OMEX file.",
     ],
 ]
 
@@ -221,8 +221,8 @@ def test_url_based_local_file():
     else:
         assert loc.File("FILE://" + file_path) == file
 
-    # A "file" URL with the "localhost" host or without an authority also refers to a local file while a "file" URL
-    # with another host refers to a remote file.
+    # A "file" URL with the "localhost" host or without an authority also refers to a local file while a "file" URL with
+    # another host refers to a remote file.
 
     if platform.system() == "Windows":
         url_path = "/" + utils.forward_slash_path(file_path)

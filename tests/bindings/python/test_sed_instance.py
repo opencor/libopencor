@@ -134,12 +134,10 @@ def test_cellml_file_with_in_memory_imports():
         assert math.isclose(state[i], math.exp(-voi[i]), abs_tol=1e-5)
 
 
-def test_combine_archive_with_cellml_file_with_imports():
+def test_omex_file_with_cellml_file_with_imports():
     # Note: the model is such that dx/dt = -x with x(0) = 1, i.e. x(t) = exp(-t).
 
-    file = loc.File(
-        utils.resource_path("support/combine/model_with_nested_imports.omex")
-    )
+    file = loc.File(utils.resource_path("support/omex/model_with_nested_imports.omex"))
     document = loc.SedDocument(file)
     instance = document.instantiate()
 
@@ -608,9 +606,9 @@ def test_stop_run_before_output_start_time():
 
     assert not math.isnan(voi[0])
 
-    # Start our run and stop it before it reaches the output start time, which means that we have no results to
-    # report. Our results should therefore not have been reallocated (since their size has not changed), but they
-    # should all be NaN values.
+    # Start our run and stop it before it reaches the output start time, which means that we have no results to report.
+    # Our results should therefore not have been reallocated (since their size has not changed), but they should all be
+    # NaN values.
 
     simulation.output_start_time = OUTPUT_START_TIME
     simulation.output_end_time = OUTPUT_START_TIME + float(simulation.number_of_steps)
@@ -1161,8 +1159,8 @@ def test_start_run_while_already_running():
 
 
 def test_start_run_right_after_status_is_idle():
-    # Note: a run is flagged as not running anymore just before it completes, so make sure that a new run can be
-    #       started as soon as our instance is reported as idle.
+    # Note: a run is flagged as not running anymore just before it completes, so make sure that a new run can be started
+    #       as soon as our instance is reported as idle.
 
     NUMBER_OF_STEPS = 10
     NUMBER_OF_RUNS = 1000
@@ -1424,8 +1422,8 @@ def test_change_model_after_stop_run():
 
 
 def test_model_changes_that_cannot_be_applied():
-    # Note: model changes that cannot be applied are reported and ignored, but they don't prevent an instance from
-    #       being run, whether they are present when the instance is created or added afterwards.
+    # Note: model changes that cannot be applied are reported and ignored, but they don't prevent an instance from being
+    #       run, whether they are present when the instance is created or added afterwards.
 
     expected_instantiation_issues = [
         [
@@ -2052,7 +2050,7 @@ def test_dae_model_with_failing_ode_solver():
     assert_issues(instance, expected_issues)
 
 
-def test_combine_archive():
+def test_omex_file():
     file = loc.File(utils.resource_path("cellml_2.omex"))
     document = loc.SedDocument(file)
     instance = document.instantiate()
@@ -2062,7 +2060,7 @@ def test_combine_archive():
     assert not instance.has_issues
 
 
-def test_combine_archive_with_cellml_file_as_master_file():
+def test_omex_file_with_cellml_file_as_master_file():
     file = loc.File(utils.resource_path("api/sed/cellml_file_as_master_file.omex"))
     document = loc.SedDocument(file)
     instance = document.instantiate()
@@ -2108,7 +2106,7 @@ def test_dae_model_from_sedml_file():
     assert not instance.has_issues
 
 
-def test_dae_model_from_combine_archive():
+def test_dae_model_from_omex_file():
     file = loc.File(utils.resource_path("api/sed/dae/model.omex"))
     document = loc.SedDocument(file)
 
@@ -2153,7 +2151,7 @@ def test_dae_model_from_legacy_sedml_file():
     assert not instance.has_issues
 
 
-def test_dae_model_from_legacy_combine_archive():
+def test_dae_model_from_legacy_omex_file():
     file = loc.File(utils.resource_path("api/sed/dae/model_legacy.omex"))
     document = loc.SedDocument(file)
 

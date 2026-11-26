@@ -10,7 +10,7 @@ int main()
     std::cout << "Version:        " << libOpenCOR::version() << "\n";
     std::cout << "Version string: " << libOpenCOR::versionString() << "\n";
 
-    // Load a COMBINE archive from GitHub and output some information about it.
+    // Load an OMEX file from GitHub and output some information about it.
 
     auto file {libOpenCOR::File::create("https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex")};
     auto document {libOpenCOR::SedDocument::create(file)};

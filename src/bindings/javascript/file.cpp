@@ -26,7 +26,7 @@ void fileApi()
         .value("UNKNOWN_FILE", libOpenCOR::File::Type::UNKNOWN_FILE)
         .value("CELLML_FILE", libOpenCOR::File::Type::CELLML_FILE)
         .value("SEDML_FILE", libOpenCOR::File::Type::SEDML_FILE)
-        .value("COMBINE_ARCHIVE", libOpenCOR::File::Type::COMBINE_ARCHIVE);
+        .value("OMEX_FILE", libOpenCOR::File::Type::OMEX_FILE);
 
     emscripten::class_<libOpenCOR::File, emscripten::base<libOpenCOR::Logger>>("File")
         // clang-format off
@@ -47,8 +47,8 @@ void fileApi()
 
             // Note: we avoid using emscripten::typed_memory_view() as an intermediate step since it creates a
             //       JavaScript's TypedArray view directly backed by wasmMemory.buffer. This is fragile since our memory
-            //       can grow (see src/CMakeLists.txt). By performing the copy entirely within a single EM_ASM()
-            //       block, HEAPU8 is fetched and used atomically.
+            //       can grow (see src/CMakeLists.txt). By performing the copy entirely within a single EM_ASM() block,
+            //       HEAPU8 is fetched and used atomically.
 
             return emscripten::val::take_ownership(static_cast<emscripten::EM_VAL>(EM_ASM_PTR({
                 let jsArray = new Uint8Array(HEAPU8.subarray($0, $0 + $1));

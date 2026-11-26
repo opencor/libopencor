@@ -203,7 +203,7 @@ set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solversecondorderrungekutta.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/omex/omexfile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile.cpp
 )
 
@@ -320,8 +320,8 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/omex/omexfile_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/omex/omexfile.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile.h
     ${CMAKE_CURRENT_SOURCE_DIR}/unittestingexport.h
@@ -343,7 +343,7 @@ include_directories(file
                     misc
                     solver
                     support/cellml
-                    support/combine
+                    support/omex
                     support/sedml
                     ${CMAKE_CURRENT_BINARY_DIR})
 

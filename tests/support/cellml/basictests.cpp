@@ -64,9 +64,9 @@ TEST(BasicCellmlTest, modelWithNestedImports)
     EXPECT_EQ(cellmlFile->type(), libcellml::AnalyserModel::Type::ODE);
 }
 
-TEST(BasicCellmlTest, modelWithNestedImportsInCombineArchive)
+TEST(BasicCellmlTest, modelWithNestedImportsInOmexFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/combine/model_with_nested_imports.omex"))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/omex/model_with_nested_imports.omex"))};
 
     EXPECT_FALSE(file->hasIssues());
     EXPECT_EQ(file->childFileCount(), 3U);

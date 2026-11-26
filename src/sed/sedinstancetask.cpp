@@ -687,10 +687,10 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
             // Wait for our delay, if any, before tracking our results, so that they get tracked at a steady rate (see
             // waitForDelay()).
             // Note: if our previous output point was not subject to a delay (i.e. a delay was set while we were running
-            //       without one), then the time of our previous output point is not known (since we don't keep track
-            //       of it when there is no delay, so that running without a delay doesn't involve getting the current
-            //       time for each output point). So, our current output point is made available straight away and our
-            //       delay only applies from it.
+            //       without one), then the time of our previous output point is not known (since we don't keep track of
+            //       it when there is no delay, so that running without a delay doesn't involve getting the current time
+            //       for each output point). So, our current output point is made available straight away and our delay
+            //       only applies from it.
 
             if (mDelay->load(std::memory_order_relaxed) != 0) {
                 if (!delayed) {
@@ -723,8 +723,8 @@ bool SedInstanceTask::Impl::prepareRun()
     // Note: we are called from the thread that runs us or that starts running us (see SedInstance::Impl::prepareRun()),
     //       i.e. before we actually get run. This means that our results are (re)allocated before we get run, so that
     //       they can be safely retrieved while we are being run (e.g., to plot them progressively). This also means
-    //       that our simulation settings and model changes are those that were in effect when we were asked to be
-    //       run, even if they get changed while we are being run.
+    //       that our simulation settings and model changes are those that were in effect when we were asked to be run,
+    //       even if they get changed while we are being run.
 
     // Reset our progress counters.
 

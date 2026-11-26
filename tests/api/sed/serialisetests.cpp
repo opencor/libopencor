@@ -264,8 +264,8 @@ TEST(SerialiseSedTest, localCellmlFileWithQuestionMarksAndNumberSigns)
 #ifndef BUILDING_ON_WINDOWS
 TEST(SerialiseSedTest, localCellmlFileWithColon)
 {
-    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
-    // mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be mistaken
+    // for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
     // Note: a file name cannot contain a colon on Windows.
 
     auto cellmlContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.cellml")).c_str())};
@@ -456,8 +456,8 @@ TEST(SerialiseSedTest, remoteCellmlFileWithNonUtf8Character)
 
 TEST(SerialiseSedTest, remoteCellmlFileWithColon)
 {
-    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
-    // mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be mistaken
+    // for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
 
     auto cellmlContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.cellml")).c_str())};
     auto file {libOpenCOR::File::create("https://example.com/my:model.cellml", false)};

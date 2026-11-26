@@ -32,7 +32,7 @@ class LIBOPENCOR_EXPORT File: public Logger
     , public std::enable_shared_from_this<File>
 {
     friend class CellmlFile;
-    friend class CombineArchive;
+    friend class OmexFile;
     friend class SedDocument;
     friend class SedInstanceTask;
     friend class SedmlFile;
@@ -43,8 +43,7 @@ public:
     /**
      * @brief The type of a file.
      *
-     * The type of a file, i.e. whether it is unknown, a CellML file, a SED-ML file, a COMBINE archive, or
-     * irretrievable.
+     * The type of a file, i.e. whether it is unknown, a CellML file, a SED-ML file, an OMEX file, or irretrievable.
      */
 
     enum class Type
@@ -53,9 +52,9 @@ public:
         CELLML_FILE, /**< The file is a CellML file. */
         SEDML_FILE, /**< The file is a SED-ML file. */
 #ifdef __EMSCRIPTEN__
-        COMBINE_ARCHIVE /**< The file is a COMBINE archive. */
+        OMEX_FILE /**< The file is an OMEX file. */
 #else
-        COMBINE_ARCHIVE, /**< The file is a COMBINE archive. */
+        OMEX_FILE, /**< The file is an OMEX file. */
         IRRETRIEVABLE_FILE /**< The file is irretrievable. */
 #endif
     };
@@ -180,7 +179,7 @@ public:
     /**
      * @brief Return whether there are some child files.
      *
-     * Return whether there are some child files. This method is only relevant for COMBINE archives.
+     * Return whether there are some child files. This method is only relevant for OMEX files.
      *
      * @return @c true if there are some child files, @c false otherwise.
      */
@@ -190,7 +189,7 @@ public:
     /**
      * @brief Return the number of child files.
      *
-     * Return the number of child files. This method is only relevant for COMBINE archives.
+     * Return the number of child files. This method is only relevant for OMEX files.
      *
      * @return The number of child files.
      */
@@ -200,7 +199,7 @@ public:
     /**
      * @brief Return the child file names.
      *
-     * Return the child file names. This method is only relevant for COMBINE archives.
+     * Return the child file names. This method is only relevant for OMEX files.
      *
      * @return The child file names, as a @ref Strings.
      */
@@ -210,7 +209,7 @@ public:
     /**
      * @brief Return the child files.
      *
-     * Return the child files. This method is only relevant for COMBINE archives.
+     * Return the child files. This method is only relevant for OMEX files.
      *
      * @return The child files, as a @ref FilePtrs.
      */
@@ -220,7 +219,7 @@ public:
     /**
      * @brief Return the child file at the given index.
      *
-     * Return the child file at the given index. This method is only relevant for COMBINE archives.
+     * Return the child file at the given index. This method is only relevant for OMEX files.
      *
      * @param pIndex The index of the child file.
      *
@@ -232,7 +231,7 @@ public:
     /**
      * @brief Return the child file with the given file name.
      *
-     * Return the child file with the given file name. This method is only relevant for COMBINE archives.
+     * Return the child file with the given file name. This method is only relevant for OMEX files.
      *
      * @param pFileName The name of the child file.
      *

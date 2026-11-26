@@ -74,9 +74,9 @@ TEST(ChildFileTest, dataset157)
     doTestDataset("157", {"fabbri_et_al_based_composite_SAN_model.cellml", "fabbri_et_al_based_composite_SAN_model.sedml"});
 }
 
-TEST(ChildFileTest, remoteVirtualCombineArchives)
+TEST(ChildFileTest, remoteVirtualOmexFiles)
 {
-    // Two remote COMBINE archives that are not downloaded must not share their child files.
+    // Two remote OMEX files that are not downloaded must not share their child files.
 
     auto file135 {libOpenCOR::File::create(std::string(libOpenCOR::REMOTE_BASE_PATH) + "/api/file/dataset_135.omex", false)};
     auto file157 {libOpenCOR::File::create(std::string(libOpenCOR::REMOTE_BASE_PATH) + "/api/file/dataset_157.omex", false)};
@@ -84,8 +84,8 @@ TEST(ChildFileTest, remoteVirtualCombineArchives)
     file135->setContents(libOpenCOR::fileContents(libOpenCOR::resourcePath("api/file/dataset_135.omex")));
     file157->setContents(libOpenCOR::fileContents(libOpenCOR::resourcePath("api/file/dataset_157.omex")));
 
-    EXPECT_EQ(file135->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
-    EXPECT_EQ(file157->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file135->type(), libOpenCOR::File::Type::OMEX_FILE);
+    EXPECT_EQ(file157->type(), libOpenCOR::File::Type::OMEX_FILE);
 
     auto simulationFile135 {file135->childFile("simulation.json")};
     auto simulationFile157 {file157->childFile("simulation.json")};
@@ -97,25 +97,25 @@ TEST(ChildFileTest, remoteVirtualCombineArchives)
     EXPECT_EQ(libOpenCOR::toString(simulationFile157->contents()), libOpenCOR::textFileContents(libOpenCOR::resourcePath("api/file/dataset_157.json")));
 }
 
-TEST(ChildFileTest, remoteCombineArchive)
+TEST(ChildFileTest, remoteOmexFile)
 {
-    // The child files of a remote COMBINE archive must be retrievable using their file name, even if the local copy of
-    // the COMBINE archive is in a directory that is accessed through a symbolic link (e.g., on macOS, the temporary
-    // directory is "/var/...", which is a symbolic link to "/private/var/...").
+    // The child files of a remote OMEX file must be retrievable using their file name, even if the local copy of the
+    // OMEX file is in a directory that is accessed through a symbolic link (e.g., on macOS, the temporary directory is
+    // "/var/...", which is a symbolic link to "/private/var/...").
     // Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
     //       remote file is never downloaded.
 
     auto file {libOpenCOR::File::create(std::string(libOpenCOR::REMOTE_BASE_PATH) + "/api/file/dataset_135.omex")};
     auto simulationFile {file->childFile("simulation.json")};
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::OMEX_FILE);
     GTEST_ASSERT_NE(simulationFile, nullptr);
     EXPECT_EQ(libOpenCOR::toString(simulationFile->contents()), libOpenCOR::textFileContents(libOpenCOR::resourcePath("api/file/dataset_135.json")));
 }
 
-TEST(ChildFileTest, combineArchiveReplacedWithOtherContents)
+TEST(ChildFileTest, omexFileReplacedWithOtherContents)
 {
-    // Replacing the contents of a COMBINE archive with some other contents must release its child files.
+    // Replacing the contents of an OMEX file with some other contents must release its child files.
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"))};
     auto &fileManager {libOpenCOR::FileManager::instance()};
@@ -129,16 +129,16 @@ TEST(ChildFileTest, combineArchiveReplacedWithOtherContents)
     EXPECT_EQ(fileManager.fileCount(), 1U);
 }
 
-TEST(ChildFileTest, combineArchiveWithFilesOutsideOfIt)
+TEST(ChildFileTest, omexFileWithFilesOutsideOfIt)
 {
-    // A COMBINE archive may reference files that are located outside of it (e.g., "../sibling.cellml" or even the
-    // COMBINE archive itself), in which case they must be ignored rather than replace the contents of another managed
-    // file (or result in an infinite recursion).
+    // An OMEX file may reference files that are located outside of it (e.g., "../sibling.cellml" or even the OMEX file
+    // itself), in which case they must be ignored rather than replace the contents of another managed file (or result
+    // in an infinite recursion).
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file '../sibling.cellml' is not located within the COMBINE archive. It has been ignored."},
-        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file '%2E%2E/encoded_sibling.cellml' is not located within the COMBINE archive. It has been ignored."},
-        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file '../entries_outside_of_archive.omex' is not located within the COMBINE archive. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "OMEX file: the file '../sibling.cellml' is not located within the OMEX file. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "OMEX file: the file '%2E%2E/encoded_sibling.cellml' is not located within the OMEX file. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "OMEX file: the file '../entries_outside_of_archive.omex' is not located within the OMEX file. It has been ignored."},
     }};
 
     auto sibling {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/sibling.cellml"), false)};
@@ -148,7 +148,7 @@ TEST(ChildFileTest, combineArchiveWithFilesOutsideOfIt)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/entries_outside_of_archive.omex"))};
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::OMEX_FILE);
     EXPECT_EQ(file->childFileCount(), 1U);
     EXPECT_NE(file->childFile("model.cellml"), nullptr);
     EXPECT_EQ_ISSUES(file, EXPECTED_ISSUES);
@@ -157,21 +157,21 @@ TEST(ChildFileTest, combineArchiveWithFilesOutsideOfIt)
 }
 
 #ifndef BUILDING_ON_WINDOWS
-TEST(ChildFileTest, combineArchiveWithFilesOutsideOfItThroughSymbolicLink)
+TEST(ChildFileTest, omexFileWithFilesOutsideOfItThroughSymbolicLink)
 {
-    // The files of a COMBINE archive are located in a directory which name is that of the COMBINE archive followed by
-    // ".contents". If such a directory happens to exist and to be a symbolic link then the ".." components that follow
-    // it are kept (see canonicalFileName()), but the files they refer to are still located outside of the COMBINE
-    // archive, so they must still be ignored.
+    // The files of an OMEX file are located in a directory which name is that of the OMEX file followed by ".contents".
+    // If such a directory happens to exist and to be a symbolic link then the ".." components that follow it are kept
+    // (see canonicalFileName()), but the files they refer to are still located outside of the OMEX file, so they must
+    // still be ignored.
     // Note: a symbolic link usually requires some special privileges on Windows.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file '../sibling.cellml' is not located within the COMBINE archive. It has been ignored."},
-        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file '%2E%2E/encoded_sibling.cellml' is not located within the COMBINE archive. It has been ignored."},
-        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file '../entries_outside_of_archive.omex' is not located within the COMBINE archive. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "OMEX file: the file '../sibling.cellml' is not located within the OMEX file. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "OMEX file: the file '%2E%2E/encoded_sibling.cellml' is not located within the OMEX file. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "OMEX file: the file '../entries_outside_of_archive.omex' is not located within the OMEX file. It has been ignored."},
     }};
 
-    auto dir {std::filesystem::temp_directory_path() / "libopencor_combine_archive_with_files_outside_of_it_through_symbolic_link"};
+    auto dir {std::filesystem::temp_directory_path() / "libopencor_omex_file_with_files_outside_of_it_through_symbolic_link"};
 
     std::filesystem::remove_all(dir);
     std::filesystem::create_directories(dir / "real");
@@ -187,7 +187,7 @@ TEST(ChildFileTest, combineArchiveWithFilesOutsideOfItThroughSymbolicLink)
 
     std::filesystem::current_path(origDir);
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::OMEX_FILE);
     EXPECT_EQ(file->childFileCount(), 1U);
     EXPECT_NE(file->childFile("model.cellml"), nullptr);
     EXPECT_EQ_ISSUES(file, EXPECTED_ISSUES);
@@ -197,7 +197,7 @@ TEST(ChildFileTest, combineArchiveWithFilesOutsideOfItThroughSymbolicLink)
 }
 #endif
 
-TEST(ChildFileTest, combineArchiveWithPercentEncodedLocations)
+TEST(ChildFileTest, omexFileWithPercentEncodedLocations)
 {
     // A location is a URI reference, so it may be percent-encoded (e.g., "./my%20file.txt"), in which case the name of
     // its ZIP entry should be its decoded location (e.g., "my file.txt"), although some tools use the location itself
@@ -214,7 +214,7 @@ TEST(ChildFileTest, combineArchiveWithPercentEncodedLocations)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/percent_encoded_locations.omex"))};
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::OMEX_FILE);
     EXPECT_FALSE(file->hasIssues());
     EXPECT_EQ(file->childFileCount(), LOCATIONS_AND_FILE_NAMES.size());
 
@@ -230,7 +230,7 @@ TEST(ChildFileTest, combineArchiveWithPercentEncodedLocations)
     }
 }
 
-TEST(ChildFileTest, combineArchiveWithNonUtf8Locations)
+TEST(ChildFileTest, omexFileWithNonUtf8Locations)
 {
     // A location may get percent-decoded to a file name that is not valid UTF-8 (e.g., "./%FF.txt" gets decoded to
     // "\xFF.txt") or that has a character outside of the Basic Multilingual Plane (e.g., "./%F0%9F%98%80.txt" gets
@@ -245,7 +245,7 @@ TEST(ChildFileTest, combineArchiveWithNonUtf8Locations)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/non_utf8_locations.omex"))};
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::OMEX_FILE);
     EXPECT_FALSE(file->hasIssues());
     EXPECT_EQ(file->childFileCount(), LOCATIONS_AND_FILE_NAMES.size());
 
@@ -262,16 +262,16 @@ TEST(ChildFileTest, combineArchiveWithNonUtf8Locations)
     }
 }
 
-TEST(ChildFileTest, combineArchiveWithDuplicateLocations)
+TEST(ChildFileTest, omexFileWithDuplicateLocations)
 {
     // Different locations may refer to the same file (e.g., "./my%20file.txt" and "./my file.txt", or "./file.txt" and
     // "file.txt"), in which case only the first one is kept and the other ones are ignored. The ignored locations can,
     // however, still be used to retrieve the child file since they refer to the same file.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file 'file.txt' is the same as the file './file.txt'. It has been ignored."},
-        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored."},
-        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file './other%20file.txt' is the same as the file './other file.txt'. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "OMEX file: the file 'file.txt' is the same as the file './file.txt'. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "OMEX file: the file './my file.txt' is the same as the file './my%20file.txt'. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "OMEX file: the file './other%20file.txt' is the same as the file './other file.txt'. It has been ignored."},
     }};
     static const std::vector<std::tuple<std::string, std::string, std::string>> LOCATIONS_FILE_NAMES_AND_DUPLICATE_LOCATIONS {
         {"./file.txt", "file.txt", "file.txt"},
@@ -281,7 +281,7 @@ TEST(ChildFileTest, combineArchiveWithDuplicateLocations)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/duplicate_locations.omex"))};
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::OMEX_FILE);
     EXPECT_EQ_ISSUES(file, EXPECTED_ISSUES);
     EXPECT_EQ(file->childFileCount(), LOCATIONS_FILE_NAMES_AND_DUPLICATE_LOCATIONS.size());
 
@@ -300,14 +300,13 @@ TEST(ChildFileTest, combineArchiveWithDuplicateLocations)
     EXPECT_EQ(libOpenCOR::FileManager::instance().fileCount(), 4U);
 }
 
-TEST(ChildFileTest, combineArchiveWithSelfReferencingLocations)
+TEST(ChildFileTest, omexFileWithSelfReferencingLocations)
 {
-    // Locations that refer to the COMBINE archive itself (e.g., ".", "./", or "/") are not child files of the COMBINE
-    // archive.
+    // Locations that refer to the OMEX file itself (e.g., ".", "./", or "/") are not child files of the OMEX file.
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/self_referencing_locations.omex"))};
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::OMEX_FILE);
     EXPECT_FALSE(file->hasIssues());
     EXPECT_EQ(file->childFileCount(), 1U);
     EXPECT_EQ(file->childFileNames()[0], "./file.txt");

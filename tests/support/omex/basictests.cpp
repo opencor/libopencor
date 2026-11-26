@@ -14,18 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "combinearchive.h"
+#include "omexfile.h"
 
 #include "tests/utils.h"
 
 #include <libopencor>
 
-TEST(CoverageOmexTest, file)
+TEST(BasicOmexTest, createOmexFileWithNonOmexFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"));
-    auto combineArchive = libOpenCOR::CombineArchive::create(file);
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("unknown_file.txt"));
+    auto omexFile = libOpenCOR::OmexFile::create(file);
 
-    EXPECT_NE(combineArchive->file(0), nullptr);
-    EXPECT_NE(combineArchive->file(1), nullptr);
-    EXPECT_EQ(combineArchive->file(2), nullptr);
+    EXPECT_EQ(omexFile, nullptr);
 }

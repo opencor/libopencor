@@ -16,51 +16,40 @@ limitations under the License.
 
 #pragma once
 
-#include "unittestingexport.h"
+#include "logger_p.h"
 
-#include "libopencor/logger.h"
+#include "omexfile.h"
 
-namespace libcombine {
-class CombineArchive;
-}
+#include <unordered_map>
 
 namespace libOpenCOR {
 
-class CombineArchive;
-using CombineArchivePtr = std::shared_ptr<CombineArchive>;
-
-class LIBOPENCOR_UNIT_TESTING_EXPORT CombineArchive: public Logger
+class OmexFile::Impl: public Logger::Impl
 {
 public:
-    CombineArchive() = delete;
-    ~CombineArchive() override;
+    UnsignedChars mArchiveContents;
+    libcombine::CombineArchive *mArchive;
+    std::string mArchiveLocation;
+    size_t mArchiveLocationSize;
+    std::vector<FilePtr> mFiles;
+    std::vector<std::string> mFileNames;
+    std::unordered_map<std::string, size_t> mIgnoredFileNameIndexes;
+    FilePtr mMasterFile;
+    size_t mCellmlFileCount {0};
+    size_t mSedmlFileCount {0};
 
-    CombineArchive(const CombineArchive &pOther) = delete;
-    CombineArchive(CombineArchive &&pOther) noexcept = delete;
-
-    CombineArchive &operator=(const CombineArchive &pRhs) = delete;
-    CombineArchive &operator=(CombineArchive &&pRhs) noexcept = delete;
-
-    static CombineArchivePtr create(const FilePtr &pFile);
+    explicit Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents);
+    ~Impl() override;
 
     const FilePtr &masterFile() const;
     size_t cellmlFileCount() const;
     size_t sedmlFileCount() const;
-
     bool hasFiles() const;
     size_t fileCount() const;
     const Strings &fileNames() const;
     const FilePtrs &files() const;
     const FilePtr &file(size_t pIndex) const;
     const FilePtr &file(const std::string &pFileName) const;
-
-private:
-    class Impl;
-
-    explicit CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents);
-
-    Impl *pimpl();
-    const Impl *pimpl() const;
 };
 
 } // namespace libOpenCOR

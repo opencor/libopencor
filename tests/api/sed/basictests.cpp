@@ -127,8 +127,8 @@ TEST(BasicSedTest, sedmlFileWithRelativeCellmlFile)
 
 TEST(BasicSedTest, sedmlFileWithRelativeCellmlFileInWorkingDirectory)
 {
-    // A relative model source is relative to the SED-ML file, not to the current working directory, even if the
-    // current working directory contains a file with that name.
+    // A relative model source is relative to the SED-ML file, not to the current working directory, even if the current
+    // working directory contains a file with that name.
 
     auto origDir {std::filesystem::current_path()};
 
@@ -488,7 +488,7 @@ TEST(BasicSedTest, sedmlFileWithRemoteCellmlFile)
     EXPECT_FALSE(document->hasIssues());
 }
 
-TEST(BasicSedTest, combineArchive)
+TEST(BasicSedTest, omexFile)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -496,10 +496,10 @@ TEST(BasicSedTest, combineArchive)
     EXPECT_FALSE(document->hasIssues());
 }
 
-TEST(BasicSedTest, combineArchiveWithNoManifestFile)
+TEST(BasicSedTest, omexFileWithNoManifestFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with no master file."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an OMEX file with no master file."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_manifest_file.omex"))};
@@ -508,7 +508,7 @@ TEST(BasicSedTest, combineArchiveWithNoManifestFile)
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
-TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneCellmlFile)
+TEST(BasicSedTest, omexFileWithNoMasterFileAndOneCellmlFile)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_one_cellml_file.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -523,10 +523,10 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneCellmlFile)
     EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownCellmlFile)
+TEST(BasicSedTest, omexFileWithNoMasterFileAndOneUnknownCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported)."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported)."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_one_unknown_cellml_file.omex"))};
@@ -535,13 +535,13 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownCellmlFile)
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
-TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownHttpsCellmlFile)
+TEST(BasicSedTest, omexFileWithNoMasterFileAndOneUnknownHttpsCellmlFile)
 {
     // The format of an unknown file is used to determine its type, and a format may use the "https" scheme (e.g.,
     // "https://identifiers.org/combine.specifications/cellml.1.1").
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported)."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported)."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_one_unknown_https_cellml_file.omex"))};
@@ -550,10 +550,10 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownHttpsCellmlFile)
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
-TEST(BasicSedTest, combineArchiveWithNoMasterFileAndSeveralCellmlFiles)
+TEST(BasicSedTest, omexFileWithNoMasterFileAndSeveralCellmlFiles)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with no master file, no SED-ML file, and several CellML files."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an OMEX file with no master file, no SED-ML file, and several CellML files."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_several_cellml_files.omex"))};
@@ -562,13 +562,13 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndSeveralCellmlFiles)
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
-TEST(BasicSedTest, combineArchiveWithMasterFileWithDuplicateLocation)
+TEST(BasicSedTest, omexFileWithMasterFileWithDuplicateLocation)
 {
     // The master attribute of an entry that is ignored because its location refers to the same file as another entry
     // still applies to that file.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::WARNING, "COMBINE archive: the file 'cellml_2_b.cellml' is the same as the file './cellml_2_b.cellml'. It has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "OMEX file: the file 'cellml_2_b.cellml' is the same as the file './cellml_2_b.cellml'. It has been ignored."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/master_file_with_duplicate_location.omex"))};
@@ -580,7 +580,7 @@ TEST(BasicSedTest, combineArchiveWithMasterFileWithDuplicateLocation)
     EXPECT_EQ(document->models()[0]->file(), file->childFile("./cellml_2_b.cellml"));
 }
 
-TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneSedmlFile)
+TEST(BasicSedTest, omexFileWithNoMasterFileAndOneSedmlFile)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_one_sedml_file.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -595,10 +595,10 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneSedmlFile)
     EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownSedmlFile)
+TEST(BasicSedTest, omexFileWithNoMasterFileAndOneUnknownSedmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported)."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported)."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_one_unknown_sedml_file.omex"))};
@@ -607,14 +607,14 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownSedmlFile)
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
-TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownVersionedSedmlFile)
+TEST(BasicSedTest, omexFileWithNoMasterFileAndOneUnknownVersionedSedmlFile)
 {
     // The format of an unknown file is used to determine its type, and a format may be versioned and use the "https"
     // scheme (e.g., "https://identifiers.org/combine.specifications/sed-ml.level-1.version-3"). So, the unknown SED-ML
     // file is the master file, rather than the CellML file.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported)."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported)."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_one_unknown_versioned_sedml_file.omex"))};
@@ -623,10 +623,10 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndOneUnknownVersionedSedmlFile
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
-TEST(BasicSedTest, combineArchiveWithNoMasterFileAndSeveralSedmlFiles)
+TEST(BasicSedTest, omexFileWithNoMasterFileAndSeveralSedmlFiles)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with no master file and several SED-ML files."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an OMEX file with no master file and several SED-ML files."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file_with_several_sedml_files.omex"))};
@@ -635,10 +635,10 @@ TEST(BasicSedTest, combineArchiveWithNoMasterFileAndSeveralSedmlFiles)
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
-TEST(BasicSedTest, combineArchiveWithUnknownDirectCellmlFile)
+TEST(BasicSedTest, omexFileWithUnknownDirectCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported)."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported)."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unknown_direct_cellml_file.omex"))};
@@ -647,7 +647,7 @@ TEST(BasicSedTest, combineArchiveWithUnknownDirectCellmlFile)
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
-TEST(BasicSedTest, combineArchiveWithUnknownIndirectCellmlFile)
+TEST(BasicSedTest, omexFileWithUnknownIndirectCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "Task: task 'task1' requires a model of CellML type."},
@@ -665,10 +665,10 @@ TEST(BasicSedTest, combineArchiveWithUnknownIndirectCellmlFile)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
-TEST(BasicSedTest, combineArchiveWithUnknownSedmlFile)
+TEST(BasicSedTest, omexFileWithUnknownSedmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported)."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported)."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unknown_sedml_file.omex"))};

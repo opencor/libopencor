@@ -215,8 +215,8 @@ TEST(UtilsTest, retrieveFileInfo)
         EXPECT_EQ(fileNameOrUrl, expectedFileNameOrUrl) << url;
     }
 
-    // A remote URL is decoded, except for its reserved characters and percent signs, and then canonicalised. Its
-    // scheme and host are also normalised to lowercase, but not its userinfo, path, query, fragment, percent-encoded
+    // A remote URL is decoded, except for its reserved characters and percent signs, and then canonicalised. Its scheme
+    // and host are also normalised to lowercase, but not its userinfo, path, query, fragment, percent-encoded
     // characters, and the zone identifier of an IPv6 address.
 
     static const std::vector<std::pair<std::string, std::string>> URLS {
@@ -305,8 +305,7 @@ TEST(UtilsTest, stringToPathAndPathToString)
     }
 
     // A path with lone surrogates that stand for bytes that form a valid UTF-8 sequence cannot, however, be converted
-    // to a file name and back without being altered (e.g., U+DCC3 U+DCA9 and U+00E9 are both converted to
-    // "\xC3\xA9").
+    // to a file name and back without being altered (e.g., U+DCC3 U+DCA9 and U+00E9 are both converted to "\xC3\xA9").
 
     static constexpr wchar_t ESCAPED_C3_SURROGATE {0xDCC3};
     static constexpr wchar_t ESCAPED_A9_SURROGATE {0xDCA9};

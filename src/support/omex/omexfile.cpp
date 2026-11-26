@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "combinearchive_p.h"
+#include "omexfile_p.h"
 #include "file_p.h"
 
 #include "utils.h"
@@ -33,15 +33,14 @@ namespace {
 
 std::string archiveLocation(const FilePtr &pFile)
 {
-    // Determine the location of the COMBINE archive, i.e. the location where its files are "virtually" extracted (e.g.,
+    // Determine the location of the OMEX file, i.e. the location where its files are "virtually" extracted (e.g.,
     // "/some/path/archive.omex.contents/").
-    // Note #1: the files of a COMBINE archive are managed by the file manager using their file name, so each COMBINE
-    //          archive must have its own location. This means that a remote COMBINE archive that has no local copy
-    //          (i.e. it was not downloaded), and therefore no file name, must use a virtual file name that is unique to
-    //          it.
-    // Note #2: we canonicalise the location since the files of the COMBINE archive have a canonical file name (see
-    //          File::create()), which we need to be able to compare against (see CombineArchive::Impl::file()). For
-    //          instance, the temporary directory on macOS is a symbolic link (i.e. "/var/..." vs. "/private/var/...").
+    // Note #1: the files of an OMEX file are managed by the file manager using their file name, so each OMEX file must
+    //          have its own location. This means that a remote OMEX file that has no local copy (i.e. it was not
+    //          downloaded), and therefore no file name, must use a virtual file name that is unique to it.
+    // Note #2: we canonicalise the location since the files of the OMEX file have a canonical file name (see
+    //          File::create()), which we need to be able to compare against (see OmexFile::Impl::file()). For instance,
+    //          the temporary directory on macOS is a symbolic link (i.e. "/var/..." vs. "/private/var/...").
 
     static std::atomic<uint64_t> virtualFileNameCounter {0};
 
@@ -58,13 +57,13 @@ std::string archiveLocation(const FilePtr &pFile)
 
 } // namespace
 
-CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents)
+OmexFile::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents)
     : mArchiveContents(std::move(pArchiveContents))
     , mArchive(pArchive)
     , mArchiveLocation(archiveLocation(pFile))
     , mArchiveLocationSize(mArchiveLocation.size())
 {
-    // Extract all the files contained in the COMBINE archive.
+    // Extract all the files contained in the OMEX file.
 
     auto fileCount {static_cast<size_t>(mArchive->getNumEntries())};
 
@@ -82,20 +81,19 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
         const auto *entry {mArchive->getEntry(i)};
         auto location {entry->getLocation()};
 
-        // Make sure that the file is located within the COMBINE archive.
+        // Make sure that the file is located within the OMEX file.
         // Note #1: a location is a URI reference (see https://www.rfc-editor.org/rfc/rfc3986#section-4.1), so it may be
         //          percent-encoded (e.g., "my%20file.cellml"). Since mArchiveLocation is a local file name, we must
         //          decode the location to get the file name of the file.
         // Note #2: a location may have some ".." segments (e.g., "../file.cellml"), possibly percent-encoded (e.g.,
-        //          "%2E%2E/file.cellml"), in which case the file would be located outside of the COMBINE archive. It
-        //          could then be confused with another managed file (which contents would get replaced) or even with
-        //          the COMBINE archive itself (resulting in an infinite recursion), so we ignore such a file. To
-        //          determine where the file is located, we use its file name as determined by File::create().
-        // Note #3: the file name of a file that is located within the COMBINE archive has no ".." component after the
-        //          location of the COMBINE archive, unless it follows a symbolic link (see canonicalFileName()), in
-        //          which case the file may be located outside of the COMBINE archive (e.g.,
-        //          "archive.omex.contents/../file.cellml" if "archive.omex.contents" is a symbolic link), so we also
-        //          ignore such a file.
+        //          "%2E%2E/file.cellml"), in which case the file would be located outside of the OMEX file. It could
+        //          then be confused with another managed file (which contents would get replaced) or even with the OMEX
+        //          file itself (resulting in an infinite recursion), so we ignore such a file. To determine where the
+        //          file is located, we use its file name as determined by File::create().
+        // Note #3: the file name of a file that is located within the OMEX file has no ".." component after the
+        //          location of the OMEX file, unless it follows a symbolic link (see canonicalFileName()), in which
+        //          case the file may be located outside of the OMEX file (e.g., "archive.omex.contents/../file.cellml"
+        //          if "archive.omex.contents" is a symbolic link), so we also ignore such a file.
 
         auto decodedLocation {decodeUrl(location)};
         auto fileNameOrUrl {mArchiveLocation + decodedLocation};
@@ -117,17 +115,17 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
 
             warning += "The file '";
             warning += location;
-            warning += "' is not located within the COMBINE archive. It has been ignored.";
+            warning += "' is not located within the OMEX file. It has been ignored.";
 
             addWarning(warning);
 
             continue;
         }
 
-        // Skip a location that refers to the COMBINE archive itself.
-        // Note: libCOMBINE skips the "." location, which is how a COMBINE archive normally refers to itself, but not
-        //       the other locations that refer to it (e.g., "./" or "/"), which would otherwise result in a file for
-        //       the directory in which we extract the COMBINE archive.
+        // Skip a location that refers to the OMEX file itself.
+        // Note: libCOMBINE skips the "." location, which is how an OMEX file normally refers to itself, but not the
+        //       other locations that refer to it (e.g., "./" or "/"), which would otherwise result in a file for the
+        //       directory in which we extract the OMEX file.
 
         if (fileName == mArchiveLocation) {
             continue;
@@ -135,11 +133,11 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
 
         // Make sure that the file is not the same as a file that we have already extracted.
         // Note: different locations may refer to the same file (e.g., "./my%20file.cellml" and "./my file.cellml", or
-        //       "./file.cellml" and "file.cellml"). This is an ambiguity in the COMBINE archive itself, so we keep the
-        //       first file and ignore the other ones (File::create() would otherwise return the same file, which
-        //       contents would get replaced and which would be counted several times). We do, however, honour the
-        //       master attribute of an ignored entry since it still refers to the file that we kept, and we keep track
-        //       of its location so that it can still be used to retrieve that file (see file()).
+        //       "./file.cellml" and "file.cellml"). This is an ambiguity in the OMEX file itself, so we keep the first
+        //       file and ignore the other ones (File::create() would otherwise return the same file, which contents
+        //       would get replaced and which would be counted several times). We do, however, honour the master
+        //       attribute of an ignored entry since it still refers to the file that we kept, and we keep track of its
+        //       location so that it can still be used to retrieve that file (see file()).
 
         if (auto fileIndex {fileIndexes.find(fileName)}; fileIndex != fileIndexes.end()) {
             const auto &fileLocation {mFileNames[fileIndex->second]};
@@ -203,7 +201,7 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
     // the format specified in the manifest. This means that a broken SED-ML file is still considered to be a SED-ML
     // file and, as such, cannot be silently ignored in favour of a CellML file.
     // Note: we do this only once the contents of all the files have been set since a CellML file may import another
-    //       CellML file from the COMBINE archive, and that file may come after it in the manifest.
+    //       CellML file from the OMEX file, and that file may come after it in the manifest.
 
     for (size_t i {0}; i < mFiles.size(); ++i) {
         const auto &file {mFiles[i]};
@@ -252,47 +250,47 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
     }
 }
 
-CombineArchive::Impl::~Impl()
+OmexFile::Impl::~Impl()
 {
     delete mArchive;
 }
 
-const FilePtr &CombineArchive::Impl::masterFile() const
+const FilePtr &OmexFile::Impl::masterFile() const
 {
     return mMasterFile;
 }
 
-size_t CombineArchive::Impl::cellmlFileCount() const
+size_t OmexFile::Impl::cellmlFileCount() const
 {
     return mCellmlFileCount;
 }
 
-size_t CombineArchive::Impl::sedmlFileCount() const
+size_t OmexFile::Impl::sedmlFileCount() const
 {
     return mSedmlFileCount;
 }
 
-bool CombineArchive::Impl::hasFiles() const
+bool OmexFile::Impl::hasFiles() const
 {
     return !mFiles.empty();
 }
 
-size_t CombineArchive::Impl::fileCount() const
+size_t OmexFile::Impl::fileCount() const
 {
     return mFiles.size();
 }
 
-const Strings &CombineArchive::Impl::fileNames() const
+const Strings &OmexFile::Impl::fileNames() const
 {
     return mFileNames;
 }
 
-const FilePtrs &CombineArchive::Impl::files() const
+const FilePtrs &OmexFile::Impl::files() const
 {
     return mFiles;
 }
 
-const FilePtr &CombineArchive::Impl::file(size_t pIndex) const
+const FilePtr &OmexFile::Impl::file(size_t pIndex) const
 {
     static const FilePtr NO_FILE_PTR;
 
@@ -303,13 +301,13 @@ const FilePtr &CombineArchive::Impl::file(size_t pIndex) const
     return mFiles[pIndex];
 }
 
-const FilePtr &CombineArchive::Impl::file(const std::string &pFileName) const
+const FilePtr &OmexFile::Impl::file(const std::string &pFileName) const
 {
     static const FilePtr NO_FILE_PTR;
 
     // Look for the file using its location, as returned by fileNames() (e.g., "./my%20file.cellml"), the location of an
     // entry that was ignored because it refers to the same file (e.g., "my%20file.cellml"), or its file name relative
-    // to the COMBINE archive (e.g., "my file.cellml").
+    // to the OMEX file (e.g., "my file.cellml").
     // Note: a file name is never decoded (see retrieveFileInfo()), so we must look for the location of an ignored entry
     //       explicitly since it may be percent-encoded.
 
@@ -336,7 +334,7 @@ const FilePtr &CombineArchive::Impl::file(const std::string &pFileName) const
     return NO_FILE_PTR;
 }
 
-CombineArchive::CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents)
+OmexFile::OmexFile(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents)
     : Logger(std::make_unique<Impl>(pFile, pArchive, std::move(pArchiveContents)))
 {
 #ifdef CODE_COVERAGE_ENABLED
@@ -344,39 +342,39 @@ CombineArchive::CombineArchive(const FilePtr &pFile, libcombine::CombineArchive 
 #endif
 }
 
-CombineArchive::~CombineArchive() = default;
+OmexFile::~OmexFile() = default;
 
-CombineArchive::Impl *CombineArchive::pimpl()
+OmexFile::Impl *OmexFile::pimpl()
 {
     return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
-const CombineArchive::Impl *CombineArchive::pimpl() const
+const OmexFile::Impl *OmexFile::pimpl() const
 {
     return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
-CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
+OmexFilePtr OmexFile::create(const FilePtr &pFile)
 {
-    static const CombineArchivePtr NO_COMBINE_ARCHIVE_PTR;
+    static const OmexFilePtr NO_OMEX_FILE_PTR;
 
-    // Check whether the file is a COMBINE archive and if so then return its CombineArchive object.
+    // Check whether the file is an OMEX file and if so then return its OmexFile object.
 
-    if (pFile->pimpl()->type() == File::Type::COMBINE_ARCHIVE) {
-        return pFile->pimpl()->mCombineArchive;
+    if (pFile->pimpl()->type() == File::Type::OMEX_FILE) {
+        return pFile->pimpl()->mOmexFile;
     }
 
     // Check whether the type of the file is already known and if so then return since there is no need to parse the
     // file contents again.
 
     if (pFile->pimpl()->mTypeChecked) {
-        return NO_COMBINE_ARCHIVE_PTR;
+        return NO_OMEX_FILE_PTR;
     }
 
-    // Try to retrieve a COMBINE archive.
-    // Note: a COMBINE archive is a ZIP file, so we make sure that it starts with 0x04034b50, which is the magic number
-    //       used by a ZIP file (we ignore empty and spanned ZIP files). Indeed, libCOMBINE may crash depending on the
-    //       file contents that is given to it.
+    // Try to retrieve an OMEX file.
+    // Note: an OMEX file is a ZIP file, so we make sure that it starts with 0x04034b50, which is the magic number used
+    //       by a ZIP file (we ignore empty and spanned ZIP files). Indeed, libCOMBINE may crash depending on the file
+    //       contents that is given to it.
 
     static const auto LS8 {8U};
     static const auto LS16 {16U};
@@ -391,56 +389,56 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 
         archive->initializeFromBuffer(fileContents);
 
-        return CombineArchivePtr {new CombineArchive {pFile, archive, std::move(fileContents)}};
+        return OmexFilePtr {new OmexFile {pFile, archive, std::move(fileContents)}};
         // Note: libCOMBINE retains pointers into the supplied buffer, so we must not destroy it until the archive is
         //       gone hence we keep the original ZIP buffer alive for the lifetime of the archive by moving it into the
-        //       CombineArchive::Impl object.
+        //       OmexFile::Impl object.
     }
 
-    return NO_COMBINE_ARCHIVE_PTR;
+    return NO_OMEX_FILE_PTR;
 }
 
-const FilePtr &CombineArchive::masterFile() const
+const FilePtr &OmexFile::masterFile() const
 {
     return pimpl()->masterFile();
 }
 
-size_t CombineArchive::cellmlFileCount() const
+size_t OmexFile::cellmlFileCount() const
 {
     return pimpl()->cellmlFileCount();
 }
 
-size_t CombineArchive::sedmlFileCount() const
+size_t OmexFile::sedmlFileCount() const
 {
     return pimpl()->sedmlFileCount();
 }
 
-bool CombineArchive::hasFiles() const
+bool OmexFile::hasFiles() const
 {
     return pimpl()->hasFiles();
 }
 
-size_t CombineArchive::fileCount() const
+size_t OmexFile::fileCount() const
 {
     return pimpl()->fileCount();
 }
 
-const Strings &CombineArchive::fileNames() const
+const Strings &OmexFile::fileNames() const
 {
     return pimpl()->fileNames();
 }
 
-const FilePtrs &CombineArchive::files() const
+const FilePtrs &OmexFile::files() const
 {
     return pimpl()->files();
 }
 
-const FilePtr &CombineArchive::file(size_t pIndex) const
+const FilePtr &OmexFile::file(size_t pIndex) const
 {
     return pimpl()->file(pIndex);
 }
 
-const FilePtr &CombineArchive::file(const std::string &pFileName) const
+const FilePtr &OmexFile::file(const std::string &pFileName) const
 {
     return pimpl()->file(pFileName);
 }

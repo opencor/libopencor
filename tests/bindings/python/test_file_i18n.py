@@ -27,7 +27,7 @@ def test_arabic_files():
     )
     assert (
         loc.File(utils.resource_path("i18n/ملف/file.omex")).type
-        == loc.File.Type.CombineArchive
+        == loc.File.Type.OmexFile
     )
 
 
@@ -42,7 +42,7 @@ def test_chinese_files():
     )
     assert (
         loc.File(utils.resource_path("i18n/文件夹/file.omex")).type
-        == loc.File.Type.CombineArchive
+        == loc.File.Type.OmexFile
     )
 
 
@@ -57,7 +57,7 @@ def test_hindi_files():
     )
     assert (
         loc.File(utils.resource_path("i18n/फोल्डर/file.omex")).type
-        == loc.File.Type.CombineArchive
+        == loc.File.Type.OmexFile
     )
 
 
@@ -72,7 +72,7 @@ def test_japanese_files():
     )
     assert (
         loc.File(utils.resource_path("i18n/フォルダ/file.omex")).type
-        == loc.File.Type.CombineArchive
+        == loc.File.Type.OmexFile
     )
 
 
@@ -87,5 +87,5 @@ def test_russian_files():
     )
     assert (
         loc.File(utils.resource_path("i18n/папка/file.omex")).type
-        == loc.File.Type.CombineArchive
+        == loc.File.Type.OmexFile
     )

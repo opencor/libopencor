@@ -345,8 +345,8 @@ std::string patchWasmSharedMemory(UnsignedChars &pWasmModule)
                     // since it depends on -sMAXIMUM_MEMORY, etc. (see src/CMakeLists.txt).
                     // Note: LLVM currently emits a 32-bit, non-shared memory import without a maximum size (i.e. flags
                     //       0x00), but we handle a memory import with a maximum size (i.e. flags 0x01) and/or that is
-                    //       already shared (i.e. flags 0x03) in case a future version of LLVM does so. Any other
-                    //       flags (e.g., a 64-bit memory) are not supported.
+                    //       already shared (i.e. flags 0x03) in case a future version of LLVM does so. Any other flags
+                    //       (e.g., a 64-bit memory) are not supported.
 
                     if (pos < sectionEnd) {
                         static constexpr unsigned char HAS_MAXIMUM {0x01};

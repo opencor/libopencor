@@ -20,7 +20,7 @@ from utils import assert_issues
 expected_unknown_file_issues = [
     [
         loc.Issue.Type.Error,
-        "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
+        "The file is not a CellML file, a SED-ML file, or an OMEX file.",
     ],
 ]
 expected_irretrievable_file_issues = [
@@ -67,10 +67,10 @@ def test_sedml_1_x_file():
     assert file.type == loc.File.Type.SedmlFile
 
 
-def test_combine_1_x_archive():
+def test_omex_1_x_file():
     file = loc.File(utils.resource_path("cellml_1_x.omex"))
 
-    assert file.type == loc.File.Type.CombineArchive
+    assert file.type == loc.File.Type.OmexFile
 
 
 def test_cellml_2_file():
@@ -85,10 +85,10 @@ def test_sedml_2_file():
     assert file.type == loc.File.Type.SedmlFile
 
 
-def test_combine_2_archive():
+def test_omex_2_file():
     file = loc.File(utils.resource_path("cellml_2.omex"))
 
-    assert file.type == loc.File.Type.CombineArchive
+    assert file.type == loc.File.Type.OmexFile
 
 
 def test_unknown_virtual_file():
@@ -128,7 +128,7 @@ def test_sedml_virtual_file():
     assert file.type == loc.File.Type.SedmlFile
 
 
-def test_combine_virtual_archive():
+def test_omex_virtual_file():
     file_path = utils.resource_path("cellml_2.omex")
     file = loc.File(file_path, False)
 
@@ -137,4 +137,4 @@ def test_combine_virtual_archive():
 
     file.contents = utils.binary_to_list(utils.binary_file_contents(file_path))
 
-    assert file.type == loc.File.Type.CombineArchive
+    assert file.type == loc.File.Type.OmexFile

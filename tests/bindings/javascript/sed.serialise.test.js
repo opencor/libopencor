@@ -240,8 +240,8 @@ test.describe('Sed serialise tests', () => {
   });
 
   test('Local CellML file with colon', () => {
-    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
-    // mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be mistaken
+    // for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
 
     const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
     const file = new loc.File(utils.resourcePath('my:model.cellml'));
@@ -420,8 +420,8 @@ test.describe('Sed serialise tests', () => {
   });
 
   test('Remote CellML file with colon', () => {
-    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be
-    // mistaken for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
+    // A relative model source which first segment contains a colon must be prefixed with "./" for it not to be mistaken
+    // for a URI with a scheme when the SED-ML file is loaded back (in which case the model would be ignored).
 
     const cellmlContents = utils.fileContents(utils.resourcePath('cellml_2.cellml'));
     const file = new loc.File('https://example.com/my:model.cellml');

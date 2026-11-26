@@ -97,8 +97,8 @@ void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &
         initialiseFromCellmlFile(pOwner, pFile);
     } else if (fileType == File::Type::SEDML_FILE) {
         initialiseFromSedmlFile(pOwner, pFile);
-    } else if (fileType == File::Type::COMBINE_ARCHIVE) {
-        initialiseFromCombineArchive(pOwner, pFile);
+    } else if (fileType == File::Type::OMEX_FILE) {
+        initialiseFromOmexFile(pOwner, pFile);
 #ifndef __EMSCRIPTEN__
     } else if (fileType == File::Type::IRRETRIEVABLE_FILE) {
         addError("A simulation experiment description cannot be created using an irretrievable file.");
@@ -133,18 +133,18 @@ void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, co
     addIssues(sedmlFile, "SED-ML file");
 }
 
-void SedDocument::Impl::initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile)
+void SedDocument::Impl::initialiseFromOmexFile(const SedDocumentPtr &pOwner, const FilePtr &pFile)
 {
-    const auto &combineArchive {pFile->pimpl()->mCombineArchive};
-    const auto &masterFile {combineArchive->masterFile()};
+    const auto &omexFile {pFile->pimpl()->mOmexFile};
+    const auto &masterFile {omexFile->masterFile()};
 
     if (masterFile == nullptr) {
-        if (combineArchive->sedmlFileCount() > 1) {
-            addError("A simulation experiment description cannot be created using a COMBINE archive with no master file and several SED-ML files.");
-        } else if (combineArchive->cellmlFileCount() > 1) {
-            addError("A simulation experiment description cannot be created using a COMBINE archive with no master file, no SED-ML file, and several CellML files.");
+        if (omexFile->sedmlFileCount() > 1) {
+            addError("A simulation experiment description cannot be created using an OMEX file with no master file and several SED-ML files.");
+        } else if (omexFile->cellmlFileCount() > 1) {
+            addError("A simulation experiment description cannot be created using an OMEX file with no master file, no SED-ML file, and several CellML files.");
         } else {
-            addError("A simulation experiment description cannot be created using a COMBINE archive with no master file.");
+            addError("A simulation experiment description cannot be created using an OMEX file with no master file.");
         }
     } else {
         auto masterFileType {masterFile->type()};
@@ -154,7 +154,7 @@ void SedDocument::Impl::initialiseFromCombineArchive(const SedDocumentPtr &pOwne
         } else if (masterFileType == File::Type::SEDML_FILE) {
             initialiseFromSedmlFile(pOwner, masterFile);
         } else {
-            addError("A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).");
+            addError("A simulation experiment description cannot be created using an OMEX file with an unknown master file (only CellML and SED-ML master files are supported).");
         }
     }
 }

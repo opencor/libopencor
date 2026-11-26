@@ -234,8 +234,8 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
     # Check whether the package has already been retrieved by checking whether its installation directory contains a
     # marker file with the SHA-1 value of the package that we want. If the marker file is missing or if it has a
     # different SHA-1 value, then we remove the installation directory and retrieve the package anew.
-    # Note: the marker file is located at the root of the installation directory, so create_package() never includes
-    #       it in a package since it only packages some specific subdirectories and/or files.
+    # Note: the marker file is located at the root of the installation directory, so create_package() never includes it
+    #       in a package since it only packages some specific subdirectories and/or files.
 
     set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
     set(MARKER_FILE ${INSTALL_DIR}/.sha1)
@@ -395,9 +395,9 @@ set(PREBUILT_DIR "${PREBUILT_DIR}" CACHE INTERNAL "Prebuilt directory.")
 
 include(ExternalProject)
 
-# On Linux, build our third-party libraries as position-independent code and put each of their functions and data in
-# its own section, so that the linker can remove the ones that we don't use when building libOpenCOR (see --gc-sections
-# in src/CMakeLists.txt and src/bindings/python/CMakeLists.txt). Indeed, the linker can only remove whole sections and,
+# On Linux, build our third-party libraries as position-independent code and put each of their functions and data in its
+# own section, so that the linker can remove the ones that we don't use when building libOpenCOR (see --gc-sections in
+# src/CMakeLists.txt and src/bindings/python/CMakeLists.txt). Indeed, the linker can only remove whole sections and,
 # without this, all the functions of an object file would be in the same section.
 # Note: there is no need for this on Windows (MSVC does it by default in release mode) or on macOS (the linker removes
 #       unused functions and data anyway, see -dead_strip in src/CMakeLists.txt).
@@ -454,8 +454,8 @@ endif()
 if(EMSCRIPTEN)
     # Note #1: we are using the same CMake variables that we used to build libOpenCOR, so that we can build our
     #          third-party libraries in the same way that we built libOpenCOR.
-    # Note #2: with Emscripten 7, libc++ no longer includes some headers indirectly, but some third-party libraries
-    #          may use something from them without including them (e.g., libCellML uses std::strtod() without including
+    # Note #2: with Emscripten 7, libc++ no longer includes some headers indirectly, but some third-party libraries may
+    #          use something from them without including them (e.g., libCellML uses std::strtod() without including
     #          <cstdlib> and libSBML uses std::nothrow without including <new>), so we force their inclusion.
 
     list(APPEND CMAKE_ARGS

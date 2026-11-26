@@ -19,7 +19,7 @@ limitations under the License.
 #include "logger_p.h"
 
 #include "cellmlfile.h"
-#include "combinearchive.h"
+#include "omexfile.h"
 #include "sedmlfile.h"
 
 #include "libopencor/file.h"
@@ -45,7 +45,7 @@ public:
 
     CellmlFilePtr mCellmlFile;
     SedmlFilePtr mSedmlFile;
-    CombineArchivePtr mCombineArchive;
+    OmexFilePtr mOmexFile;
 
     explicit Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents);
     ~Impl() override;
