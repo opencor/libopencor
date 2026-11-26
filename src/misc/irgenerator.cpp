@@ -2015,8 +2015,7 @@ private:
 
     LLVM_ATTRIBUTE_NOINLINE ExprPtr newCall(const Token &pToken, ExprPtr pCallee, std::vector<ExprPtr> &pArgs)
     {
-        // Retrieve the type of the function that is being called (a function having been converted to a pointer to
-        // it).
+        // Retrieve the type of the function that is being called (a function having been converted to a pointer to it).
 
         auto callee {rvalue(std::move(pCallee))};
         const auto *type {callee->type};
@@ -2318,8 +2317,8 @@ private:
 
     llvm::MDNode *tbaaAnyPointer(size_t pDepth)
     {
-        // The "any" pointer type nodes, i.e. "any pointer", "any p2 pointer", "any p3 pointer", etc., each of which
-        // has the previous one as its parent.
+        // The "any" pointer type nodes, i.e. "any pointer", "any p2 pointer", "any p3 pointer", etc., each of which has
+        // the previous one as its parent.
 
         while (mTbaaAnyPointers.size() < pDepth) {
             mTbaaAnyPointers.push_back(mTbaaAnyPointers.empty() ?
@@ -2578,8 +2577,8 @@ private:
             store(arg, param->value, variableAlignment(param->type), tbaaScalarAccessTag(param->type));
         }
 
-        // Generate the code for our statements, up to the first return statement (as Clang does since any code after
-        // it is unreachable).
+        // Generate the code for our statements, up to the first return statement (as Clang does since any code after it
+        // is unreachable).
 
         for (const auto &stmt : pFunction.body) {
             generateStatement(*stmt);
@@ -3092,9 +3091,9 @@ private:
 
     llvm::Value *generateFMulAdd(llvm::Value *pLhs, llvm::Value *pRhs, bool pIsSub)
     {
-        // Contract a multiplication followed by an addition or a subtraction into a fmuladd() call, as Clang does
-        // with -ffp-contract=on, i.e. when the multiplication is one of the operands of the addition/subtraction,
-        // possibly through a negation, and the result of the multiplication is not used for anything else.
+        // Contract a multiplication followed by an addition or a subtraction into a fmuladd() call, as Clang does with
+        // -ffp-contract=on, i.e. when the multiplication is one of the operands of the addition/subtraction, possibly
+        // through a negation, and the result of the multiplication is not used for anything else.
 
         auto multiplication = [](llvm::Value *pValue, bool &pNegated) -> llvm::BinaryOperator * {
             auto *unaryOperator {llvm::dyn_cast<llvm::UnaryOperator>(pValue)};

@@ -91,9 +91,9 @@ const std::string LIBOPENCOR_EXPORT &libcombineVersionString();
 unsigned int LIBOPENCOR_EXPORT libcurlVersion();
 
 /**
- * Return the version of libcurl as a string. The version string is in the format x.y.z, where the "."s are literal,
- * and x, y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the
- * patch level.
+ * Return the version of libcurl as a string. The version string is in the format x.y.z, where the "."s are literal, and
+ * x, y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the patch
+ * level.
  *
  * @return A string that represents the version of libcurl.
  */
@@ -128,8 +128,8 @@ const std::string LIBOPENCOR_EXPORT &libsedmlVersionString();
 unsigned int LIBOPENCOR_EXPORT llvmVersion();
 
 /**
- * Return the version of LLVM as a string. The version string is in the format x.y.z, where the "."s are literal, and
- * x, y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the patch
+ * Return the version of LLVM as a string. The version string is in the format x.y.z, where the "."s are literal, and x,
+ * y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the patch
  * level.
  *
  * @return A string that represents the version of LLVM.

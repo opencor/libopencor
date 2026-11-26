@@ -90,8 +90,8 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
 
         // Restrict-qualify the pointer parameters of computeRates() and computeVariables() since they never point to
         // the same array (i.e. our ODE solvers and SedInstanceTask never pass the same array twice), something that
-        // allows LLVM to optimise our code further (e.g., by not reloading the value of a state after having computed
-        // a rate).
+        // allows LLVM to optimise our code further (e.g., by not reloading the value of a state after having computed a
+        // rate).
 
         if (differentialModel) {
             generatorProfile->setImplementationComputeRatesMethodString(WITH_EXTERNAL_VARIABLES,
@@ -370,9 +370,9 @@ CellmlFileRuntime::Impl::~Impl()
 // task (e.g., at the start of each run), and it is removed from that cache once its runtime has been deleted. If some
 // table slots have already been allocated in that table, then reuse them rather than grow the table again, which would
 // otherwise both grow the table unboundedly and keep previously created WebAssembly instances alive forever.
-// Note: we keep track of our table slots using the table itself rather than the current thread since a table belongs
-//       to a JavaScript worker, which is reused by different threads over time (e.g., each asynchronous run is done in
-//       a new thread, but most likely by the same worker).
+// Note: we keep track of our table slots using the table itself rather than the current thread since a table belongs to
+//       a JavaScript worker, which is reused by different threads over time (e.g., each asynchronous run is done in a
+//       new thread, but most likely by the same worker).
 
 // clang-format off
 EM_JS(int, initialiseWorkerWasmJS, (int wasmModuleId, const void* wasmBytesPtr, size_t wasmBytesSize,

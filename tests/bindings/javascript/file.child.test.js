@@ -129,9 +129,9 @@ test.describe('File child tests', () => {
   });
 
   test('OMEX file with files outside of it', () => {
-    // An OMEX file may reference files that are located outside of it (e.g., "../sibling.cellml" or even the
-    // OMEX file itself), in which case they must be ignored rather than replace the contents of another managed
-    // file (or result in an infinite recursion).
+    // An OMEX file may reference files that are located outside of it (e.g., "../sibling.cellml" or even the OMEX file
+    // itself), in which case they must be ignored rather than replace the contents of another managed file (or result
+    // in an infinite recursion).
 
     const expectedIssues = [
       [
@@ -165,10 +165,10 @@ test.describe('File child tests', () => {
   });
 
   test('OMEX file with files outside of it through symbolic link', () => {
-    // The files of an OMEX file are located in a directory which name is that of the OMEX file followed by
-    // ".contents". If such a directory happens to exist and to be a symbolic link then the ".." components that follow
-    // it are kept (see canonicalFileName()), but the files they refer to are still located outside of the OMEX
-    // file, so they must still be ignored.
+    // The files of an OMEX file are located in a directory which name is that of the OMEX file followed by ".contents".
+    // If such a directory happens to exist and to be a symbolic link then the ".." components that follow it are kept
+    // (see canonicalFileName()), but the files they refer to are still located outside of the OMEX file, so they must
+    // still be ignored.
     // Note: our JavaScript bindings use a virtual file system, so a symbolic link is never followed (i.e. the ".."
     //       components are normalised lexically), but the result must be the same.
 
@@ -326,8 +326,7 @@ test.describe('File child tests', () => {
   });
 
   test('OMEX file with self-referencing locations', () => {
-    // Locations that refer to the OMEX file itself (e.g., ".", "./", or "/") are not child files of the OMEX
-    // file.
+    // Locations that refer to the OMEX file itself (e.g., ".", "./", or "/") are not child files of the OMEX file.
 
     const file = new loc.File(utils.resourcePath('api/file/self_referencing_locations.omex'));
 

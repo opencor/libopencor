@@ -123,8 +123,8 @@ def test_sedml_file_with_relative_cellml_file():
 
 
 def test_sedml_file_with_relative_cellml_file_in_working_directory():
-    # A relative model source is relative to the SED-ML file, not to the current working directory, even if the
-    # current working directory contains a file with that name.
+    # A relative model source is relative to the SED-ML file, not to the current working directory, even if the current
+    # working directory contains a file with that name.
 
     orig_dir = os.getcwd()
 

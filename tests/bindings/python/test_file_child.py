@@ -107,9 +107,9 @@ def test_remote_virtual_omex_files():
 
 
 def test_remote_omex_file():
-    # The child files of a remote OMEX file must be retrievable using their file name, even if the local copy of
-    # the OMEX file is in a directory that is accessed through a symbolic link (e.g., on macOS, the temporary
-    # directory is "/var/...", which is a symbolic link to "/private/var/...").
+    # The child files of a remote OMEX file must be retrievable using their file name, even if the local copy of the
+    # OMEX file is in a directory that is accessed through a symbolic link (e.g., on macOS, the temporary directory is
+    # "/var/...", which is a symbolic link to "/private/var/...").
     # Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
     #       remote file is never downloaded.
 
@@ -141,9 +141,9 @@ def test_omex_file_replaced_with_other_contents():
 
 
 def test_omex_file_with_files_outside_of_it():
-    # An OMEX file may reference files that are located outside of it (e.g., "../sibling.cellml" or even the
-    # OMEX file itself), in which case they must be ignored rather than replace the contents of another managed
-    # file (or result in an infinite recursion).
+    # An OMEX file may reference files that are located outside of it (e.g., "../sibling.cellml" or even the OMEX file
+    # itself), in which case they must be ignored rather than replace the contents of another managed file (or result in
+    # an infinite recursion).
 
     expected_issues = [
         [
@@ -180,10 +180,10 @@ def test_omex_file_with_files_outside_of_it():
     reason="A symbolic link usually requires some special privileges on Windows.",
 )
 def test_omex_file_with_files_outside_of_it_through_symbolic_link():
-    # The files of an OMEX file are located in a directory which name is that of the OMEX file followed by
-    # ".contents". If such a directory happens to exist and to be a symbolic link then the ".." components that follow
-    # it are kept (see canonicalFileName()), but the files they refer to are still located outside of the OMEX
-    # file, so they must still be ignored.
+    # The files of an OMEX file are located in a directory which name is that of the OMEX file followed by ".contents".
+    # If such a directory happens to exist and to be a symbolic link then the ".." components that follow it are kept
+    # (see canonicalFileName()), but the files they refer to are still located outside of the OMEX file, so they must
+    # still be ignored.
     # Note: a symbolic link usually requires some special privileges on Windows.
 
     expected_issues = [
@@ -338,8 +338,7 @@ def test_omex_file_with_duplicate_locations():
 
 
 def test_omex_file_with_self_referencing_locations():
-    # Locations that refer to the OMEX file itself (e.g., ".", "./", or "/") are not child files of the OMEX
-    # file.
+    # Locations that refer to the OMEX file itself (e.g., ".", "./", or "/") are not child files of the OMEX file.
 
     file = File(utils.resource_path("api/file/self_referencing_locations.omex"))
 

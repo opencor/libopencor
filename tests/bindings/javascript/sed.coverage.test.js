@@ -1031,8 +1031,8 @@ test.describe('Sed coverage tests', () => {
   test('KINSOL with no solution when initialising', () => {
     // The first NLA system of our model (a^2+x = 1) has no solution for x > 1, so if the initial value of x gets set to
     // 2 after our instance has been created, then our model cannot be (re)initialised when running our instance,
-    // whether we use a fixed-step ODE solver or CVODE. Our simulation should therefore stop there and we should have
-    // no results to report.
+    // whether we use a fixed-step ODE solver or CVODE. Our simulation should therefore stop there and we should have no
+    // results to report.
 
     const expectedIssues = [
       [loc.Issue.Type.ERROR, "Task | KINSOL: the linear solver's setup function failed in an unrecoverable manner."]

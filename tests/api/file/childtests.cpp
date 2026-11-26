@@ -99,9 +99,9 @@ TEST(ChildFileTest, remoteVirtualOmexFiles)
 
 TEST(ChildFileTest, remoteOmexFile)
 {
-    // The child files of a remote OMEX file must be retrievable using their file name, even if the local copy of
-    // the OMEX file is in a directory that is accessed through a symbolic link (e.g., on macOS, the temporary
-    // directory is "/var/...", which is a symbolic link to "/private/var/...").
+    // The child files of a remote OMEX file must be retrievable using their file name, even if the local copy of the
+    // OMEX file is in a directory that is accessed through a symbolic link (e.g., on macOS, the temporary directory is
+    // "/var/...", which is a symbolic link to "/private/var/...").
     // Note: this has no JavaScript equivalent since our JavaScript bindings never retrieve the contents of a file, so a
     //       remote file is never downloaded.
 
@@ -131,9 +131,9 @@ TEST(ChildFileTest, omexFileReplacedWithOtherContents)
 
 TEST(ChildFileTest, omexFileWithFilesOutsideOfIt)
 {
-    // An OMEX file may reference files that are located outside of it (e.g., "../sibling.cellml" or even the
-    // OMEX file itself), in which case they must be ignored rather than replace the contents of another managed
-    // file (or result in an infinite recursion).
+    // An OMEX file may reference files that are located outside of it (e.g., "../sibling.cellml" or even the OMEX file
+    // itself), in which case they must be ignored rather than replace the contents of another managed file (or result
+    // in an infinite recursion).
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::WARNING, "OMEX file: the file '../sibling.cellml' is not located within the OMEX file. It has been ignored."},
@@ -159,10 +159,10 @@ TEST(ChildFileTest, omexFileWithFilesOutsideOfIt)
 #ifndef BUILDING_ON_WINDOWS
 TEST(ChildFileTest, omexFileWithFilesOutsideOfItThroughSymbolicLink)
 {
-    // The files of an OMEX file are located in a directory which name is that of the OMEX file followed by
-    // ".contents". If such a directory happens to exist and to be a symbolic link then the ".." components that follow
-    // it are kept (see canonicalFileName()), but the files they refer to are still located outside of the OMEX
-    // file, so they must still be ignored.
+    // The files of an OMEX file are located in a directory which name is that of the OMEX file followed by ".contents".
+    // If such a directory happens to exist and to be a symbolic link then the ".." components that follow it are kept
+    // (see canonicalFileName()), but the files they refer to are still located outside of the OMEX file, so they must
+    // still be ignored.
     // Note: a symbolic link usually requires some special privileges on Windows.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
@@ -302,8 +302,7 @@ TEST(ChildFileTest, omexFileWithDuplicateLocations)
 
 TEST(ChildFileTest, omexFileWithSelfReferencingLocations)
 {
-    // Locations that refer to the OMEX file itself (e.g., ".", "./", or "/") are not child files of the OMEX
-    // file.
+    // Locations that refer to the OMEX file itself (e.g., ".", "./", or "/") are not child files of the OMEX file.
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/self_referencing_locations.omex"))};
 

@@ -606,9 +606,9 @@ def test_stop_run_before_output_start_time():
 
     assert not math.isnan(voi[0])
 
-    # Start our run and stop it before it reaches the output start time, which means that we have no results to
-    # report. Our results should therefore not have been reallocated (since their size has not changed), but they
-    # should all be NaN values.
+    # Start our run and stop it before it reaches the output start time, which means that we have no results to report.
+    # Our results should therefore not have been reallocated (since their size has not changed), but they should all be
+    # NaN values.
 
     simulation.output_start_time = OUTPUT_START_TIME
     simulation.output_end_time = OUTPUT_START_TIME + float(simulation.number_of_steps)
@@ -1159,8 +1159,8 @@ def test_start_run_while_already_running():
 
 
 def test_start_run_right_after_status_is_idle():
-    # Note: a run is flagged as not running anymore just before it completes, so make sure that a new run can be
-    #       started as soon as our instance is reported as idle.
+    # Note: a run is flagged as not running anymore just before it completes, so make sure that a new run can be started
+    #       as soon as our instance is reported as idle.
 
     NUMBER_OF_STEPS = 10
     NUMBER_OF_RUNS = 1000
@@ -1422,8 +1422,8 @@ def test_change_model_after_stop_run():
 
 
 def test_model_changes_that_cannot_be_applied():
-    # Note: model changes that cannot be applied are reported and ignored, but they don't prevent an instance from
-    #       being run, whether they are present when the instance is created or added afterwards.
+    # Note: model changes that cannot be applied are reported and ignored, but they don't prevent an instance from being
+    #       run, whether they are present when the instance is created or added afterwards.
 
     expected_instantiation_issues = [
         [

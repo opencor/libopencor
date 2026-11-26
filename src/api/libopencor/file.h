@@ -43,8 +43,7 @@ public:
     /**
      * @brief The type of a file.
      *
-     * The type of a file, i.e. whether it is unknown, a CellML file, a SED-ML file, an OMEX file, or
-     * irretrievable.
+     * The type of a file, i.e. whether it is unknown, a CellML file, a SED-ML file, an OMEX file, or irretrievable.
      */
 
     enum class Type

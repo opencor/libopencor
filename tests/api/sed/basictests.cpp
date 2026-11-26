@@ -127,8 +127,8 @@ TEST(BasicSedTest, sedmlFileWithRelativeCellmlFile)
 
 TEST(BasicSedTest, sedmlFileWithRelativeCellmlFileInWorkingDirectory)
 {
-    // A relative model source is relative to the SED-ML file, not to the current working directory, even if the
-    // current working directory contains a file with that name.
+    // A relative model source is relative to the SED-ML file, not to the current working directory, even if the current
+    // working directory contains a file with that name.
 
     auto origDir {std::filesystem::current_path()};
 

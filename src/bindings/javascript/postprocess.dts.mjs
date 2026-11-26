@@ -35,8 +35,8 @@ function findMatchingClosingBrace(text, start) {
   return -1;
 }
 
-// Normalise an interface declaration by adding 2 extra spaces of indentation to every non-empty line in the body
-// and re-indenting the closing brace by 2 spaces.
+// Normalise an interface declaration by adding 2 extra spaces of indentation to every non-empty line in the body and
+// re-indenting the closing brace by 2 spaces.
 
 function normaliseInterfaceDeclaration(interfaceDeclaration) {
   const openingBraceIndex = interfaceDeclaration.indexOf('{');

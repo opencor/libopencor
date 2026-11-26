@@ -91,9 +91,9 @@ File::Impl::~Impl()
 void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
 {
     // Reset the type of the file, if needed.
-    // Note: we also release our previous CellML file, SED-ML file, or OMEX file, if any, so that we don't keep
-    //       using it (and, for an OMEX file, keep its child files managed) if our new contents are of a different
-    //       type or are not recognised.
+    // Note: we also release our previous CellML file, SED-ML file, or OMEX file, if any, so that we don't keep using it
+    //       (and, for an OMEX file, keep its child files managed) if our new contents are of a different type or are
+    //       not recognised.
 
     if (pResetType) {
         removeAllIssues();

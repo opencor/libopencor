@@ -136,8 +136,8 @@ test.describe('Sed basic tests', () => {
   });
 
   test('SED-ML file with relative CellML file in working directory', () => {
-    // A relative model source is relative to the SED-ML file, not to the current working directory, even if the
-    // current working directory contains a file with that name.
+    // A relative model source is relative to the SED-ML file, not to the current working directory, even if the current
+    // working directory contains a file with that name.
 
     const origDir = process.cwd();
 

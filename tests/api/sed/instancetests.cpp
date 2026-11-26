@@ -610,9 +610,9 @@ TEST(InstanceSedTest, stopRunBeforeOutputStartTime)
 
     EXPECT_FALSE(std::isnan(voi[0]));
 
-    // Start our run and stop it before it reaches the output start time, which means that we have no results to
-    // report. Our results should therefore not have been reallocated (since their size has not changed), but they
-    // should all be NaN values.
+    // Start our run and stop it before it reaches the output start time, which means that we have no results to report.
+    // Our results should therefore not have been reallocated (since their size has not changed), but they should all be
+    // NaN values.
 
     simulation->setOutputStartTime(OUTPUT_START_TIME);
     simulation->setOutputEndTime(OUTPUT_START_TIME + static_cast<double>(simulation->numberOfSteps()));

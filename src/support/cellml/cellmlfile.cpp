@@ -233,14 +233,14 @@ void populateImporterLibrary(const libcellml::ImporterPtr &pImporter, const libc
     // Populate the library of the given importer with the models that are (directly or indirectly) imported by the
     // given model.
     // Note #1: libCellML can only resolve imports that are local files. So, we retrieve the imported models ourselves
-    //          (be they local files, remote files, files in an OMEX file, or files which contents were set in
-    //          memory) and add them to the library of its importer, which is what libCellML looks up before trying to
-    //          open a file.
+    //          (be they local files, remote files, files in an OMEX file, or files which contents were set in memory)
+    //          and add them to the library of its importer, which is what libCellML looks up before trying to open a
+    //          file.
     // Note #2: libCellML looks up an imported model using its URL as is or, if there is no such key, using the URL
     //          prefixed with a base path. The base path for the imports of the given model is the location of its file
     //          (which is either empty or ends with a directory separator) while the base path for the imports of an
-    //          imported model is the base path of its importing model followed by the path (i.e. up to the last
-    //          forward slash) of its URL.
+    //          imported model is the base path of its importing model followed by the path (i.e. up to the last forward
+    //          slash) of its URL.
     // Note #3: we keep track of the files that lead to an imported model, so that we don't end up in an infinite loop
     //          in the case of an import cycle (which libCellML will report).
     // Note #4: if we cannot retrieve an imported model, or if it is not valid XML, then we simply don't add it to the
@@ -269,8 +269,8 @@ void populateImporterLibrary(const libcellml::ImporterPtr &pImporter, const libc
                 continue;
             }
 
-            // Resolve the URL against the location of the importing model, skipping it if it cannot be retrieved,
-            // e.g., if it has an unsupported scheme.
+            // Resolve the URL against the location of the importing model, skipping it if it cannot be retrieved, e.g.,
+            // if it has an unsupported scheme.
 
             auto resolvedUrl {resolveUriReference(importingModel.location, url)};
 

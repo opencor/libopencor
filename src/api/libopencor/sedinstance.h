@@ -122,9 +122,9 @@ public:
     /**
      * @brief Start running, in a background thread, all the tasks associated with this instance.
      *
-     * Start running, in a background thread, all the tasks associated with this instance. The results of the tasks
-     * are (re)allocated before this method returns, so they can be retrieved while the tasks are being run (e.g., to
-     * plot them progressively). The simulation settings and model changes used are those in effect when this method is
+     * Start running, in a background thread, all the tasks associated with this instance. The results of the tasks are
+     * (re)allocated before this method returns, so they can be retrieved while the tasks are being run (e.g., to plot
+     * them progressively). The simulation settings and model changes used are those in effect when this method is
      * called.
      *
      * Note: in a Web browser, this method can only be used if the page is cross-origin isolated (i.e. served with the

@@ -8,7 +8,7 @@
     mErrors.clear();
     mTasksErrors = mErrors;
         mErrors.clear();
-    // Note: the clearing of mIssues, mErrors, and mWarnings could be done using removeAllIssues(), but this would
+    // Note #1: the clearing of mIssues, mErrors, and mWarnings could be done using removeAllIssues(), but this would
         mErrors = mTasksErrors;
         mErrorCount.store(mErrors.size(), std::memory_order_release);
     if ((document->getNumErrors() == 0)

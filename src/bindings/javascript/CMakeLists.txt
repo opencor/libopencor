@@ -68,9 +68,8 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
         #          supported by all major browsers (and by Node.js). Indeed, Emscripten otherwise aborts on any C++
         #          exception, even one that would be caught. This means that something that works natively would abort
         #          in our WASM version (e.g., libCellML handles a units prefix that is out of the integer range by
-        #          catching the std::out_of_range exception thrown by std::stoi()). Unlike Emscripten's
-        #          JavaScript-based exception handling, WebAssembly exception handling has no runtime cost when no
-        #          exception is thrown.
+        #          catching the std::out_of_range exception thrown by std::stoi()). Unlike Emscripten's JavaScript-based
+        #          exception handling, WebAssembly exception handling has no runtime cost when no exception is thrown.
         # Note #3: the linker flags also allow the WebAssembly table to grow (-sALLOW_TABLE_GROWTH), which we need to
         #          install the functions of the WebAssembly modules that we generate for our models (see
         #          initialiseWorkerWasmJS()).

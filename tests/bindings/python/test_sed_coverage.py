@@ -462,9 +462,9 @@ def test_sed_ids():
 
     assert other_model.id == "model1"
 
-    # An id that is already used by another object, whatever its type, is a duplicate and is therefore rejected,
-    # leaving the id unchanged, even though it is a valid SED-ML identifier. The id of an object is, however, not a
-    # duplicate, so an object can be given its own id.
+    # An id that is already used by another object, whatever its type, is a duplicate and is therefore rejected, leaving
+    # the id unchanged, even though it is a valid SED-ML identifier. The id of an object is, however, not a duplicate,
+    # so an object can be given its own id.
 
     for id in ["model2", "simulation1", "task1"]:
         assert loc.SedBase.is_valid_id(id)
@@ -1135,9 +1135,9 @@ def test_kinsol_with_no_solution_over_time():
 
 def test_kinsol_with_no_solution_when_initialising():
     # The first NLA system of our model (a^2+x = 1) has no solution for x > 1, so if the initial value of x gets set to
-    # 2 after our instance has been created, then our model cannot be (re)initialised when running our instance,
-    # whether we use a fixed-step ODE solver or CVODE. Our simulation should therefore stop there and we should have no
-    # results to report.
+    # 2 after our instance has been created, then our model cannot be (re)initialised when running our instance, whether
+    # we use a fixed-step ODE solver or CVODE. Our simulation should therefore stop there and we should have no results
+    # to report.
 
     expected_issues = [
         [

@@ -171,11 +171,11 @@ void SedInstance::Impl::prepareRun()
     //       (re)allocated before our tasks get run, so that they can be safely retrieved while our tasks are being run.
 
     // Reset ourselves by restoring the issues of all the tasks.
-    // Note: the clearing of mIssues, mErrors, and mWarnings could be done using removeAllIssues(), but this would
-    //       result in transiently-empty issues, which could be seen by a reader. So, instead, we just clear and restore
-    //       the issues in one go.
-    // Note: the issue counts are published with std::memory_order_release so that readers using
-    //       std::memory_order_acquire never see an updated count before the corresponding issue vectors are visible.
+    // Note #1: the clearing of mIssues, mErrors, and mWarnings could be done using removeAllIssues(), but this would
+    //          result in transiently-empty issues, which could be seen by a reader. So, instead, we just clear and
+    //          restore the issues in one go.
+    // Note #2: the issue counts are published with std::memory_order_release so that readers using
+    //          std::memory_order_acquire never see an updated count before the corresponding issue vectors are visible.
 
     {
         const std::scoped_lock<std::mutex> lock(mMutex);

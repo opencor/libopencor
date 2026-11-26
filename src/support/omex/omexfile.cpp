@@ -35,12 +35,12 @@ std::string archiveLocation(const FilePtr &pFile)
 {
     // Determine the location of the OMEX file, i.e. the location where its files are "virtually" extracted (e.g.,
     // "/some/path/archive.omex.contents/").
-    // Note #1: the files of an OMEX file are managed by the file manager using their file name, so each OMEX file
-    //          must have its own location. This means that a remote OMEX file that has no local copy (i.e. it was not
+    // Note #1: the files of an OMEX file are managed by the file manager using their file name, so each OMEX file must
+    //          have its own location. This means that a remote OMEX file that has no local copy (i.e. it was not
     //          downloaded), and therefore no file name, must use a virtual file name that is unique to it.
     // Note #2: we canonicalise the location since the files of the OMEX file have a canonical file name (see
-    //          File::create()), which we need to be able to compare against (see OmexFile::Impl::file()). For
-    //          instance, the temporary directory on macOS is a symbolic link (i.e. "/var/..." vs. "/private/var/...").
+    //          File::create()), which we need to be able to compare against (see OmexFile::Impl::file()). For instance,
+    //          the temporary directory on macOS is a symbolic link (i.e. "/var/..." vs. "/private/var/...").
 
     static std::atomic<uint64_t> virtualFileNameCounter {0};
 
@@ -86,15 +86,14 @@ OmexFile::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive,
         //          percent-encoded (e.g., "my%20file.cellml"). Since mArchiveLocation is a local file name, we must
         //          decode the location to get the file name of the file.
         // Note #2: a location may have some ".." segments (e.g., "../file.cellml"), possibly percent-encoded (e.g.,
-        //          "%2E%2E/file.cellml"), in which case the file would be located outside of the OMEX file. It
-        //          could then be confused with another managed file (which contents would get replaced) or even with
-        //          the OMEX file itself (resulting in an infinite recursion), so we ignore such a file. To
-        //          determine where the file is located, we use its file name as determined by File::create().
+        //          "%2E%2E/file.cellml"), in which case the file would be located outside of the OMEX file. It could
+        //          then be confused with another managed file (which contents would get replaced) or even with the OMEX
+        //          file itself (resulting in an infinite recursion), so we ignore such a file. To determine where the
+        //          file is located, we use its file name as determined by File::create().
         // Note #3: the file name of a file that is located within the OMEX file has no ".." component after the
-        //          location of the OMEX file, unless it follows a symbolic link (see canonicalFileName()), in
-        //          which case the file may be located outside of the OMEX file (e.g.,
-        //          "archive.omex.contents/../file.cellml" if "archive.omex.contents" is a symbolic link), so we also
-        //          ignore such a file.
+        //          location of the OMEX file, unless it follows a symbolic link (see canonicalFileName()), in which
+        //          case the file may be located outside of the OMEX file (e.g., "archive.omex.contents/../file.cellml"
+        //          if "archive.omex.contents" is a symbolic link), so we also ignore such a file.
 
         auto decodedLocation {decodeUrl(location)};
         auto fileNameOrUrl {mArchiveLocation + decodedLocation};
@@ -124,9 +123,9 @@ OmexFile::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive,
         }
 
         // Skip a location that refers to the OMEX file itself.
-        // Note: libCOMBINE skips the "." location, which is how an OMEX file normally refers to itself, but not
-        //       the other locations that refer to it (e.g., "./" or "/"), which would otherwise result in a file for
-        //       the directory in which we extract the OMEX file.
+        // Note: libCOMBINE skips the "." location, which is how an OMEX file normally refers to itself, but not the
+        //       other locations that refer to it (e.g., "./" or "/"), which would otherwise result in a file for the
+        //       directory in which we extract the OMEX file.
 
         if (fileName == mArchiveLocation) {
             continue;
@@ -134,11 +133,11 @@ OmexFile::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive,
 
         // Make sure that the file is not the same as a file that we have already extracted.
         // Note: different locations may refer to the same file (e.g., "./my%20file.cellml" and "./my file.cellml", or
-        //       "./file.cellml" and "file.cellml"). This is an ambiguity in the OMEX file itself, so we keep the
-        //       first file and ignore the other ones (File::create() would otherwise return the same file, which
-        //       contents would get replaced and which would be counted several times). We do, however, honour the
-        //       master attribute of an ignored entry since it still refers to the file that we kept, and we keep track
-        //       of its location so that it can still be used to retrieve that file (see file()).
+        //       "./file.cellml" and "file.cellml"). This is an ambiguity in the OMEX file itself, so we keep the first
+        //       file and ignore the other ones (File::create() would otherwise return the same file, which contents
+        //       would get replaced and which would be counted several times). We do, however, honour the master
+        //       attribute of an ignored entry since it still refers to the file that we kept, and we keep track of its
+        //       location so that it can still be used to retrieve that file (see file()).
 
         if (auto fileIndex {fileIndexes.find(fileName)}; fileIndex != fileIndexes.end()) {
             const auto &fileLocation {mFileNames[fileIndex->second]};
@@ -373,9 +372,9 @@ OmexFilePtr OmexFile::create(const FilePtr &pFile)
     }
 
     // Try to retrieve an OMEX file.
-    // Note: an OMEX file is a ZIP file, so we make sure that it starts with 0x04034b50, which is the magic number
-    //       used by a ZIP file (we ignore empty and spanned ZIP files). Indeed, libCOMBINE may crash depending on the
-    //       file contents that is given to it.
+    // Note: an OMEX file is a ZIP file, so we make sure that it starts with 0x04034b50, which is the magic number used
+    //       by a ZIP file (we ignore empty and spanned ZIP files). Indeed, libCOMBINE may crash depending on the file
+    //       contents that is given to it.
 
     static const auto LS8 {8U};
     static const auto LS16 {16U};
